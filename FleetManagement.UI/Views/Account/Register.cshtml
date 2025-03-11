@@ -2,6 +2,7 @@
     ViewData["Title"] = "Register";
     Layout = null;
 }
+@model FleetManagement.UI.Models.Dto.RegisterDto
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,7 +22,7 @@
                             <div class="auth-max-width col-sm-8 col-md-6 col-xl-7 px-4">
                                 <h1 class="mb-3 mt-3">Sign Up</h1>
                                 <p class="mb-4">Get your free Fleet Management account now.</p>
-                                
+
                                 <div class="row">
                                     <div class="col-6 mb-2 mb-sm-0">
                                         <a class="btn btn-link border d-flex align-items-center justify-content-center rounded-2 py-8 text-decoration-none" href="javascript:void(0)" role="button">
@@ -36,6 +37,7 @@
                                         </a>
                                     </div>
                                 </div>
+
                                 <div class="position-relative text-center my-4">
                                     <p class="mb-0 fs-4 px-3 d-inline-block bg-white text-dark z-index-5 position-relative">
                                         or sign up with
@@ -43,24 +45,23 @@
                                     <span class="border-top w-100 position-absolute top-50 start-50 translate-middle"></span>
                                 </div>
 
-
-                                <form>
+                                <form asp-action="Register" method="post">
                                     <div class="mb-3">
-                                        <label for="exampleInputName" class="form-label">Name</label>
-                                        <input type="text" class="form-control" id="exampleInputName" aria-describedby="nameHelp">
+                                        <label asp-for="UserName" class="form-label">Name</label>
+                                        <input asp-for="UserName" class="form-control" />
                                     </div>
                                     <div class="mb-3">
-                                        <label for="exampleInputEmail1" class="form-label">Email address</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                        <label asp-for="Email" class="form-label">Email address</label>
+                                        <input asp-for="Email" class="form-control" />
                                     </div>
                                     <div class="mb-4">
-                                        <label for="exampleInputPassword1" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="exampleInputPassword1">
+                                        <label asp-for="Password" class="form-label">Password</label>
+                                        <input asp-for="Password" type="password" class="form-control" />
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100 py-8 mb-4">Sign Up</button>
                                     <div class="d-flex align-items-center">
                                         <p class="fs-4 mb-0 text-dark">Already have an Account?</p>
-                                        <a class="text-primary fw-medium ms-2" href="authentication-login.html">Sign In</a>
+                                        <a class="text-primary fw-medium ms-2" asp-controller="Account" asp-action="Login">Sign In</a>
                                     </div>
                                 </form>
                             </div>
@@ -75,5 +76,11 @@
             </div>
         </div>
     </div>
+
+    @section Scripts {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+    }
 </body>
 </html>
