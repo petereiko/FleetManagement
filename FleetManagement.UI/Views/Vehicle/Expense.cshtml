@@ -1,5 +1,12 @@
-﻿
+﻿@{
+    ViewData["Title"] = "Expenses";
+    Layout = null;
+}
+@model FleetManagement.UI.Models.Dto.FuelExpenseDto
+
 <!DOCTYPE html>
+
+
 <html lang="en" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="vertical">
 
 <head>
@@ -9,25 +16,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Favicon icon-->
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="~/assets/images/logos/favicon.png" />
 
     <!-- Core Css -->
-    <link rel="stylesheet" href="../assets/css/styles.css" />
+    <link rel="stylesheet" href="~/assets/css/styles.css" />
 
-    <title>MaterialPro Template by WrapPixel</title>
 </head>
 
 <body>
+
 
     <div class="body-wrapper">
         <div class="container-fluid">
             <div class="font-weight-medium shadow-none position-relative overflow-hidden mb-7">
             </div>
 
-            <div class="row">
+            <div class="row justify-content-center">
 
-                <div class="col-12">
-                    <!-- start Person Info -->
+                <div class="col-6">
                     <div class="card">
                         <div class="card-header text-bg-primary">
                             <h4 class="mb-0 text-white">Upload your expense details</h4>
@@ -50,7 +56,7 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label class="form-label" asp-for="Amount">Amount</label>
-                                                <input type="text" asp-for="Amount" class="form-control" placeholder="Amount of fuel bought">
+                                                <input type="number" asp-for="Amount" class="form-control" placeholder="Amount of fuel bought">
 
                                             </div>
                                         </div>
@@ -95,65 +101,16 @@
                                             </div>
                                         </div>
                                         <!--/span-->
-                                        <div class="mb-3">
-                                            <label asp-for="Receipt" class="form-label">Default file input example</label>
-                                            <input class="form-control" type="file" asp-for="Receipt">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label asp-for="Receipt" class="form-label">Default file input example</label>
+                                                <input class="form-control" type="file" asp-for="Receipt">
+                                            </div>
                                         </div>
+                                        
                                     </div>
 
                                 </div>
-                                <hr>
-
-                                @* <div class="card-body">
-                                    <!--/row-->
-                                    <h4 class="card-title mb-4">Address</h4>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Street</label>
-                                                <input type="text" class="form-control">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">City</label>
-                                                <input type="text" class="form-control">
-                                            </div>
-                                        </div>
-                                        <!--/span-->
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">State</label>
-                                                <input type="text" class="form-control">
-                                            </div>
-                                        </div>
-                                        <!--/span-->
-                                    </div>
-                                    <!--/row-->
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Post Code</label>
-                                                <input type="text" class="form-control">
-                                            </div>
-                                        </div>
-                                        <!--/span-->
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Country</label>
-                                                <select class="form-select">
-                                                    <option>--Select your Country--</option>
-                                                    <option>India</option>
-                                                    <option>Sri Lanka</option>
-                                                    <option>USA</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <!--/span-->
-                                    </div>
-                                </div> *@
 
                                 <div class="form-actions">
                                     <div class="card-body border-top">
@@ -168,13 +125,16 @@
                             </div>
                         </form>
                     </div>
-                    <!-- end Person Info -->
                 </div>
 
             </div>
         </div>
+            
     </div>
 
 </body>
 
 </html>
+
+
+

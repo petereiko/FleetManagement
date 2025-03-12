@@ -57,7 +57,7 @@
                                             <input class="form-check-input primary" type="checkbox" id="flexCheckChecked" checked>
                                             <label class="form-check-label text-dark fs-3" for="flexCheckChecked">Remember this Device</label>
                                         </div>
-                                        <a href="#" class="text-primary fw-medium fs-3" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot Password?</a>
+                                        <a asp-controller="Account" asp-action="ForgotPassword" class="text-primary fw-medium fs-3" >Forgot Password?</a>
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100 py-8 mb-4">Sign In</button>
                                     <div class="d-flex align-items-center justify-content-center">
@@ -79,7 +79,7 @@
     </div>
 
 
-    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+@*     <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -98,7 +98,7 @@
             </div>
         </div>
     </div>
-</body>
+ *@</body>
 
 <script>
     $(document).ready(function () {

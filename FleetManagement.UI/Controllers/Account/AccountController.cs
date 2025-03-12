@@ -14,5 +14,10 @@ namespace FleetManagement.UI.Controllers.Account
         {
             return View();
         }
+
+        public IActionResult Forgotpassword()
+        {
+            return View();
+        }
     }
 }
