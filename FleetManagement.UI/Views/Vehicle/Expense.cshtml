@@ -20,6 +20,8 @@
 
     <!-- Core Css -->
     <link rel="stylesheet" href="~/assets/css/styles.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 
 </head>
 
@@ -38,7 +40,7 @@
                         <div class="card-header text-bg-primary">
                             <h4 class="mb-0 text-white">Upload your expense details</h4>
                         </div>
-                        <form asp-action="Expense" asp-controller="Vehicle">
+                        <form asp-action="Expense" asp-controller="Vehicle" method="post">
                             <div>
                                 <div class="card-body">
                                     <h4 class="card-title">Expense Info</h4>
@@ -68,12 +70,12 @@
                                             <div class="mb-3 has-success">
                                                 <label class="form-label" asp-for="State">State/City</label>
                                                 <select class="form-select" asp-for="State">
-                                                    <option value="">Abuja</option>
-                                                    <option value="">Kaduna</option>
-                                                    <option value="">Anambra</option>
-                                                    <option value="">Enugu</option>
-                                                    <option value="">Lagos</option>
-                                                    <option value="">Ogun</option>
+                                                    <option value="Abuja">Abuja</option>
+                                                    <option value="Kaduna">Kaduna</option>
+                                                    <option value="Anambra">Anambra</option>
+                                                    <option value="Enugu">Enugu</option>
+                                                    <option value="Lagos">Lagos</option>
+                                                    <option value="Ogun">Ogun</option>
                                                 </select>
 
                                             </div>
@@ -85,10 +87,11 @@
                                                 <div class="mb-3">
                                                     <label class="form-label" asp-for="LGA">Local Government Area</label>
                                                     <select asp-for="LGA" class="form-select" data-placeholder="Choose an LGA" tabindex="1">
-                                                        <option value="Category 1">Category 1</option>
-                                                        <option value="Category 2">Category 2</option>
-                                                        <option value="Category 3">Category 5</option>
-                                                        <option value="Category 4">Category 4</option>
+                                                        <option value="Eti-Osa">Eti-Osa</option>
+                                                        <option value="Ijebu-Ode">Ijebu-Ode</option>
+                                                        <option value="Nnewi">Nnewi</option>
+                                                        <option value="Oba">Oba</option>
+                                                        <option value="Garki">Garki</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -97,7 +100,7 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label class="form-label" asp-for="Date">Date of Purchase</label>
-                                                <input asp-for="State" type="date" class="form-control">
+                                                <input asp-for="Date" type="text" id="datePicker" class="form-control">
                                             </div>
                                         </div>
                                         <!--/span-->
@@ -131,6 +134,22 @@
         </div>
             
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            flatpickr("#datePicker", {
+                enableTime: false, // Set to true if you want time selection
+                dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                altInput: true,
+                altFormat: "F j, Y", // Displayed as: January 1, 2025
+                weekNumbers: true,
+                theme: "light", // Choose from light, dark, material_blue, etc.
+            });
+        });
+    </script>
+
 
 </body>
 

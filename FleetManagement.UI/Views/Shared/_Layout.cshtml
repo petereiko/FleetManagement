@@ -14,6 +14,13 @@
     <link rel="stylesheet" href="~/assets/css/styles.css" />
     <!-- Favicon icon-->
       <link rel="shortcut icon" type="image/png" href="~/assets/images/acc/fleet.png" />
+
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
 </head>
 
 <body>
@@ -30,13 +37,23 @@
     </div>
     <!-- Preloader -->
     <div class="preloader">
-        <!-- From Uiverse.io by Nawsome -->
-        <svg class="pl" width="240" height="240" viewBox="0 0 240 240 justify-content-center">
-            <circle class="pl__ring pl__ring--a" cx="120" cy="120" r="105" fill="none" stroke="#000" stroke-width="20" stroke-dasharray="0 660" stroke-dashoffset="-330" stroke-linecap="round"></circle>
-            <circle class="pl__ring pl__ring--b" cx="120" cy="120" r="35" fill="none" stroke="#000" stroke-width="20" stroke-dasharray="0 220" stroke-dashoffset="-110" stroke-linecap="round"></circle>
-            <circle class="pl__ring pl__ring--c" cx="85" cy="120" r="70" fill="none" stroke="#000" stroke-width="20" stroke-dasharray="0 440" stroke-linecap="round"></circle>
-            <circle class="pl__ring pl__ring--d" cx="155" cy="120" r="70" fill="none" stroke="#000" stroke-width="20" stroke-dasharray="0 440" stroke-linecap="round"></circle>
-        </svg>
+        <!-- From Uiverse.io by mobinkakei -->
+        <div id="wifi-loader">
+            <svg class="circle-outer" viewBox="0 0 86 86">
+                <circle class="back" cx="43" cy="43" r="40"></circle>
+                <circle class="front" cx="43" cy="43" r="40"></circle>
+                <circle class="new" cx="43" cy="43" r="40"></circle>
+            </svg>
+            <svg class="circle-middle" viewBox="0 0 60 60">
+                <circle class="back" cx="30" cy="30" r="27"></circle>
+                <circle class="front" cx="30" cy="30" r="27"></circle>
+            </svg>
+            <svg class="circle-inner" viewBox="0 0 34 34">
+                <circle class="back" cx="17" cy="17" r="14"></circle>
+                <circle class="front" cx="17" cy="17" r="14"></circle>
+            </svg>
+            <div class="text" data-text="Please wait"></div>
+        </div>
     </div>
     <div id="main-wrapper">
         <!-- Sidebar Start -->
@@ -1434,31 +1451,31 @@
                                                     <div class="row">
                                                         <div class="col-6">
                                                             <div class="position-relative">
-                                                                <a href="app-chat.html" class="d-flex align-items-center pb-9 position-relative ">
+                                                                <a asp-action="Expense" asp-controller="Vehicle" class="d-flex align-items-center pb-9 position-relative ">
                                                                     <div class="bg-primary-subtle rounded-circle round-40 me-3 p-6 d-flex align-items-center justify-content-center">
                                                                         <iconify-icon icon="solar:chat-line-linear" class="text-primary fs-5"></iconify-icon>
                                                                     </div>
                                                                     <div class="d-inline-block ">
-                                                                        <h6 class="mb-0 bg-hover-primary">Chat Application</h6>
-                                                                        <span class="fs-3 d-block text-muted">New messages arrived</span>
+                                                                        <h6 class="mb-0 bg-hover-primary">Add New Expense</h6>
+                                                                        <span class="fs-3 d-block text-muted">Include your latest expense</span>
                                                                     </div>
                                                                 </a>
-                                                                <a href="app-invoice.html" class="d-flex align-items-center pb-9 position-relative">
+                                                                <a asp-action="ExpenseList" asp-controller="Vehicle" class="d-flex align-items-center pb-9 position-relative">
                                                                     <div class="bg-secondary-subtle rounded-circle round-40 me-3 p-6 d-flex align-items-center justify-content-center">
                                                                         <iconify-icon icon="solar:bill-list-linear" class="text-secondary fs-5"></iconify-icon>
                                                                     </div>
                                                                     <div class="d-inline-block">
-                                                                        <h6 class="mb-0 bg-hover-primary">Invoice App</h6>
-                                                                        <span class="fs-3 d-block text-muted">Get latest invoice</span>
+                                                                        <h6 class="mb-0 bg-hover-primary">Fuel Expenses</h6>
+                                                                        <span class="fs-3 d-block text-muted">Get latest list</span>
                                                                     </div>
                                                                 </a>
-                                                                <a href="app-contact2.html" class="d-flex align-items-center pb-9 position-relative">
+                                                                <a asp-action="TicketList" asp-controller="Maintenance" class="d-flex align-items-center pb-9 position-relative">
                                                                     <div class="bg-success-subtle rounded-circle round-40 me-3 p-6 d-flex align-items-center justify-content-center">
                                                                         <iconify-icon icon="solar:bedside-table-2-linear" class="text-success fs-5"></iconify-icon>
                                                                     </div>
                                                                     <div class="d-inline-block">
-                                                                        <h6 class="mb-0 bg-hover-primary">Contact Application</h6>
-                                                                        <span class="fs-3 d-block text-muted">2 Unsaved Contacts</span>
+                                                                        <h6 class="mb-0 bg-hover-primary">Car Maintenance</h6>
+                                                                        <span class="fs-3 d-block text-muted">View tickets and requests</span>
                                                                     </div>
                                                                 </a>
                                                                 <a href="app-email.html" class="d-flex align-items-center pb-9 position-relative">
@@ -1536,10 +1553,10 @@
                                                         <a class="text-dark bg-hover-primary" href="page-pricing.html">Pricing Page</a>
                                                     </li>
                                                     <li class="mb-3">
-                                                        <a class="text-dark bg-hover-primary" href="authentication-login.html">Authentication Design</a>
+                                                        <a class="text-dark bg-hover-primary" asp-controller="Account" asp-action="Register">Login</a>
                                                     </li>
                                                     <li class="mb-3">
-                                                        <a class="text-dark bg-hover-primary" href="authentication-register.html">Register Now</a>
+                                                        <a class="text-dark bg-hover-primary" asp-controller="Account" asp-action="Register">Register Now</a>
                                                     </li>
                                                     <li class="mb-3">
                                                         <a class="text-dark bg-hover-primary" href="authentication-error.html">404 Error Page</a>
@@ -3808,6 +3825,22 @@
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
+
+
+        <script>
+            $(document).ready(function () {
+                var successMessage = '@TempData["SuccessMessage"]';
+                if (successMessage) {
+                    Toastify({
+                        text: successMessage,
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#00e606",
+                    }).showToast();
+                }
+            });
+        </script>
     </div>
 
 
@@ -3822,7 +3855,7 @@
     @* <script src="~/js/site.js" asp-append-version="true"></script> *@
 
 
-
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <!-- Import Js Files -->
     <script src="~/assets/js/breadcrumb/breadcrumbChart.js"></script>
