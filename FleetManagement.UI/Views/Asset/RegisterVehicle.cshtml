@@ -1,0 +1,420 @@
+﻿@using FleetManagement.UI.Models.CompanyAssetDto;
+
+@model Vehicle
+
+@{
+    ViewData["Title"] = "Register Vehicle";
+}
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title mb-0">Register Vehicle Details</h4>
+        <form id="vehicle-registration-form" asp-action="RegisterVehicle" method="post" enctype="multipart/form-data" class="mt-5 wizard clearfix" novalidate>
+            <div class="steps clearfix">
+                <ul role="tablist">
+                    <li class="step first current" data-step="1">
+                        <a href="#">
+                            <span class="number">1.</span> Vehicle Information
+                        </a>
+                    </li>
+                    <li class="step disabled" data-step="2">
+                        <a href="#">
+                            <span class="number">2.</span> Insurance & Status
+                        </a>
+                    </li>
+                    <li class="step disabled" data-step="3">
+                        <a href="#">
+                            <span class="number">3.</span> Documents
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="content clearfix">
+                <fieldset id="vehicle-info" class="body current">
+                    <h5 class="mb-4">Vehicle Details</h5>
+                    <label class="form-label" asp-for="Make">Vehicle Brand *</label>
+                    <input id="Make" asp-for="Make" type="text" class="form-control mb-3" required>
+
+                    <label class="form-label" asp-for="Model">Vehicle Model *</label>
+                    <input id="Model" asp-for="Model" type="text" class="form-control mb-3" required>
+
+                    <label class="form-label" asp-for="Year">Vehicle Year *</label>
+                    <input id="Year" asp-for="Year" type="number" class="form-control mb-3" required>
+
+                    <label class="form-label" asp-for="VIN">Vehicle Identification Number *</label>
+                    <input id="VIN" asp-for="VIN" type="text" class="form-control mb-3" required>
+
+                    <label class="form-label" asp-for="LicensePlate">License Plate *</label>
+                    <input id="LicensePlate" asp-for="LicensePlate" type="text" class="form-control mb-3" required>
+
+                    <label class="form-label" asp-for="Color">Vehicle Color *</label>
+                    <input id="Color" asp-for="Color" type="color" class="form-control mb-3" value="#000000">
+
+                    <label class="form-label" asp-for="Mileage">Vehicle Mileage *</label>
+                    <input id="Mileage" asp-for="Mileage" type="number" class="form-control mb-3" required>
+
+                    <label class="form-label" asp-for="ChassisNumber">Chassis Number *</label>
+                    <input id="ChassisNumber" asp-for="ChassisNumber" type="text" class="form-control mb-3" required>
+
+                    <label class="form-label" asp-for="FuelType">Engine Type</label>
+                    <select class="form-select mb-3" id="FuelType" asp-for="FuelType">
+                        <option selected>Choose...</option>
+                        <option>Petrol</option>
+                        <option>Diesel</option>
+                        <option>Electric</option>
+                        <option>Hybrid</option>
+                    </select>
+
+                    <label class="form-label" asp-for="Transmission">Transmission Type</label>
+                    <select class="form-select mb-3" id="Transmission" asp-for="Transmission">
+                        <option selected>Choose...</option>
+                        <option>Manual</option>
+                        <option>Automatic</option>
+                    </select>
+
+                    <label class="form-label" for="RegistrationDate">Date of Registration</label>
+                    <input id="RegistrationDate" name="RegistrationDate" type="date" class="form-control mb-3">
+
+                    <label class="form-label" for="LastServiceDate">Last Service Date</label>
+                    <input id="LastServiceDate" name="LastServiceDate" type="date" class="form-control mb-3">
+                </fieldset>
+
+                <fieldset id="insurance-status" class="body" style="display: none;">
+                    <h5 class="mb-4">Car Insurance Information</h5>
+                    <label class="form-label" asp-for="InsuranceCompany">Insurance Company *</label>
+                    <input id="InsuranceCompany" asp-for="InsuranceCompany" type="text" class="form-control mb-3" required>
+
+                    <label class="form-label" asp-for="InsuranceExpiryDate">Insurance Expiry Date</label>
+                    <input id="InsuranceExpiryDate" asp-for="InsuranceExpiryDate" type="date" class="form-control mb-3">
+
+                    <label class="form-label" asp-for="Status">Vehicle Status</label>
+                    <select class="form-select mb-3" id="Status" asp-for="Status">
+                        <option selected>Choose...</option>
+                        <option>Active</option>
+                        <option>Inactive</option>
+                        <option>Under Maintenance</option>
+                    </select>
+                </fieldset>
+
+                <fieldset id="vehicle-documents" class="body" style="display: none;">
+                    <h5 class="mb-4">Upload Vehicle Documents</h5>
+                    <label for="DocumentCount">Number of Documents to Upload</label>
+                    <input type="number" id="DocumentCount" asp-for="Documents" class="form-control mb-3" min="1" max="10">
+                    <div id="documentUploads"></div>
+                </fieldset>
+            </div>
+
+            <div class="actions clearfix">
+                <ul role="menu" aria-label="Pagination">
+                    <li>
+                        <button type="button" id="prev-btn" class="btn btn-secondary" disabled>Previous</button>
+                    </li>
+                    <li>
+                        <button type="button" id="next-btn" class="btn btn-primary">Next</button>
+                    </li>
+                    <li>
+                        <button type="submit" id="submit-btn" class="btn btn-success" style="display: none;">Submit</button>
+                    </li>
+                </ul>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        const sections = document.querySelectorAll(".body");
+        const nextBtn = document.getElementById("next-btn");
+        const prevBtn = document.getElementById("prev-btn");
+        const submitBtn = document.getElementById("submit-btn");
+
+        function validateStep(step) {
+            const fields = document.querySelectorAll(`fieldset:nth-of-type(${step}) input[required],
+                                                      fieldset:nth-of-type(${step}) select[required]`);
+            let isValid = true;
+
+            fields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add("is-invalid");
+                    isValid = false;
+                } else {
+                    field.classList.remove("is-invalid");
+                }
+            });
+
+            return isValid;
+        }
+
+        function validateAllSteps() {
+            let allValid = true;
+            for (let i = 1; i <= totalSteps; i++) {
+                if (!validateStep(i)) {
+                    allValid = false;
+                }
+            }
+            return allValid;
+        }
+
+        function showStep(step) {
+            sections.forEach((section, index) => {
+                section.style.display = index + 1 === step ? "block" : "none";
+            });
+
+            document.querySelectorAll(".step").forEach((stepEl, index) => {
+                if (index + 1 === step) {
+                    stepEl.classList.add("current");
+                    stepEl.classList.remove("disabled");
+                } else {
+                    stepEl.classList.remove("current");
+                }
+            });
+
+            prevBtn.disabled = step === 1;
+            nextBtn.style.display = step === totalSteps ? "none" : "inline-block";
+            submitBtn.style.display = step === totalSteps ? "inline-block" : "none";
+        }
+
+        nextBtn.addEventListener("click", function () {
+            if (validateStep(currentStep)) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        });
+
+        prevBtn.addEventListener("click", function () {
+            currentStep--;
+            showStep(currentStep);
+        });
+
+        document.getElementById("vehicle-registration-form").addEventListener("submit", function (e) {
+            if (!validateAllSteps()) {
+                e.preventDefault();
+            }
+        });
+
+        showStep(currentStep);
+    });
+
+     document.getElementById('DocumentCount').addEventListener('input', function() {
+        var count = parseInt(this.value) || 0;
+        var container = document.getElementById('documentUploads');
+        container.innerHTML = '';
+
+        for (var i = 0; i < count; i++) {
+            var div = document.createElement('div');
+            div.classList.add('form-group');
+            div.innerHTML = '<label>Upload Document ' + (i + 1) + '</label>' +
+                            '<input type="file" name="documents" class="form-control" required />';
+            container.appendChild(div);
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+
+@* <div class="card">
+    <div class="card-body">
+        <h4 class="card-title mb-0">Register Vehicle Details</h4>
+        <h6 class="card-subtitle mb-3"></h6>
+        <form id="example-advanced-form" asp-action="RegisterVehicle" method="post" enctype="multipart/form-data" class="mt-5 wizard clearfix" role="application" novalidate="novalidate">
+            <div class="steps clearfix">
+                <ul role="tablist">
+                    <li role="tab" class="first current error" aria-disabled="false" aria-selected="true">
+                        <a id="example-advanced-form-t-0" href="#example-advanced-form-h-0" aria-controls="example-advanced-form-p-0">
+                            <span class="current-info audible">current step: </span><span class="number">1.</span> Vehicle Information
+                        </a>
+                    </li>
+                    <li role="tab" class="disabled" aria-disabled="true">
+                        <a id="example-advanced-form-t-1" href="#example-advanced-form-h-1" aria-controls="example-advanced-form-p-1">
+                            <span class="number">2.</span> Insurance & Status
+                        </a>
+                    </li>
+                    <li role="tab" class="disabled" aria-disabled="true">
+                        <a id="example-advanced-form-t-2" href="#example-advanced-form-h-2" aria-controls="example-advanced-form-p-2">
+                            <span class="number">3.</span> Documents
+                        </a>
+                    </li>
+                </ul>
+            </div><div class="content clearfix">
+
+
+
+                <h3 id="example-advanced-form-h-0" tabindex="-1" class="title current">Vehicle Information</h3>
+                <fieldset id="example-advanced-form-p-0" role="tabpanel" aria-labelledby="example-advanced-form-h-0" class="body current" aria-hidden="false">
+                    <h5 class="mb-4">Vehicle Details</h5>
+                    <label class="form-label" asp-for="Make">Vehicle Brand *</label>
+                    <label id="Make" class="error" asp-for="Make">This field is required.</label>
+                    <input id="Make" asp-for="Make" type="text" class="required form-control mb-3 error" autocomplete="on">
+                    <label class="form-label" asp-for="Model">Vehicle Model *</label>
+                    <label id="Model" class="error" asp-for="Model">This field is required.</label>
+                    <input id="Model" asp-for="Model" type="text" class="required form-control mb-3 error" autocomplete="on">
+                    <label class="form-label" asp-for="Year">Vehicle Year *</label>
+                    <label id="Year" class="error" asp-for="Year">This field is required.</label>
+                    <input id="Year" asp-for="Year" type="number" class="required form-control mb-3 error" autocomplete="on">
+                    <label class="form-label" asp-for="VIN">Vehicle Identification Number *</label>
+                    <label id="VIN" class="error" asp-for="VIN">This field is required.</label>
+                    <input id="VIN" asp-for="VIN" type="text" class="required form-control mb-3 error" autocomplete="on">
+                    <label class="form-label" asp-for="LicensePlate">License Plate *</label>
+                    <label id="LicensePlate" class="error" asp-for="LicensePlate">This field is required.</label>
+                    <input id="LicensePlate" asp-for="LicensePlate" type="text" class="required form-control mb-3 error" autocomplete="on">
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Color">Color</label>
+                        <div class="minicolors minicolors-theme-bootstrap minicolors-position-bottom minicolors-position-left">
+                            <input asp-for="Color" type="text" id="wheel-demo" class="form-control demo minicolors-input" data-control="wheel" value="#ff99ee" size="7" style="width:50%;">
+                            <span class="minicolors-swatch minicolors-sprite minicolors-input-swatch" style="top:5px; left:5px;">
+                                <span class="minicolors-swatch-color" style="background-color: rgb(255, 75, 150); opacity: 1;">
+                                </span>
+                            </span>
+                            <div class="minicolors-panel minicolors-slider-wheel" style="display: none;">
+                                <div class="minicolors-slider minicolors-sprite" style="background-color: rgb(255, 75, 150);">
+                                    <div class="minicolors-picker" style="top: 0px;">
+                                    </div>
+                                </div>
+                                <div class="minicolors-opacity-slider minicolors-sprite">
+                                    <div class="minicolors-picker">
+                                    </div>
+                                </div>
+                                <div class="minicolors-grid minicolors-sprite">
+                                    <div class="minicolors-grid-inner">
+                                    </div><div class="minicolors-picker" style="top: 97px; left: 27px;">
+                                        <div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <label class="form-label" asp-for="Mileage">Vehicle Mileage *</label>
+                    <label id="Mileage" class="error" asp-for="Mileage">This field is required.</label>
+                    <input id="Mileage" asp-for="Mileage" type="text" class="required form-control mb-3 error" autocomplete="on">
+                    <label class="form-label" asp-for="ChassisNumber">Chassis Number *</label>
+                    <label id="ChassisNumber" class="error" asp-for="ChassisNumber">This field is required.</label>
+                    <input id="ChassisNumber" asp-for="ChassisNumber" type="text" class="required form-control mb-3 error" autocomplete="on">
+                    <div class="form-group mb-4">
+                        <label class="mr-sm-2" asp-for="FuelType" for="inlineFormCustomSelect">Engine Type</label>
+                        <select class="form-select mr-sm-2" asp-for="FuelType" id="inlineFormCustomSelect">
+                            <option selected="">Choose...</option>
+                            <option>Petrol</option>
+                            <option>Diesel</option>
+                            <option>Electric</option>
+                            <option>Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="mr-sm-2" asp-for="Transmission" for="inlineFormCustomSelect">Transmission Type</label>
+                        <select class="form-select mr-sm-2" asp-for="Transmission" id="inlineFormCustomSelect">
+                            <option selected="">Choose...</option>
+                            <option>Manual</option>
+                            <option>Automatic</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" asp-for="RegistrationDate">Date of Registration</label>
+                            <input asp-for="RegistrationDate" type="text" id="datePicker" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" asp-for="LastServiceDate">Date vehicle was last serviced</label>
+                            <input asp-for="LastServiceDate" type="text" id="datePicker" class="form-control">
+                        </div>
+                    </div>
+                    <p>(*) Mandatory</p>
+                </fieldset>
+
+                <h3 id="example-advanced-form-h-1" tabindex="-1" class="title">Insurance & Status</h3>
+                <fieldset id="example-advanced-form-p-1" role="tabpanel" aria-labelledby="example-advanced-form-h-1" class="body" aria-hidden="true" style="display: none;">
+                    <h5 class="mb-4">Car Insurance Information</h5>
+                    <label class="form-label" asp-for="InsuranceCompany">Insurance Company *</label>
+                    <input asp-for="InsuranceCompany" type="text" class="required form-control mb-3" autocomplete="on">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label" asp-for="InsuranceExpiryDate">Insurance Expiry Date</label>
+                            <input asp-for="InsuranceExpiryDate" type="date" id="datePicker" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="mr-sm-2" asp-for="Status" for="inlineFormCustomSelect">Vehicle Status</label>
+                        <select class="form-select mr-sm-2" asp-for="Status" id="inlineFormCustomSelect">
+                            <option selected="">Choose...</option>
+                            <option>Active</option>
+                            <option>Inactive</option>
+                            <option>Under Maintenance</option>
+                        </select>
+                    </div>
+                    <p>(*) Mandatory</p>
+                </fieldset>
+                <h3 id="example-advanced-form-h-2" tabindex="-1" class="title">Vehicle Documents</h3>
+                <fieldset id="example-advanced-form-p-2" role="tabpanel" aria-labelledby="example-advanced-form-h-2" class="body" aria-hidden="true" style="display: none;">
+                    <h5 class="mb-4">Upload all valid documents for this vehicle</h5>
+                    <div class="form-group">
+                        <label for="DocumentCount">Number of Documents to Upload</label>
+                        <input type="number" id="DocumentCount" name="DocumentCount" class="form-control" min="1" max="10" />
+                    </div>
+
+                    <div id="documentUploads"></div>
+                </fieldset>
+
+            </div>
+            <div class="actions clearfix">
+                <ul role="menu" aria-label="Pagination">
+                    <li class="disabled" aria-disabled="true">
+                        <a href="#previous" role="menuitem">Previous</a>
+                    </li>
+                    <li aria-hidden="false" aria-disabled="false">
+                        <a href="#next" role="menuitem">Next</a>
+                    </li>
+                    <li aria-hidden="true" style="display: none;">
+                        <button type="submit" class="btn btn-success hstack gap-6"><i class="fas fa-plus fs-4"></i>Register Vehicle</button>
+                    </li>
+                </ul>
+            </div>
+        </form>
+    </div>
+</div>
+ *@
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+@* <script>
+
+    document.getElementById('DocumentCount').addEventListener('input', function() {
+        var count = parseInt(this.value) || 0;
+        var container = document.getElementById('documentUploads');
+        container.innerHTML = '';
+
+        for (var i = 0; i < count; i++) {
+            var div = document.createElement('div');
+            div.classList.add('form-group');
+            div.innerHTML = '<label>Upload Document ' + (i + 1) + '</label>' +
+                            '<input type="file" name="documents" class="form-control" required />';
+            container.appendChild(div);
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        flatpickr("#datePicker", {
+            enableTime: false, // Set to true if you want time selection
+            dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+            altInput: true,
+            altFormat: "F j, Y", // Displayed as: January 1, 2025
+            weekNumbers: true,
+            theme: "light", // Choose from light, dark, material_blue, etc.
+        });
+    });
+</script> *@

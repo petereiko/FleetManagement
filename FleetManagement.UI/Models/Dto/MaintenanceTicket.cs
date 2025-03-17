@@ -10,6 +10,8 @@
 
         public decimal TotalCost => Items.Sum(i => i.TotalPrice);
         public int TotalQuantity => Items.Sum(i => i.Quantity);
+        public DateTime DateLogged { get; set; } = DateTime.Now;
+
 
     }
 

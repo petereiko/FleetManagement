@@ -13,7 +13,9 @@
 
     <link rel="stylesheet" href="~/assets/css/styles.css" />
     <!-- Favicon icon-->
-      <link rel="shortcut icon" type="image/png" href="~/assets/images/acc/fleet.png" />
+    <link rel="shortcut icon" type="image/png" href="~/assets/images/acc/fleet.png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 
     <!-- Toastify CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
@@ -25,7 +27,7 @@
 
 <body>
 
-     <div class="toast toast-onload align-items-center text-bg-secondary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast toast-onload align-items-center text-bg-secondary border-0" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-body hstack align-items-start gap-6">
             <i class="ti ti-alert-circle fs-6"></i>
             <div>
@@ -1550,7 +1552,7 @@
                                                 <h5 class="fs-5 mb-9 fw-semibold">Quick Links</h5>
                                                 <ul>
                                                     <li class="mb-3">
-                                                        <a class="text-dark bg-hover-primary" href="page-pricing.html">Pricing Page</a>
+                                                        <a class="text-dark bg-hover-primary" asp-controller="Asset" asp-action="RegisterVehicle">Onboard Vehichle</a>
                                                     </li>
                                                     <li class="mb-3">
                                                         <a class="text-dark bg-hover-primary" asp-controller="Account" asp-action="Register">Login</a>
@@ -2172,7 +2174,6 @@
                     <!-- ---------------------------------- -->
                     <!-- End Vertical Layout Header -->
                     <!-- ---------------------------------- -->
-
                     <!-- ------------------------------- -->
                     <!-- apps Dropdown in Small screen -->
                     <!-- ------------------------------- -->
@@ -3575,12 +3576,12 @@
                 <!-- End Sidebar scroll-->
             </aside>
 
-           
+
             <script>
-  function handleColorTheme(e) {
-    $("html").attr("data-color-theme", e);
-    $(e).prop("checked", !0);
-  }
+                function handleColorTheme(e) {
+                  $("html").attr("data-color-theme", e);
+                  $(e).prop("checked", !0);
+                }
             </script>
             <button class="btn btn-primary p-3 rounded-circle d-flex align-items-center justify-content-center customizer-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
                 <i class="icon ti ti-settings fs-7 text-white"></i>
@@ -3721,9 +3722,9 @@
             </div>
 
             <script>
-  function handleColorTheme(e) {
-    document.documentElement.setAttribute("data-color-theme", e);
-  }
+                function handleColorTheme(e) {
+                  document.documentElement.setAttribute("data-color-theme", e);
+                }
             </script>
         </div>
 
@@ -3818,30 +3819,39 @@
             </div>
         </div>
 
+
+
+
+
+
+
+        <div class="body-wrapper">
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
+
+
+            <script>
+                $(document).ready(function () {
+                    var successMessage = '@TempData["SuccessMessage"]';
+                    if (successMessage) {
+                        Toastify({
+                            text: successMessage,
+                            duration: 3000,
+                            gravity: "top",
+                            position: "right",
+                            backgroundColor: "#00e606",
+                        }).showToast();
+                    }
+                });
+            </script>
+        </div>
+
+
+
     </div>
 
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-
-
-        <script>
-            $(document).ready(function () {
-                var successMessage = '@TempData["SuccessMessage"]';
-                if (successMessage) {
-                    Toastify({
-                        text: successMessage,
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: "#00e606",
-                    }).showToast();
-                }
-            });
-        </script>
-    </div>
 
 
 

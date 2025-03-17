@@ -64,69 +64,74 @@
             </div>
 
 
-                <div class="datatables">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="mb-2">
-                                <h4 class="card-title">Fuel Expense List</h4>
-                            </div>
-                            <p class="card-subtitle mb-3">
-                                Browse through the list of recorded fuel expenses. Use the search and filters to refine your results.
-                            </p>
+            <div class="datatables">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <h4 class="card-title">Fuel Expense List</h4>
+                        </div>
+                        <p class="card-subtitle mb-3">
+                            Browse through the list of recorded fuel expenses. Use the search and filters to refine your results.
+                        </p>
 
-                            <a asp-controller="Vehicle" asp-for="Expense" class="btn btn-primary mb-2">
-                                <i class="ri-filter-line"></i> Add Expense
-                            </a>
+                        <a asp-controller="Vehicle" asp-for="Expense" class="btn btn-primary mb-2">
+                            <i class="ri-filter-line"></i> Add Expense
+                        </a>
 
-                            <div class="table-responsive">
-                                <table class="table table-striped w-100 table-bordered text-nowrap" id="expenseTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Amount (₦)</th>
-                                            <th>State</th>
-                                            <th>LGA</th>
-                                            <th>Filling Station</th>
-                                            <th>Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var expense in Model)
-                                        {
-                                        <tr>
-                                            <td>@expense.Amount.ToString("N0")</td>
-                                            <td>@expense.State</td>
-                                            <td>@expense.LGA</td>
-                                            <td>@expense.FillingStation</td>
-                                            <td>@expense.Date.ToString("yyyy-MM-dd")</td>
-                                        </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped w-100 table-bordered text-nowrap" id="expenseTable">
+                                <thead>
+                                    <tr>
+                                        <th>Amount (₦)</th>
+                                        <th>State</th>
+                                        <th>LGA</th>
+                                        <th>Filling Station</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var expense in Model)
+                                    {
+                                    <tr>
+                                        <td>@expense.Amount.ToString("N0")</td>
+                                        <td>@expense.State</td>
+                                        <td>@expense.LGA</td>
+                                        <td>@expense.FillingStation</td>
+                                        <td>@expense.Date.ToString("yyyy-MM-dd")</td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Include jQuery and DataTables if not already included -->
-                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-                <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+            <!-- Include jQuery and DataTables if not already included -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+            <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
-                <script>
-    $(document).ready(function () {
-        // Initialize DataTables with pagination
-        $("#expenseTable").DataTable({
-            "paging": true,
-            "pageLength": 5, // Default number of rows per page
-            "lengthMenu": [5, 10, 25, 50], // Dropdown to select rows per page
-            "searching": true,
-            "ordering": true
-        });
-    });
-                </script>
+            <script>
+                $(document).ready(function () {
+                    // Initialize DataTables with pagination
+                    $("#expenseTable").DataTable({
+                        "paging": true,
+                        "pageLength": 5, // Default number of rows per page
+                        "lengthMenu": [5, 10, 25, 50], // Dropdown to select rows per page
+                        "searching": true,
+                        "ordering": true
+                    });
+                });
+            </script>
         </div>
     </div>
 
 </body>
 
 </html>
+
+
+
+
+<input class="form-control" type="file" id="formFile">
