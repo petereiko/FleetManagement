@@ -1,0 +1,38 @@
+﻿@using FleetManagement.UI.Models.Dto
+
+@model MaintenanceTicket
+
+<div class="modal-header">
+    <h5 class="modal-title">Ticket Details: @Model.TicketNumber</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <div class="mb-3">
+        <strong>Driver Name:</strong> @Model.DriverName
+    </div>
+    <div class="mb-3">
+        <strong>Car License:</strong> @Model.CarLicense
+    </div>
+    <div class="mb-3">
+        <strong>Date Logged:</strong> @Model.DateLogged.ToString("dd MMM yyyy HH:mm")
+    </div>
+    <div class="mb-3">
+        <strong>Total Items:</strong> @Model.TotalQuantity
+    </div>
+    <div class="mb-3">
+        <strong>Total Cost:</strong> ₦@Model.TotalCost.ToString("N2")
+    </div>
+    <hr />
+    <h6>Maintenance Items</h6>
+    <ul class="list-group">
+        @foreach (var item in Model.Items)
+        {
+            <li class="list-group-item">
+                <strong>@item.Part</strong> — Quantity: @item.Quantity, Unit Price: ₦@item.UnitPrice.ToString("N2"), Total: ₦@item.TotalPrice.ToString("N2")
+            </li>
+        }
+    </ul>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

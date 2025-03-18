@@ -134,4 +134,81 @@
 
 
 
-<input class="form-control" type="file" id="formFile">
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title mb-0">Advanced Form Example</h4>
+        <h6 class="card-subtitle mb-3"></h6>
+        <form id="example-advanced-form" action="#" class="mt-5 wizard clearfix" role="application" novalidate="novalidate">
+            <div class="steps clearfix">
+                <ul role="tablist">
+                    <li role="tab" class="first current error" aria-disabled="false" aria-selected="true">
+                        <a id="example-advanced-form-t-0" href="#example-advanced-form-h-0" aria-controls="example-advanced-form-p-0">
+                            <span class="current-info audible">current step: </span>
+                            <span class="number">1.</span> Account
+                        </a>
+                    </li>
+                    <li role="tab" class="disabled" aria-disabled="true">
+                        <a id="example-advanced-form-t-1" href="#example-advanced-form-h-1" aria-controls="example-advanced-form-p-1">
+                            <span class="number">2.</span> Profile
+                        </a>
+                    </li>
+                    <li role="tab" class="disabled" aria-disabled="true">
+                        <a id="example-advanced-form-t-2" href="#example-advanced-form-h-2" aria-controls="example-advanced-form-p-2">
+                            <span class="number">3.</span> Warning
+                        </a>
+                    </li>
+                    <li role="tab" class="disabled last" aria-disabled="true">
+                        <a id="example-advanced-form-t-3" href="#example-advanced-form-h-3" aria-controls="example-advanced-form-p-3">
+                            <span class="number">4.</span> Finish
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="content clearfix">
+
+
+                <h3 id="example-advanced-form-h-0" tabindex="-1" class="title current">Account</h3>
+                <fieldset id="example-advanced-form-p-0" role="tabpanel" aria-labelledby="example-advanced-form-h-0" class="body current" aria-hidden="false">
+                    <h5 class="mb-4">Account Information</h5>
+                    <label class="form-label" for="userName-2">User name *</label>
+                    <label id="userName-2-error" class="error" for="userName-2" style="display: none;"></label><input id="userName-2" name="userName" type="text" class="required form-control mb-3 valid" autocomplete="on" aria-invalid="false">
+                    <label class="form-label" for="password-2">Password *</label>
+                    <label id="password-2-error" class="error" for="password-2" style="display: none;"></label><input id="password-2" name="password" type="password" class="required form-control mb-3 valid" autocomplete="current-password" aria-invalid="false">
+                    <label class="form-label" for="confirm-2">Confirm Password *</label>
+                    <label id="confirm-2-error" class="error" for="confirm-2">This field is required.</label><input id="confirm-2" name="confirm" type="text" class="required form-control mb-3 error">
+                    <p>(*) Mandatory</p>
+                </fieldset>
+                <h3 id="example-advanced-form-h-1" tabindex="-1" class="title">Profile</h3>
+                <fieldset id="example-advanced-form-p-1" role="tabpanel" aria-labelledby="example-advanced-form-h-1" class="body" aria-hidden="true" style="display: none;">
+                    <h5 class="mb-4">Profile Information</h5>
+                    <label class="form-label" for="name-2">First name *</label>
+                    <input id="name-2" name="name" type="text" class="required form-control mb-3" autocomplete="on">
+                    <label class="form-label" for="surname-2">Last name *</label>
+                    <input id="surname-2" name="surname" type="text" class="required form-control mb-3">
+                    <label class="form-label" for="email-2">Email *</label>
+                    <input id="email-2" name="email" type="text" class="required email form-control mb-3" autocomplete="on">
+                    <label class="form-label" for="address-2">Address</label>
+                    <input id="address-2" name="address" type="text" class="form-control mb-3" autocomplete="on">
+                    <label class="form-label" for="age-2">
+                        Age (The warning step will show up if age is less than 18)
+                        *
+                    </label>
+                    <input id="age-2" name="age" type="text" class="required number form-control mb-3">
+                    <p>(*) Mandatory</p>
+                </fieldset>
+                <h3 id="example-advanced-form-h-2" tabindex="-1" class="title">Warning</h3>
+                <fieldset id="example-advanced-form-p-2" role="tabpanel" aria-labelledby="example-advanced-form-h-2" class="body" aria-hidden="true" style="display: none;">
+                    <h5 class="mb-4">You are to young</h5>
+                    <p>Please go away ;-)</p>
+                </fieldset>
+                <h3 id="example-advanced-form-h-3" tabindex="-1" class="title">Finish</h3>
+                <fieldset id="example-advanced-form-p-3" role="tabpanel" aria-labelledby="example-advanced-form-h-3" class="body" aria-hidden="true" style="display: none;">
+                    <h5 class="mb-4">Terms and Conditions</h5>
+                    <input id="acceptTerms-2" name="acceptTerms" type="checkbox" class="required form-control">
+                    <label for="acceptTerms-2">I agree with the Terms and Conditions.</label>
+                </fieldset>
+            </div>
+            <div class="actions clearfix"><ul role="menu" aria-label="Pagination"><li class="disabled" aria-disabled="true"><a href="#previous" role="menuitem">Previous</a></li><li aria-hidden="false" aria-disabled="false"><a href="#next" role="menuitem">Next</a></li><li aria-hidden="true" style="display: none;"><a href="#finish" role="menuitem">Finish</a></li></ul></div>
+        </form>
+    </div>
+</div>

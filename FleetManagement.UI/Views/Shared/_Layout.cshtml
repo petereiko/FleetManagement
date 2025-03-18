@@ -21,6 +21,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/themes/classic.min.css" />
+
 
 
 </head>
@@ -1453,16 +1455,16 @@
                                                     <div class="row">
                                                         <div class="col-6">
                                                             <div class="position-relative">
-                                                                <a asp-action="Expense" asp-controller="Vehicle" class="d-flex align-items-center pb-9 position-relative ">
+                                                                <a asp-area="" asp-action="Expense" asp-controller="Vehicle" class="d-flex align-items-center pb-9 position-relative ">
                                                                     <div class="bg-primary-subtle rounded-circle round-40 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                        <iconify-icon icon="solar:chat-line-linear" class="text-primary fs-5"></iconify-icon>
+                                                                        <iconify-icon icon="arcticons:expense-manager-2" class="text-primary fs-5"></iconify-icon>
                                                                     </div>
                                                                     <div class="d-inline-block ">
                                                                         <h6 class="mb-0 bg-hover-primary">Add New Expense</h6>
                                                                         <span class="fs-3 d-block text-muted">Include your latest expense</span>
                                                                     </div>
                                                                 </a>
-                                                                <a asp-action="ExpenseList" asp-controller="Vehicle" class="d-flex align-items-center pb-9 position-relative">
+                                                                <a asp-area="" asp-action="ExpenseList" asp-controller="Vehicle" class="d-flex align-items-center pb-9 position-relative">
                                                                     <div class="bg-secondary-subtle rounded-circle round-40 me-3 p-6 d-flex align-items-center justify-content-center">
                                                                         <iconify-icon icon="solar:bill-list-linear" class="text-secondary fs-5"></iconify-icon>
                                                                     </div>
@@ -1471,35 +1473,35 @@
                                                                         <span class="fs-3 d-block text-muted">Get latest list</span>
                                                                     </div>
                                                                 </a>
-                                                                <a asp-action="TicketList" asp-controller="Maintenance" class="d-flex align-items-center pb-9 position-relative">
+                                                                <a asp-area="" asp-action="TicketList" asp-controller="Maintenance" class="d-flex align-items-center pb-9 position-relative">
                                                                     <div class="bg-success-subtle rounded-circle round-40 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                        <iconify-icon icon="solar:bedside-table-2-linear" class="text-success fs-5"></iconify-icon>
+                                                                        <iconify-icon icon="carbon:vehicle-services" class="text-success fs-5"></iconify-icon>
                                                                     </div>
                                                                     <div class="d-inline-block">
                                                                         <h6 class="mb-0 bg-hover-primary">Car Maintenance</h6>
                                                                         <span class="fs-3 d-block text-muted">View tickets and requests</span>
                                                                     </div>
                                                                 </a>
-                                                                <a href="app-email.html" class="d-flex align-items-center pb-9 position-relative">
+                                                                <a asp-area="" asp-action="Index" asp-controller="Admin" class="d-flex align-items-center pb-9 position-relative">
                                                                     <div class="bg-warning-subtle rounded-circle round-40 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                        <iconify-icon icon="solar:letter-unread-linear" class="text-warning fs-5"></iconify-icon>
+                                                                        <iconify-icon icon="streamline:ai-vehicle-spark-1" class="text-warning fs-5"></iconify-icon>
                                                                     </div>
                                                                     <div class="d-inline-block">
-                                                                        <h6 class="mb-0 bg-hover-primary">Email App</h6>
-                                                                        <span class="fs-3 d-block text-muted">Get new emails</span>
+                                                                        <h6 class="mb-0 bg-hover-primary">Admin Dashboard</h6>
+                                                                        <span class="fs-3 d-block text-muted">Manage Assets</span>
                                                                     </div>
                                                                 </a>
                                                             </div>
                                                         </div>
                                                         <div class="col-6">
                                                             <div class="position-relative">
-                                                                <a href="page-user-profile.html" class="d-flex align-items-center pb-9 position-relative">
+                                                                <a asp-area="Admin" asp-action="Index" asp-controller="AdminTicket" class="d-flex align-items-center pb-9 position-relative">
                                                                     <div class="bg-danger-subtle rounded-circle round-40 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                        <iconify-icon icon="solar:cart-large-2-linear" class="text-danger fs-5"></iconify-icon>
+                                                                        <iconify-icon icon="eos-icons:admin-outlined" class="text-danger fs-5"></iconify-icon>
                                                                     </div>
                                                                     <div class="d-inline-block">
-                                                                        <h6 class="mb-0 bg-hover-primary">User Profile</h6>
-                                                                        <span class="fs-3 d-block text-muted">learn more information</span>
+                                                                        <h6 class="mb-0 bg-hover-primary">Tickets & Requests for Admin</h6>
+                                                                        <span class="fs-3 d-block text-muted">Manage tickets and vehicle maintenance</span>
                                                                     </div>
                                                                 </a>
                                                                 <a href="app-calendar.html" class="d-flex align-items-center pb-9 position-relative">
@@ -1552,13 +1554,13 @@
                                                 <h5 class="fs-5 mb-9 fw-semibold">Quick Links</h5>
                                                 <ul>
                                                     <li class="mb-3">
-                                                        <a class="text-dark bg-hover-primary" asp-controller="Asset" asp-action="RegisterVehicle">Onboard Vehichle</a>
+                                                        <a class="text-dark bg-hover-primary" asp-area="" asp-controller="Asset" asp-action="RegisterVehicle">Onboard Vehichle</a>
                                                     </li>
                                                     <li class="mb-3">
-                                                        <a class="text-dark bg-hover-primary" asp-controller="Account" asp-action="Register">Login</a>
+                                                        <a class="text-dark bg-hover-primary" asp-area="" asp-controller="Account" asp-action="Register">Login</a>
                                                     </li>
                                                     <li class="mb-3">
-                                                        <a class="text-dark bg-hover-primary" asp-controller="Account" asp-action="Register">Register Now</a>
+                                                        <a class="text-dark bg-hover-primary" asp-area="" asp-controller="Account" asp-action="Register">Register Now</a>
                                                     </li>
                                                     <li class="mb-3">
                                                         <a class="text-dark bg-hover-primary" href="authentication-error.html">404 Error Page</a>

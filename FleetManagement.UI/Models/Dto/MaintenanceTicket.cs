@@ -6,7 +6,13 @@
         public List<MaintenanceItem> Items { get; set; } = new List<MaintenanceItem>();
         public bool IsApproved { get; set; } = false;
         public bool IsSubmitted { get; set; } = false;
-        public bool IsRejected { get; set; } = false; 
+        public bool IsRejected { get; set; } = false;
+        public bool IsOnHold { get; set; } = false;
+
+
+        // New fields for the driver and the vehicle
+        public string DriverName { get; set; }
+        public string CarLicense { get; set; }
 
         public decimal TotalCost => Items.Sum(i => i.TotalPrice);
         public int TotalQuantity => Items.Sum(i => i.Quantity);

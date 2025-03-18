@@ -48,8 +48,11 @@
                     <label class="form-label" asp-for="LicensePlate">License Plate *</label>
                     <input id="LicensePlate" asp-for="LicensePlate" type="text" class="form-control mb-3" required>
 
-                    <label class="form-label" asp-for="Color">Vehicle Color *</label>
-                    <input id="Color" asp-for="Color" type="color" class="form-control mb-3" value="#000000">
+                    <label class="form-label" for="Color">Vehicle Color *</label>
+                    <div id="color-picker"></div>
+                    <input type="hidden" id="Color" asp-for="Color">
+                    <br />
+
 
                     <label class="form-label" asp-for="Mileage">Vehicle Mileage *</label>
                     <input id="Mileage" asp-for="Mileage" type="number" class="form-control mb-3" required>
@@ -73,11 +76,11 @@
                         <option>Automatic</option>
                     </select>
 
-                    <label class="form-label" for="RegistrationDate">Date of Registration</label>
-                    <input id="RegistrationDate" name="RegistrationDate" type="date" class="form-control mb-3">
+                    <label class="form-label" asp-for="RegistrationDate">Date of Registration</label>
+                    <input id="datePicker" asp-for="RegistrationDate" type="date" class="form-control mb-3">
 
-                    <label class="form-label" for="LastServiceDate">Last Service Date</label>
-                    <input id="LastServiceDate" name="LastServiceDate" type="date" class="form-control mb-3">
+                    <label class="form-label" asp-for="LastServiceDate">Last Service Date</label>
+                    <input id="datePicker" asp-for="LastServiceDate" type="date" class="form-control mb-3">
                 </fieldset>
 
                 <fieldset id="insurance-status" class="body" style="display: none;">
@@ -86,7 +89,7 @@
                     <input id="InsuranceCompany" asp-for="InsuranceCompany" type="text" class="form-control mb-3" required>
 
                     <label class="form-label" asp-for="InsuranceExpiryDate">Insurance Expiry Date</label>
-                    <input id="InsuranceExpiryDate" asp-for="InsuranceExpiryDate" type="date" class="form-control mb-3">
+                    <input id="datePicker" asp-for="InsuranceExpiryDate" type="date" class="form-control mb-3">
 
                     <label class="form-label" asp-for="Status">Vehicle Status</label>
                     <select class="form-select mb-3" id="Status" asp-for="Status">
@@ -121,6 +124,9 @@
         </form>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@@simonwep/pickr"></script>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -208,9 +214,46 @@
             var div = document.createElement('div');
             div.classList.add('form-group');
             div.innerHTML = '<label>Upload Document ' + (i + 1) + '</label>' +
-                            '<input type="file" name="documents" class="form-control" required />';
+                            '<input type="file" asp-for="Documents" class="form-control" required />';
             container.appendChild(div);
         }
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+            flatpickr("#datePicker", {
+                enableTime: false, // Set to true if you want time selection
+                dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+                altInput: true,
+                altFormat: "F j, Y", // Displayed as: January 1, 2025
+                weekNumbers: true,
+                theme: "light", // Choose from light, dark, material_blue, etc.
+            });
+        });
+
+        const pickr = Pickr.create({
+        el: '#color-picker',
+        theme: 'classic', // Available themes: 'classic', 'monolith', 'nano'
+        default: '#000000', // Default color
+        swatches: [
+            '#ff0000', '#00ff00', '#0000ff', '#ffff00',
+            '#ff00ff', '#00ffff', '#ffffff', '#000000'
+        ],
+        components: {
+            preview: true,
+            opacity: true,
+            hue: true,
+            interaction: {
+                hex: true,  // Input field for HEX
+                rgba: true, // Input field for RGBA
+                input: true,
+                clear: true,
+                save: true
+            }
+        }
+    });
+
+    // Update hidden input when color is selected
+    pickr.on('save', (color) => {
+        document.getElementById('Color').value = color.toHEXA().toString();
     });
 </script>
 

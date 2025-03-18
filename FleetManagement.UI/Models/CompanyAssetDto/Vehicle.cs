@@ -27,7 +27,7 @@
     public class VehicleDocument
     {
         public int Id { get; set; }
-        public int VehicleId { get; set; }
+        public string VehicleId { get; set; }
         public string DocumentName { get; set; }
         public string FilePath { get; set; }
         public DateTime UploadDate { get; set; }

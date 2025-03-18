@@ -1,0 +1,196 @@
+﻿@using FleetManagement.UI.Models.Dto
+@model List<MaintenanceTicket>
+
+@{
+    ViewBag.Title = "Admin Ticket Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2>Admin Ticket Management</h2>
+
+    <form method="get" asp-action="Index" class="row g-3 mb-3">
+        <div class="col-md-4">
+            <input type="text" name="search" value="@ViewBag.Search" placeholder="Search by Driver or Car License" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <select name="status" class="form-control">
+                <option value="">All Status</option>
+                <option value="pending" selected="@(ViewBag.FilterStatus=="pending" ? "selected" : null)">Pending</option>
+                <option value="approved" selected="@(ViewBag.FilterStatus=="approved" ? "selected" : null)">Approved</option>
+                <option value="rejected" selected="@(ViewBag.FilterStatus=="rejected" ? "selected" : null)">Rejected</option>
+                <option value="onhold" selected="@(ViewBag.FilterStatus=="onhold" ? "selected" : null)">On Hold</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Ticket Number</th>
+                <th>Driver Name</th>
+                <th>Car License</th>
+                <th>Total Items</th>
+                <th>Total Cost</th>
+                <th>Date Logged</th>
+                <th>Status</th>
+                <th>Manage</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ticket in Model)
+            {
+                <tr>
+                    <td>@ticket.TicketNumber</td>
+                    <td>@ticket.DriverName</td>
+                    <td>@ticket.CarLicense</td>
+                    <td>@ticket.TotalQuantity</td>
+                    <td>₦@ticket.TotalCost.ToString("N2")</td>
+                    <td>@ticket.DateLogged.ToString("dd MMM yyyy HH:mm")</td>
+                    <td class="ticket-status">
+                        @if (ticket.IsApproved)
+                        {
+                            <span class="badge bg-success">Approved</span>
+                        }
+                        else if (ticket.IsRejected)
+                        {
+                            <span class="badge bg-danger">Rejected</span>
+                        }
+                        else if (ticket.IsOnHold)
+                        {
+                            <span class="badge bg-secondary">On Hold</span>
+                        }
+                        else if (ticket.IsSubmitted)
+                        {
+                            <span class="badge bg-warning">Pending</span>
+                        }
+                    </td>
+                    <td>
+                        <select class="status-selector form-control" data-ticket-number="@ticket.TicketNumber">
+                            <option value="">--Select--</option>
+                            <option value="approved" @(ticket.IsApproved ? "selected" : "")>Approved</option>
+                            <option value="rejected" @(ticket.IsRejected ? "selected" : "")>Rejected</option>
+                            <option value="onhold" @(ticket.IsOnHold ? "selected" : "")>On Hold</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-info btn-sm view-details-btn" data-ticket-number="@ticket.TicketNumber">
+                            View Details
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Pagination (if needed) -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)" asp-route-status="@ViewBag.FilterStatus" asp-route-search="@ViewBag.Search">Previous</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            }
+            <li class="page-item disabled"><span class="page-link">Page @ViewBag.CurrentPage of @ViewBag.TotalPages</span></li>
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)" asp-route-status="@ViewBag.FilterStatus" asp-route-search="@ViewBag.Search">Next</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Next</span></li>
+            }
+        </ul>
+    </nav>
+</div>
+
+<!-- Modal Container for Ticket Details -->
+<div class="modal fade" id="ticketDetailsModal" tabindex="-1" aria-labelledby="ticketDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="ticketDetailsContent">
+            <!-- Ticket details partial view will be loaded here dynamically -->
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.status-selector').forEach(function(selector) {
+        selector.addEventListener('change', function() {
+            var self = this;
+            var ticketNumber = self.getAttribute('data-ticket-number');
+            var status = self.value;
+            fetch('@Url.Action("UpdateStatusAjax", "AdminTicket", new { area = "Admin" })', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ticketNumber: ticketNumber, status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the status cell in the same row without reloading the page
+                    var row = self.closest('tr');
+                    var statusCell = row.querySelector('.ticket-status');
+                    var newBadge = '';
+                    switch (status.toLowerCase()) {
+                        case 'approved':
+                            newBadge = '<span class="badge bg-success">Approved</span>';
+                            break;
+                        case 'rejected':
+                            newBadge = '<span class="badge bg-danger">Rejected</span>';
+                            break;
+                        case 'onhold':
+                            newBadge = '<span class="badge bg-secondary">On Hold</span>';
+                            break;
+                        default:
+                            newBadge = '<span class="badge bg-warning">Pending</span>';
+                            break;
+                    }
+                    statusCell.innerHTML = newBadge;
+                } else {
+                    alert("Status update failed.");
+                }
+            })
+            .catch(error => {
+                console.error('Error updating status:', error);
+                alert("An error occurred while updating the status.");
+            });
+        });
+    });
+
+    // Attach click event to all "View Details" buttons
+    document.querySelectorAll('.view-details-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var ticketNumber = this.getAttribute('data-ticket-number');
+            // Fetch the partial view for ticket details via AJAX
+            fetch('@Url.Action("TicketDetails", "AdminTicket", new { area = "Admin" })?ticketNumber=' + ticketNumber)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.text();
+                })
+                .then(html => {
+                    // Inject the returned HTML into the modal container
+                    document.getElementById('ticketDetailsContent').innerHTML = html;
+                    // Show the modal using Bootstrap 5
+                    var modal = new bootstrap.Modal(document.getElementById('ticketDetailsModal'));
+                    modal.show();
+                })
+                .catch(error => {
+                    console.error('Error fetching ticket details:', error);
+                    alert('Error fetching ticket details.');
+                });
+        });
+    });
+</script>

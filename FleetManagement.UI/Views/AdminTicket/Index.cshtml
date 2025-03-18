@@ -1,0 +1,112 @@
+﻿@using FleetManagement.UI.Models.Dto
+
+@model List<MaintenanceTicket>
+
+@{
+    ViewBag.Title = "Admin Ticket Management";
+}
+<div class="container mt-4">
+    <h2>Admin Ticket Management</h2>
+
+    <form method="get" asp-action="Index" class="row g-3 mb-3">
+        <div class="col-md-4">
+            <input type="text" name="search" value="@ViewBag.Search" placeholder="Search by Driver or Car License" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <select name="status" class="form-control">
+                <option value="">All Status</option>
+                <option value="pending" selected="@(ViewBag.FilterStatus == "pending" ? "selected" : null)">Pending</option>
+                <option value="approved" selected="@(ViewBag.FilterStatus == "approved" ? "selected" : null)">Approved</option>
+                <option value="rejected" selected="@(ViewBag.FilterStatus == "rejected" ? "selected" : null)">Rejected</option>
+                <option value="onhold" selected="@(ViewBag.FilterStatus == "onhold" ? "selected" : null)">On Hold</option>
+
+            </select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Ticket Number</th>
+                <th>Driver Name</th>
+                <th>Car License</th>
+                <th>Total Items</th>
+                <th>Total Cost</th>
+                <th>Date Logged</th>
+                <th>Status</th>
+                <th>Manage</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ticket in Model)
+            {
+                <tr>
+                    <td>@ticket.TicketNumber</td>
+                    <td>@ticket.DriverName</td>
+                    <td>@ticket.CarLicense</td>
+                    <td>@ticket.TotalQuantity</td>
+                    <td>₦@ticket.TotalCost.ToString("N2")</td>
+                    <td>@ticket.DateLogged.ToString("dd MMM yyyy HH:mm")</td>
+                    <td>
+                        @if (ticket.IsApproved)
+                        {
+                            <span class="badge bg-success">Approved</span>
+                        }
+                        else if (ticket.IsRejected)
+                        {
+                            <span class="badge bg-danger">Rejected</span>
+                        }
+                        else if (ticket.IsOnHold)
+                        {
+                            <span class="badge bg-secondary">On Hold</span>
+                        }
+                        else if (ticket.IsSubmitted)
+                        {
+                            <span class="badge bg-warning">Pending</span>
+                        }
+                    </td>
+                    <td>
+                        <form method="post" asp-action="UpdateStatus">
+                            <input type="hidden" name="ticketNumber" value="@ticket.TicketNumber" />
+                            <select name="status" class="form-control" onchange="this.form.submit();">
+                                <option value="">--Select--</option>
+                                <option value="approved">Approve</option>
+                                <option value="rejected">Reject</option>
+                                <option value="onhold">On Hold</option>
+                            </select>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)" asp-route-status="@ViewBag.FilterStatus" asp-route-search="@ViewBag.Search">Previous</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            }
+            <li class="page-item disabled"><span class="page-link">Page @ViewBag.CurrentPage of @ViewBag.TotalPages</span></li>
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)" asp-route-status="@ViewBag.FilterStatus" asp-route-search="@ViewBag.Search">Next</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Next</span></li>
+            }
+        </ul>
+    </nav>
+</div>
