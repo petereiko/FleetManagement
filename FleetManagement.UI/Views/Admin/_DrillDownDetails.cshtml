@@ -1,0 +1,77 @@
+﻿@using FleetManagement.UI.Models.Dto;
+
+@model List<MaintenanceTicket>
+
+<style>
+    /* Container styling for a sleek look */
+    .drilldown-table {
+        background: #fff;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+        /* Gradient header for the table */
+        .drilldown-table thead {
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            color: #fff;
+        }
+
+        .drilldown-table th, .drilldown-table td {
+            padding: 0.75rem;
+            vertical-align: middle;
+        }
+        /* Hover effect for table rows */
+        .drilldown-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+    /* Badge styling for status labels */
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.75em;
+    }
+</style>
+
+<div class="table-responsive drilldown-table">
+    <table class="table table-hover table-borderless mb-0">
+        <thead>
+            <tr>
+                <th>Ticket Number</th>
+                <th>Driver</th>
+                <th>Date Logged</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ticket in Model)
+            {
+                <tr>
+                    <td>@ticket.TicketNumber</td>
+                    <td>@(string.IsNullOrEmpty(ticket.DriverName) ? "Unknown" : ticket.DriverName)</td>
+                    <td>@ticket.DateLogged.ToString("dd MMM yyyy HH:mm")</td>
+                    <td>
+                        @if (ticket.IsApproved)
+                        {
+                            <span class="badge bg-success">Accepted</span>
+                        }
+                        else if (ticket.IsRejected)
+                        {
+                            <span class="badge bg-danger">Rejected</span>
+                        }
+                        else if (ticket.IsOnHold)
+                        {
+                            <span class="badge bg-secondary">On Hold</span>
+                        }
+                        else if (ticket.IsSubmitted)
+                        {
+                            <span class="badge bg-warning">Pending</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-info">Draft</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

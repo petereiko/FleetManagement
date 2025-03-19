@@ -391,16 +391,14 @@
     });
 
     // Function to load drill-down details in the modal (simulate AJAX call)
-    function loadDrillDownDetails(category) {
-        // In a real application, make an AJAX call to fetch detailed info from session.
-        var detailsHtml = "<div class='modal-header'><h5 class='modal-title'>Drill-Down Details: " + category + " Tickets</h5>" +
-                          "<button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button></div>" +
-                          "<div class='modal-body'><p>Details for " + category + " tickets would appear here. (This is simulated data.)</p></div>" +
-                          "<div class='modal-footer'><button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button></div>";
-        document.getElementById('drillDownContent').innerHTML = detailsHtml;
-        var modal = new bootstrap.Modal(document.getElementById('drillDownModal'));
-        modal.show();
+        function loadDrillDownDetails(category) {
+        $.get('@Url.Action("DrillDownDetails", "Admin")', { category: category }, function(html) {
+            document.getElementById('drillDownContent').innerHTML = html;
+            var modal = new bootstrap.Modal(document.getElementById('drillDownModal'));
+            modal.show();
+        });
     }
+
 
     // Export Tickets CSV button
     document.getElementById('exportTickets').addEventListener('click', function() {

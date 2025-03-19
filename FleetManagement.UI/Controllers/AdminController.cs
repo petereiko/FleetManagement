@@ -246,6 +246,41 @@ namespace FleetManagement.UI.Controllers
             return PartialView("_VehicleDetails", vehicle);
         }
 
+        [HttpGet]
+        public IActionResult DrillDownDetails(string category)
+        {
+            // Retrieve tickets from session
+            var sessionData = HttpContext.Session.GetString("MaintenanceTickets");
+            var tickets = string.IsNullOrEmpty(sessionData)
+                ? new List<MaintenanceTicket>()
+                : JsonSerializer.Deserialize<List<MaintenanceTicket>>(sessionData);
+
+            List<MaintenanceTicket> filteredTickets = new List<MaintenanceTicket>();
+
+            // Filter tickets based on the category clicked
+            switch (category.ToLower())
+            {
+                case "total received":
+                    // For example, here you could filter for tickets received this week.
+                    // For simplicity, we'll return all tickets.
+                    filteredTickets = tickets;
+                    break;
+                case "pending":
+                    filteredTickets = tickets.Where(t => t.IsSubmitted && !t.IsApproved && !t.IsRejected && !t.IsOnHold).ToList();
+                    break;
+                case "accepted":
+                    filteredTickets = tickets.Where(t => t.IsApproved).ToList();
+                    break;
+                case "rejected":
+                    filteredTickets = tickets.Where(t => t.IsRejected).ToList();
+                    break;
+                default:
+                    break;
+            }
+
+            return PartialView("_DrillDownDetails", filteredTickets);
+        }
+
 
     }
 }
