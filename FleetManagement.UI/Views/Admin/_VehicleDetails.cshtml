@@ -1,0 +1,112 @@
+﻿@using FleetManagement.UI.Models.CompanyAssetDto;
+
+@model Vehicle
+
+<style>
+    /* Custom styles for the vehicle details modal */
+    .vehicle-details-modal .modal-header {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        color: #fff;
+        border-bottom: none;
+    }
+
+    .vehicle-details-modal .modal-title i {
+        margin-right: 8px;
+    }
+
+    .vehicle-details-modal .modal-body {
+        background-color: #f8f9fa;
+    }
+
+    .vehicle-details-modal dt {
+        font-weight: bold;
+        color: #343a40;
+    }
+
+    .vehicle-details-modal dd {
+        color: #495057;
+    }
+
+    .color-box {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 1px solid #ccc;
+        margin-right: 5px;
+        vertical-align: middle;
+    }
+</style>
+
+<div class="modal-content vehicle-details-modal">
+    <div class="modal-header">
+        <h5 class="modal-title">
+            <i class="fas fa-car-side"></i>
+            Vehicle Details: @Model.Make @Model.Model
+            (<span class="fw-bold">@Model.LicensePlate</span>)
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <div class="card border-0">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Make:</dt>
+                    <dd class="col-sm-8">@Model.Make</dd>
+
+                    <dt class="col-sm-4">Model:</dt>
+                    <dd class="col-sm-8">@Model.Model</dd>
+
+                    <dt class="col-sm-4">Year:</dt>
+                    <dd class="col-sm-8">@Model.Year</dd>
+
+                    <dt class="col-sm-4">VIN:</dt>
+                    <dd class="col-sm-8">@Model.VIN</dd>
+
+                    <dt class="col-sm-4">License Plate:</dt>
+                    <dd class="col-sm-8">@Model.LicensePlate</dd>
+
+                    <dt class="col-sm-4">Color:</dt>
+                    <dd class="col-sm-8">
+                        <span class="color-box" style="background:@Model.Color;"></span> @Model.Color
+                    </dd>
+
+                    <dt class="col-sm-4">Engine No.:</dt>
+                    <dd class="col-sm-8">@Model.EngineNumber</dd>
+
+                    <dt class="col-sm-4">Chassis No.:</dt>
+                    <dd class="col-sm-8">@Model.ChassisNumber</dd>
+
+                    <dt class="col-sm-4">Registered On:</dt>
+                    <dd class="col-sm-8">@Model.RegistrationDate.ToString("dd MMM yyyy")</dd>
+
+                    <dt class="col-sm-4">Last Service:</dt>
+                    <dd class="col-sm-8">@Model.LastServiceDate?.ToString("dd MMM yyyy")</dd>
+
+                    <dt class="col-sm-4">Mileage:</dt>
+                    <dd class="col-sm-8">@Model.Mileage.ToString("N0") km</dd>
+
+                    <dt class="col-sm-4">Fuel Type:</dt>
+                    <dd class="col-sm-8">@Model.FuelType</dd>
+
+                    <dt class="col-sm-4">Transmission:</dt>
+                    <dd class="col-sm-8">@Model.Transmission</dd>
+
+                    <dt class="col-sm-4">Insurance:</dt>
+                    <dd class="col-sm-8">@Model.InsuranceCompany</dd>
+
+                    <dt class="col-sm-4">Insurance Expiry:</dt>
+                    <dd class="col-sm-8">@Model.InsuranceExpiryDate.ToString("dd MMM yyyy")</dd>
+
+                    <dt class="col-sm-4">Roadworthy Expiry:</dt>
+                    <dd class="col-sm-8">@Model.RoadWorthyExpiryDate.ToString("dd MMM yyyy")</dd>
+
+                    <dt class="col-sm-4">Status:</dt>
+                    <dd class="col-sm-8">@Model.Status</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+    </div>
+</div>

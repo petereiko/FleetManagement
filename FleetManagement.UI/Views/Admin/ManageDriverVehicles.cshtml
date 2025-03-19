@@ -1,0 +1,253 @@
+﻿@using FleetManagement.UI.Models.DummyModels
+@model DriverVehicleMappingViewModel
+
+@{
+    ViewBag.Title = "Manage Driver-Vehicle Assignments";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Custom CSS for professional look -->
+<style>
+    body {
+        background: #f4f7fa;
+    }
+
+    h2 {
+        color: #343a40;
+    }
+
+    .card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .table {
+        background: #fff;
+    }
+
+    .form-control {
+        border-radius: 0.25rem;
+    }
+
+    .btn {
+        border-radius: 0.25rem;
+    }
+
+    .modal-header, .modal-footer {
+        background: #007bff;
+        color: #fff;
+    }
+
+    .modal-body {
+        background: #f8f9fa;
+    }
+
+    .view-vehicle-details {
+        cursor: pointer;
+        color: #007bff;
+        text-decoration: underline;
+    }
+</style>
+
+<div class="container mt-4">
+    <h2>Driver-Vehicle Assignments</h2>
+
+    <!-- Current Assignment Table -->
+    <h4>Current Assignments</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Driver</th>
+                <th>Assigned Vehicles</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var driver in Model.Drivers)
+            {
+                var assignedVehicles = Model.Vehicles.Where(v => v.AssignedDriverId == driver.Id).ToList();
+                <tr>
+                    <td>@driver.FullName</td>
+                    <td>
+                        @if (assignedVehicles.Any())
+                        {
+                            <ul>
+                                @foreach (var vehicle in assignedVehicles)
+                                {
+                                    <li>
+                                        @vehicle.Make @vehicle.Model (@vehicle.LicensePlate)
+                                        <span class="view-vehicle-details" data-vehicle-id="@vehicle.Id">[View Details]</span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <em>None</em>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Assignment Form -->
+    <div class="card mt-4">
+        <div class="card-header">
+            Map Vehicles to Driver
+        </div>
+        <div class="card-body">
+            <div class="form-group mb-3">
+                <label for="driverSelect">Select Driver</label>
+                <select id="driverSelect" class="form-control">
+                    <option value="">-- Select Driver --</option>
+                    @foreach (var driver in Model.Drivers)
+                    {
+                        <option value="@driver.Id" selected="@(driver.Id == Model.SelectedDriverId ? "selected" : null)">
+                            @driver.FullName
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label>Available Vehicles</label>
+                <div id="vehiclesCheckboxes">
+                    <!-- Dynamic checkboxes will be populated here -->
+                </div>
+            </div>
+
+            <button id="updateAssignment" class="btn btn-success">Update Assignment</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Vehicle Details Partial -->
+<div class="modal fade" id="vehicleDetailsModal" tabindex="-1" aria-labelledby="vehicleDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="vehicleDetailsContent">
+            <!-- Partial view content will load here dynamically -->
+        </div>
+    </div>
+</div>
+
+<!-- Include jQuery and Toastify if not already in layout -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script>
+    // Pass the vehicles list to JavaScript
+    var allVehicles = @Html.Raw(Json.Serialize(Model.Vehicles));
+
+    // Function to update checkboxes based on selected driver
+    function updateVehicleCheckboxes(selectedDriverId) {
+        var container = $("#vehiclesCheckboxes");
+        container.empty();
+
+        // Filter vehicles that are unassigned or assigned to the selected driver
+        var availableVehicles = allVehicles.filter(function(vehicle) {
+            return (!vehicle.isAssigned) || (vehicle.assignedDriverId === selectedDriverId);
+        });
+
+        if (availableVehicles.length === 0) {
+            container.append("<p>No vehicles available for assignment.</p>");
+        } else {
+            availableVehicles.forEach(function(vehicle) {
+                var isChecked = (vehicle.isAssigned && vehicle.assignedDriverId === selectedDriverId) ? "checked" : "";
+                var checkboxHtml = "<div class='form-check'>" +
+                                   "<input type='checkbox' class='form-check-input vehicle-checkbox' data-vehicle-id='" + vehicle.id + "' " + isChecked + ">" +
+                                   "<label class='form-check-label'>" + vehicle.make + " " + vehicle.model + " (" + vehicle.licensePlate + ")</label>" +
+                                   "</div>";
+                container.append(checkboxHtml);
+            });
+        }
+    }
+
+    // On driver selection change
+    $("#driverSelect").on("change", function() {
+        var selectedDriverId = $(this).val();
+        updateVehicleCheckboxes(selectedDriverId);
+    });
+
+    // On update assignment button click
+    $("#updateAssignment").on("click", function() {
+        var selectedDriverId = $("#driverSelect").val();
+        if (!selectedDriverId) {
+            Toastify({
+                text: "Please select a driver.",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#dc3545",
+            }).showToast();
+            return;
+        }
+        var assignedVehicleIds = [];
+        $(".vehicle-checkbox:checked").each(function() {
+            assignedVehicleIds.push($(this).data("vehicle-id"));
+        });
+
+        $.ajax({
+            url: '@Url.Action("AssignVehicles", "Admin")',
+            type: 'POST',
+            data: {
+                selectedDriverId: selectedDriverId,
+                vehicleIds: assignedVehicleIds
+            },
+            traditional: true, // Important for sending array data
+            success: function(response) {
+                if (response.success) {
+                    Toastify({
+                        text: "Assignment updated successfully!",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#28a745",
+                    }).showToast();
+                    // Reload page to update the assignments table and global data
+                    location.reload();
+                } else {
+                    Toastify({
+                        text: "Failed to update assignment.",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#dc3545",
+                    }).showToast();
+                }
+            },
+            error: function() {
+                Toastify({
+                    text: "Error updating assignment.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                }).showToast();
+            }
+        });
+    });
+
+    // On page load, update checkboxes for the default selected driver
+    $(document).ready(function() {
+        var selectedDriverId = $("#driverSelect").val();
+        if(selectedDriverId) {
+            updateVehicleCheckboxes(selectedDriverId);
+        }
+
+        // Attach click event for view details link (delegated event)
+        $(document).on("click", ".view-vehicle-details", function() {
+            var vehicleId = $(this).data("vehicle-id");
+            // Load partial view for vehicle details via AJAX
+            $.get('@Url.Action("VehicleDetails", "Admin")', { vehicleId: vehicleId }, function(data) {
+                $("#vehicleDetailsContent").html(data);
+                var modal = new bootstrap.Modal(document.getElementById('vehicleDetailsModal'));
+                modal.show();
+            });
+        });
+    });
+</script>

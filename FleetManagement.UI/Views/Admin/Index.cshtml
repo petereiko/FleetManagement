@@ -1,53 +1,474 @@
-﻿<div class="container mt-4">
-    <h2 class="mb-4">Admin/HR Dashboard - Ticket Management</h2>
-    <div class="d-flex justify-content-between mb-3">
-        <a href="/Admin/ManageVehicles" class="btn btn-primary">Manage Vehicles</a>
-        <a href="/Admin/ManageDrivers" class="btn btn-secondary">Manage Drivers</a>
+﻿@using FleetManagement.UI.Models.DummyModels
+@model AdminDashboardViewModel
+
+@{
+    ViewBag.Title = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Include DataTables CSS/JS and Toastify (if not already included in your layout) -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>@* 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script> *@
+
+<!-- Inline CSS for blinking notification icon and chart sizing -->
+<!-- Inline CSS for notifications and chart container styling -->
+<style>
+    .blinking-icon {
+        animation: blinker 1s linear infinite;
+        color: #fff;
+        margin-left: 10px;
+    }
+
+    @@keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+    }
+
+    .chart-container {
+        max-height: 250px;
+    }
+    /* Notification Panel Styling */
+    .notification-panel {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+
+        .notification-panel h5 {
+            margin-bottom: 15px;
+        }
+
+    .notification-item {
+        padding: 5px 0;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item a {
+            text-decoration: none;
+        }
+
+    .clear-btn {
+        float: right;
+        font-size: 0.9rem;
+        cursor: pointer;
+        color: #007bff;
+    }
+</style>
+<div class="container-fluid">
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <!-- Notification Center Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <h5>
+            Recent Notifications
+            <button class="btn btn-link text-danger" id="clearNotifications">Clear</button>
+        </h5>
+        <div id="notificationItems">
+            @if (Model.Notifications != null && Model.Notifications.Any())
+            {
+                foreach (var note in Model.Notifications)
+                {
+                    <div class="notification-item">
+                        <a href="/Admin/AdminTicket" class="text-primary">
+                            <i class="fas fa-info-circle"></i> @note
+                        </a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="notification-item">
+                    <em>No notifications at this time.</em>
+                </div>
+            }
+        </div>
     </div>
-    <table class="table table-striped table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Ticket ID</th>
-                <th>Driver Name</th>
-                <th>Vehicle License Plate</th>
-                <th>Request Details</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>#1234</td>
-                <td>John Doe</td>
-                <td>ABC-123XYZ</td>
-                <td>Request for vehicle maintenance</td>
-                <td><span class="badge bg-warning text-dark">Pending</span></td>
-                <td>
-                    <button class="btn btn-success btn-sm">Approve</button>
-                    <button class="btn btn-danger btn-sm">Reject</button>
-                    <button class="btn btn-warning btn-sm">Put on Hold</button>
-                </td>
-            </tr>
-            <tr>
-                <td>#1235</td>
-                <td>Jane Smith</td>
-                <td>XYZ-456ABC</td>
-                <td>Request for route change</td>
-                <td><span class="badge bg-success">Approved</span></td>
-                <td>
-                    <button class="btn btn-secondary btn-sm" disabled>Approved</button>
-                </td>
-            </tr>
-            <tr>
-                <td>#1236</td>
-                <td>Michael Brown</td>
-                <td>LMN-789DEF</td>
-                <td>Vehicle damage report</td>
-                <td><span class="badge bg-danger">Rejected</span></td>
-                <td>
-                    <button class="btn btn-secondary btn-sm" disabled>Rejected</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="row">
+        <!-- Assets Card -->
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Assets</h5>
+                    <h2>@Model.TotalAssets</h2>
+                    <a href="/Assets" class="btn btn-light btn-sm mt-2">Manage Assets</a>
+                </div>
+            </div>
+        </div>
+        <!-- Staff Card -->
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Total Drivers</h5>
+                    <h2>@Model.TotalDrivers</h2>
+                    <a href="/Admin/ManageDriverVehicles" class="btn btn-light btn-sm mt-2">Manage Drivers</a>
+                </div>
+            </div>
+        </div>
+        <!-- Reports Card -->
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Reports Filed</h5>
+                    <h2>@Model.TotalReports</h2>
+                    <a href="/Reports" class="btn btn-light btn-sm mt-2">View Reports</a>
+                </div>
+            </div>
+        </div>
+        <!-- Pending Tickets Card with Blinking Notification -->
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Tickets</h5>
+                    <h2>
+                        @Model.PendingTickets
+                        @if (Model.PendingTickets > 0)
+                        {
+                            <span class="blinking-icon"><i class="fas fa-bell"></i></span>
+                        }
+                    </h2>
+                    <a href="/Admin/AdminTicket" class="btn btn-light btn-sm mt-2">Manage Tickets</a>
+                    <button id="exportTickets" class="btn btn-light btn-sm mt-2">Export Tickets CSV</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Tables for Recent Data -->
+    <div class="row">
+        <!-- Recent Assets Table -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Recent Assets
+                </div>
+                <div class="card-body">
+                    <table id="assetsTable" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Asset ID</th>
+                                <th>Name</th>
+                                <th>Condition</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var asset in Model.RecentAssets)
+                            {
+                                <tr>
+                                    <td>@asset.Id</td>
+                                    <td>@asset.Name</td>
+                                    <td>@asset.Condition</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <a href="/Assets" class="btn btn-primary btn-sm">View All Assets</a>
+                </div>
+            </div>
+        </div>
+        <!-- Recent Staff Table -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Recent Staff
+                </div>
+                <div class="card-body">
+                    <table id="staffTable" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Staff ID</th>
+                                <th>Name</th>
+                                <th>Position</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var staff in Model.RecentStaff)
+                            {
+                                <tr>
+                                    <td>@staff.Id</td>
+                                    <td>@staff.FullName</td>
+                                    <td>@staff.Position</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <a href="/Staff" class="btn btn-primary btn-sm">View All Staff</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reports Table -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Recent Reports
+                </div>
+                <div class="card-body">
+                    <table id="reportsTable" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Report ID</th>
+                                <th>Title</th>
+                                <th>Date Filed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var report in Model.RecentReports)
+                            {
+                                <tr>
+                                    <td>@report.Id</td>
+                                    <td>@report.Title</td>
+                                    <td>@report.DateFiled.ToString("dd MMM yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <a href="/Reports" class="btn btn-primary btn-sm">View All Reports</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mt-4">
+        <!-- Doughnut Chart: Accepted vs Rejected Tickets (clickable for drill-down) -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Accepted vs Rejected Tickets
+                </div>
+                <div class="card-body chart-container">
+                    <canvas id="ticketsDoughnutChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Bar Chart: Tickets This Week Overview (clickable for drill-down) -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Tickets This Week Overview
+                </div>
+                <div class="card-body chart-container">
+                    <canvas id="ticketsBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Line Chart: Ticket Trend (Last 7 Days) -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    Ticket Trend (Last 7 Days)
+                </div>
+                <div class="card-body chart-container">
+                    <canvas id="ticketsLineChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Modal for Drill-Down Details -->
+<div class="modal fade" id="drillDownModal" tabindex="-1" aria-labelledby="drillDownModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="drillDownContent">
+            <!-- Drill-down details will load here -->
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Initialize DataTables on the recent tables
+    $(document).ready(function(){
+        $('#assetsTable').DataTable();
+        $('#staffTable').DataTable();
+        $('#reportsTable').DataTable();
+    });
+
+    // Doughnut Chart: Accepted vs Rejected Tickets
+    var ctx = document.getElementById('ticketsDoughnutChart').getContext('2d');
+    var ticketsDoughnutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Accepted', 'Rejected'],
+            datasets: [{
+                data: [@Model.TotalAcceptedTickets, @Model.TotalRejectedTickets],
+                backgroundColor: ['#28a745', '#dc3545'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            onClick: function(evt, activeEls) {
+                if (activeEls.length > 0) {
+                    var index = activeEls[0].index;
+                    var label = this.data.labels[index];
+                    // Call a function to load drill-down details based on the label (Accepted or Rejected)
+                    loadDrillDownDetails(label);
+                }
+            },
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Bar Chart: Tickets This Week Overview
+    var ctx2 = document.getElementById('ticketsBarChart').getContext('2d');
+    var ticketsBarChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ['Total Received', 'Pending'],
+            datasets: [{
+                label: 'Tickets',
+                data: [@Model.TotalTicketsReceivedWeek, @Model.PendingTicketsWeek],
+                backgroundColor: ['#007bff', '#ffc107'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            onClick: function(evt, activeEls) {
+                if (activeEls.length > 0) {
+                    var index = activeEls[0].index;
+                    var label = this.data.labels[index];
+                    loadDrillDownDetails(label);
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Line Chart: Ticket Trend (simulate daily counts for last 7 days)
+    var dailyCounts = @Html.Raw(Json.Serialize(Model.DailyTicketCounts)); // Model.DailyTicketCounts should be a list of integers for last 7 days
+    var ctx3 = document.getElementById('ticketsLineChart').getContext('2d');
+    var ticketsLineChart = new Chart(ctx3, {
+        type: 'line',
+        data: {
+            labels: @Html.Raw(Json.Serialize(Model.Last7Days)), // e.g. ["Mon","Tue",...]
+            datasets: [{
+                label: 'Tickets per Day',
+                data: dailyCounts,
+                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                borderColor: '#007bff',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+
+    // Function to load drill-down details in the modal (simulate AJAX call)
+    function loadDrillDownDetails(category) {
+        // In a real application, make an AJAX call to fetch detailed info from session.
+        var detailsHtml = "<div class='modal-header'><h5 class='modal-title'>Drill-Down Details: " + category + " Tickets</h5>" +
+                          "<button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button></div>" +
+                          "<div class='modal-body'><p>Details for " + category + " tickets would appear here. (This is simulated data.)</p></div>" +
+                          "<div class='modal-footer'><button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button></div>";
+        document.getElementById('drillDownContent').innerHTML = detailsHtml;
+        var modal = new bootstrap.Modal(document.getElementById('drillDownModal'));
+        modal.show();
+    }
+
+    // Export Tickets CSV button
+    document.getElementById('exportTickets').addEventListener('click', function() {
+        window.location.href = '@Url.Action("ExportTicketsCsv", "Admin")'; // Ensure you create this action in AdminController
+    });
+
+
+    // Function to update notifications in the panel
+    function updateNotifications(notifications) {
+        var container = $("#notificationItems");
+        container.empty();
+        if (notifications.length > 0) {
+            notifications.forEach(function(note) {
+                container.append("<div class='notification-item'><a href='/Admin/AdminTicket' class='text-primary'><i class='fas fa-info-circle'></i> " + note + "</a></div>");
+            });
+        } else {
+            container.append("<div class='notification-item'><em>No notifications at this time.</em></div>");
+        }
+    }
+
+    // Poll for new notifications every 30 seconds
+    setInterval(function() {
+        $.ajax({
+            url: '@Url.Action("GetNotifications", "Admin")',
+            type: 'GET',
+            success: function(data) {
+                updateNotifications(data);
+            },
+            error: function() {
+                console.error("Error fetching notifications.");
+            }
+        });
+    }, 30000); // 30,000 milliseconds = 30 seconds
+
+    // Clear Notifications button
+    $("#clearNotifications").on("click", function() {
+        $.ajax({
+            url: '@Url.Action("ClearNotifications", "Admin")',
+            type: 'POST',
+            success: function(response) {
+                console.log("Clear notifications response:", response);
+                if(response.success) {
+                    updateNotifications([]);
+                    Toastify({
+                        text: "Notifications cleared.",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#28a745",
+                    }).showToast();
+                }
+            },
+            error: function() {
+                console.error("Error clearing notifications.");
+            }
+        });
+    });
+
+    // Example: Toastify for notifications on drill-down load success
+    function showToast(message, color) {
+        Toastify({
+            text: message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: color,
+        }).showToast();
+    }
+</script>

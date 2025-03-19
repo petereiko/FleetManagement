@@ -81,7 +81,21 @@ namespace FleetManagement.UI.Controllers
             {
                 activeTicket.IsSubmitted = true;
                 SaveTicketsToSession(tickets);
+
+                // Retrieve notifications from session
+                var notificationsSession = HttpContext.Session.GetString("AdminNotifications");
+                List<string> notifications;
+                if (string.IsNullOrEmpty(notificationsSession))
+                    notifications = new List<string>();
+                else
+                    notifications = JsonSerializer.Deserialize<List<string>>(notificationsSession);
+
+                // Add a new notification
+                notifications.Add($"{activeTicket.DriverName} raised a new ticket: {activeTicket.TicketNumber}");
+                HttpContext.Session.SetString("AdminNotifications", JsonSerializer.Serialize(notifications));
+
             }
+
 
             return RedirectToAction("TicketList");
         }

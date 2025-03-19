@@ -20,8 +20,13 @@
         public DateTime InsuranceExpiryDate { get; set; }
         public DateTime RoadWorthyExpiryDate { get; set; }
         public string Status { get; set; } // Active, Inactive, Under Maintenance
+        public bool IsAssigned { get; set; }
+        public string AssignedDriverId { get; set; }
+        public string AssignedDriverName { get; set; }
+
 
         public List<VehicleDocument> Documents { get; set; } = new List<VehicleDocument>();
+
     }
 
     public class VehicleDocument
@@ -32,4 +37,11 @@
         public string FilePath { get; set; }
         public DateTime UploadDate { get; set; }
     }
+
+    public class Driver
+    {
+        public string Id { get; set; }
+        public string FullName { get; set; }
+    }
+
 }

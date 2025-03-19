@@ -9,6 +9,10 @@
 <div class="container mt-4">
     <h2>Admin Ticket Management</h2>
 
+    <div class="col-md-12">
+        <a asp-controller="Admin" asp-action="Index" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+
     <form method="get" asp-action="Index" class="row g-3 mb-3">
         <div class="col-md-4">
             <input type="text" name="search" value="@ViewBag.Search" placeholder="Search by Driver or Car License" class="form-control" />
@@ -158,14 +162,43 @@
                             newBadge = '<span class="badge bg-warning">Pending</span>';
                             break;
                     }
-                    statusCell.innerHTML = newBadge;
+                        statusCell.innerHTML = newBadge;
+
+
+
+                        // Show success toast
+                    Toastify({
+                        text: "Status updated successfully!",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top", // `top` or `bottom`
+                        position: "right", // `left`, `center` or `right`
+                        backgroundColor: "#28a745",
+                    }).showToast();
                 } else {
-                    alert("Status update failed.");
+                    // Show error toast
+                    Toastify({
+                        text: "Status update failed.",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#dc3545",
+                    }).showToast();
                 }
             })
             .catch(error => {
                 console.error('Error updating status:', error);
-                alert("An error occurred while updating the status.");
+
+                // Show error toast
+                Toastify({
+                    text: "An error occurred while updating the status.",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#dc3545",
+                }).showToast();
             });
         });
     });
