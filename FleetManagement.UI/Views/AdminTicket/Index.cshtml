@@ -5,7 +5,264 @@
 @{
     ViewBag.Title = "Admin Ticket Management";
 }
+
+<style>
+    .table-responsive {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.75em;
+    }
+
+    /* .reject-reason {
+        display: none; */
+    }
+</style>
+
 <div class="container mt-4">
+    <h2 class="mb-4">Admin Ticket Management</h2>
+
+    <!-- Filter Form -->
+    <form method="get" asp-action="Index" class="row g-3 mb-3">
+        <div class="col-md-4">
+            <input type="text" name="search" value="@ViewBag.Search" placeholder="Search by Driver or Car License" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <select name="status" class="form-control">
+                <option value="">All Status</option>
+                <option value="pending" selected="@(ViewBag.FilterStatus == "pending" ? "selected" : null)">Pending</option>
+                <option value="approved" selected="@(ViewBag.FilterStatus == "approved" ? "selected" : null)">Approved</option>
+                <option value="rejected" selected="@(ViewBag.FilterStatus == "rejected" ? "selected" : null)">Rejected</option>
+                <option value="onhold" selected="@(ViewBag.FilterStatus == "onhold" ? "selected" : null)">On Hold</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+
+    <!-- Tickets Table -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Ticket #</th>
+                    <th>Driver Name</th>
+                    <th>Car License</th>
+                    <th>Total Items</th>
+                    <th>Total Cost</th>
+                    <th>Date Logged</th>
+                    <th>Status</th>
+                    <th>Manage</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ticket in Model)
+                {
+                    <tr>
+                        <td>@ticket.TicketNumber</td>
+                        <td>@ticket.DriverName</td>
+                        <td>@ticket.CarLicense</td>
+                        <td>@ticket.TotalQuantity</td>
+                        <td>₦@ticket.TotalCost.ToString("N2")</td>
+                        <td>@ticket.DateLogged.ToString("dd MMM yyyy HH:mm")</td>
+                        <td>
+                            @if (ticket.IsApproved)
+                            {
+                                <span class="badge bg-success">Approved</span>
+                            }
+                            else if (ticket.IsRejected)
+                            {
+                                <span class="badge bg-danger">Rejected</span>
+                            }
+                            else if (ticket.IsOnHold)
+                            {
+                                <span class="badge bg-secondary">On Hold</span>
+                            }
+                            else if (ticket.IsSubmitted)
+                            {
+                                <span class="badge bg-warning">Pending</span>
+                            }
+                        </td>
+                        <td>
+                            <select name="status" class="form-control status-select" onchange="SubmitStatus('@ticket.TicketNumber', this)">
+                                <option value="">--Select--</option>
+                                <option value="approved">Approve</option>
+                                <option value="rejected">Reject</option>
+                                <option value="onhold">On Hold</option>
+                            </select>
+                            @* <form method="post" asp-action="UpdateStatus" id="statusForm-@ticket.TicketNumber">
+                                <input type="hidden" name="ticketNumber" value="@ticket.TicketNumber" />
+                                <select name="status" class="form-control status-select" data-ticket="@ticket.TicketNumber">
+                                    <option value="">--Select--</option>
+                                    <option value="approved">Approve</option>
+                                    <option value="rejected">Reject</option>
+                                    <option value="onhold">On Hold</option>
+                                </select>
+                            </form> *@
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)" asp-route-status="@ViewBag.FilterStatus" asp-route-search="@ViewBag.Search">Previous</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            }
+            <li class="page-item disabled"><span class="page-link">Page @ViewBag.CurrentPage of @ViewBag.TotalPages</span></li>
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)" asp-route-status="@ViewBag.FilterStatus" asp-route-search="@ViewBag.Search">Next</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Next</span></li>
+            }
+        </ul>
+    </nav>
+</div>
+
+<!-- Reject Reason Modal -->
+<div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectReasonModalLabel">Enter Rejection Reason</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="rejectReason" class="form-control" placeholder="Enter reason for rejection"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmReject">Reject Ticket</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+        // When the admin confirms the rejection reason:
+        document.getElementById('confirmReject').addEventListener('click', function () {
+            let reason = document.getElementById('rejectReason').value.trim();
+            console.log("Rejection Reason:", reason);
+
+            if (reason === "") {
+                alert("Please provide a reason for rejection.");
+                return;
+            }
+
+            if (!currentTicket) {
+                console.error("No ticket selected!");
+                return;
+            }
+
+            let form = document.getElementById(`statusForm-${currentTicket}`);
+            if (!form) {
+                console.error("Form not found for ticket:", currentTicket);
+                return;
+            }
+
+            console.log("Form Element:", form);
+
+            // Remove any previous hidden input for rejectReason
+            let existing = form.querySelector('input[name="rejectReason"]');
+            if (existing) {
+                existing.remove();
+            }
+
+            let input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "rejectReason";
+            input.value = reason;
+            form.appendChild(input);
+
+            console.log("Submitting form with rejection reason...");
+            form.submit();
+        });
+    });
+
+    function SubmitStatus(ticketNumber, e){
+        console.log(ticketNumber);
+    }
+
+
+</script>
+
+
+
+@* <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let currentTicket = null;
+
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', function (e) {
+                e.preventDefault(); // Prevent any default action
+                let selectedValue = this.value;
+                currentTicket = this.dataset.ticket;
+
+                if (selectedValue === "rejected") {
+                    // Clear the selection to prevent immediate form submission
+                    this.value = "";
+                    // Show the rejection reason modal
+                    var rejectModal = new bootstrap.Modal(document.getElementById('rejectReasonModal'));
+                    rejectModal.show();
+                } else if (selectedValue !== "") {
+                    // For other statuses, submit the form normally
+                    document.getElementById(`statusForm-${currentTicket}`).submit();
+                }
+            });
+        });
+
+        // When the admin confirms the rejection reason:
+        document.getElementById('confirmReject').addEventListener('click', function () {
+            let reason = document.getElementById('rejectReason').value.trim();
+            if (reason === "") {
+                alert("Please provide a reason for rejection.");
+                return;
+            }
+
+            // Append the rejectReason to the form
+            let form = document.getElementById(`statusForm-${currentTicket}`);
+            // Remove any previous hidden input for rejectReason
+            let existing = form.querySelector('input[name="rejectReason"]');
+            if (existing) { existing.remove(); }
+            let input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "rejectReason";
+            input.value = reason;
+            form.appendChild(input);
+
+            // Set the status to "rejected" and submit the form
+            form.querySelector('select.status-select').value = "rejected";
+            form.submit();
+        });
+    });
+</script>
+ *@
+
+
+
+
+@* <div class="container mt-4">
     <h2>Admin Ticket Management</h2>
 
     <form method="get" asp-action="Index" class="row g-3 mb-3">
@@ -110,3 +367,4 @@
         </ul>
     </nav>
 </div>
+ *@
