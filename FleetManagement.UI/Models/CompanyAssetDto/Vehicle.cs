@@ -38,10 +38,10 @@
         public DateTime UploadDate { get; set; }
     }
 
-    public class Driver
-    {
-        public string Id { get; set; }
-        public string FullName { get; set; }
-    }
+    //public class Driver
+    //{
+    //    public string Id { get; set; }
+    //    public string FullName { get; set; }
+    //}
 
 }

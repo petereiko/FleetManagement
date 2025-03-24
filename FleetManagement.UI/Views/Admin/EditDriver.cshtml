@@ -1,0 +1,173 @@
+﻿@using FleetManagement.UI.Models.DriverDTOs;
+
+@model Driver
+
+@{
+    ViewData["Title"] = "Edit Driver";
+}
+
+@* <div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4>Edit Driver Details</h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="EditDriver" method="post" class="form-horizontal">
+            <!-- Hidden field for driver ID -->
+            <input type="hidden" asp-for="Id" />
+
+            <!-- Personal Information -->
+            <h5 class="mb-3">Personal Information</h5>
+            <div class="mb-3 row">
+                <label asp-for="FirstName" class="col-sm-3 col-form-label">First Name</label>
+                <div class="col-sm-9">
+                    <input asp-for="FirstName" class="form-control" placeholder="Enter First Name" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="MiddleName" class="col-sm-3 col-form-label">Middle Name</label>
+                <div class="col-sm-9">
+                    <input asp-for="MiddleName" class="form-control" placeholder="Enter Middle Name" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="LastName" class="col-sm-3 col-form-label">Last Name</label>
+                <div class="col-sm-9">
+                    <input asp-for="LastName" class="form-control" placeholder="Enter Last Name" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="Email" class="col-sm-3 col-form-label">Email</label>
+                <div class="col-sm-9">
+                    <input asp-for="Email" type="email" class="form-control" placeholder="Enter Email" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="PhoneNumber" class="col-sm-3 col-form-label">Phone Number</label>
+                <div class="col-sm-9">
+                    <input asp-for="PhoneNumber" type="tel" class="form-control" placeholder="Enter Phone Number" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="Address" class="col-sm-3 col-form-label">Address</label>
+                <div class="col-sm-9">
+                    <textarea asp-for="Address" class="form-control" placeholder="Enter Address"></textarea>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="DateOfBirth" class="col-sm-3 col-form-label">Date of Birth</label>
+                <div class="col-sm-9">
+                    <input asp-for="DateOfBirth" type="date" class="form-control" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="Gender" class="col-sm-3 col-form-label">Gender</label>
+                <div class="col-sm-9">
+                    <select asp-for="Gender" class="form-select">
+                        <option value="">--Select Gender--</option>
+                        <option value="Male" selected="@(Model.Gender == \"Male\" ? \"selected\" : null)">Male</option>
+                        <option value="Female" selected="@(Model.Gender == \"Female\" ? \"selected\" : null)">Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- Employment Details -->
+            <h5 class="mb-3">Employment Details</h5>
+            <div class="mb-3 row">
+                <label asp-for="EmployeeId" class="col-sm-3 col-form-label">Employee ID</label>
+                <div class="col-sm-9">
+                    <input asp-for="EmployeeId" class="form-control" placeholder="Enter Employee ID" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="DateHired" class="col-sm-3 col-form-label">Date Hired</label>
+                <div class="col-sm-9">
+                    <input asp-for="DateHired" type="date" class="form-control" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="EmploymentStatus" class="col-sm-3 col-form-label">Employment Status</label>
+                <div class="col-sm-9">
+                    <select asp-for="EmploymentStatus" class="form-select">
+                        <option value="Active" selected="@(Model.EmploymentStatus == \"Active\" ? \"selected\" : null)">Active</option>
+                        <option value="Inactive" selected="@(Model.EmploymentStatus == \"Inactive\" ? \"selected\" : null)">Inactive</option>
+                        <option value="Suspended" selected="@(Model.EmploymentStatus == \"Suspended\" ? \"selected\" : null)">Suspended</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- License and Vehicle Information -->
+            <h5 class="mb-3">Driver's License & Vehicle</h5>
+            <div class="mb-3 row">
+                <label asp-for="LicenseNumber" class="col-sm-3 col-form-label">License Number</label>
+                <div class="col-sm-9">
+                    <input asp-for="LicenseNumber" class="form-control" placeholder="Enter License Number" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="LicenseExpiryDate" class="col-sm-3 col-form-label">License Expiry Date</label>
+                <div class="col-sm-9">
+                    <input asp-for="LicenseExpiryDate" type="date" class="form-control" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="LicenseCategory" class="col-sm-3 col-form-label">License Category</label>
+                <div class="col-sm-9">
+                    <select asp-for="LicenseCategory" class="form-select">
+                        <option>--Select Category--</option>
+                        <option value=\"Class A\" selected="@(Model.LicenseCategory == \"Class A\" ? \"selected\" : null)">Class A</option>
+                        <option value=\"Class B\" selected="@(Model.LicenseCategory == \"Class B\" ? \"selected\" : null)">Class B</option>
+                        <option value=\"Class C\" selected="@(Model.LicenseCategory == \"Class C\" ? \"selected\" : null)">Class C</option>
+                        <option value=\"Class D\" selected="@(Model.LicenseCategory == \"Class D\" ? \"selected\" : null)">Class D</option>
+                        <option value=\"Class E\" selected="@(Model.LicenseCategory == \"Class E\" ? \"selected\" : null)">Class E</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="AssignedVehicle" class="col-sm-3 col-form-label">Assigned Vehicle</label>
+                <div class="col-sm-9">
+                    <select asp-for="AssignedVehicle" class="form-select">
+                        <option>Select Vehicle</option>
+                        <option>Toyota Camry - ABC123</option>
+                        <option>Honda Civic - XYZ789</option>
+                        <option>Ford Focus - FOC456</option>
+                        <option>Nissan Altima - ALT654</option>
+                        <option>Toyota Tundra - VALL423</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- Emergency Contact Information -->
+            <h5 class="mb-3">Next of Kin Information</h5>
+            <div class="mb-3 row">
+                <label asp-for="EmergencyContactName" class="col-sm-3 col-form-label">Next of Kin Name</label>
+                <div class="col-sm-9">
+                    <input asp-for="EmergencyContactName" class="form-control" placeholder="Enter Next of Kin Name" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="EmergencyContactPhone" class="col-sm-3 col-form-label">Next of Kin Contact</label>
+                <div class="col-sm-9">
+                    <input asp-for="EmergencyContactPhone" type="tel" class="form-control" placeholder="Enter Contact Number" />
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="Relationship" class="col-sm-3 col-form-label">Relationship</label>
+                <div class="col-sm-9">
+                    <input asp-for="Relationship" class="form-control" placeholder="Specify Relationship" />
+                </div>
+            </div>
+
+            <div class="text-end p-3">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a asp-action="ListDrivers" class="btn btn-secondary ms-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+ *@

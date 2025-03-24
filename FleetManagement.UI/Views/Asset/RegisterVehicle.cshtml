@@ -205,19 +205,25 @@
         showStep(currentStep);
     });
 
-     document.getElementById('DocumentCount').addEventListener('input', function() {
+         document.getElementById('DocumentCount').addEventListener('input', function() {
         var count = parseInt(this.value) || 0;
         var container = document.getElementById('documentUploads');
         container.innerHTML = '';
 
         for (var i = 0; i < count; i++) {
             var div = document.createElement('div');
-            div.classList.add('form-group');
-            div.innerHTML = '<label>Upload Document ' + (i + 1) + '</label>' +
-                            '<input type="file" asp-for="Documents" class="form-control" required />';
+            div.classList.add('form-group', 'mb-3');
+            div.innerHTML = `
+                <label>Document ${i + 1} Name *</label>
+                <input type="text" name="DocumentNames[]" class="form-control mb-2" placeholder="Enter document name" required />
+
+                <label>Upload Document ${i + 1} *</label>
+                <input type="file" name="Documents[]" class="form-control" required />
+            `;
             container.appendChild(div);
         }
     });
+
     document.addEventListener("DOMContentLoaded", function () {
             flatpickr("#datePicker", {
                 enableTime: false, // Set to true if you want time selection

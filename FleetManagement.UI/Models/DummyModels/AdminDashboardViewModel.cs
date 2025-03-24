@@ -1,4 +1,6 @@
-﻿namespace FleetManagement.UI.Models.DummyModels
+﻿using FleetManagement.UI.Models.DriverDTOs;
+
+namespace FleetManagement.UI.Models.DummyModels
 {
     public class AdminDashboardViewModel
     {
@@ -23,5 +25,6 @@
         public IEnumerable<Asset> RecentAssets { get; set; }
         public IEnumerable<Staff> RecentStaff { get; set; }
         public IEnumerable<Report> RecentReports { get; set; }
+        public IEnumerable<Driver> ListOfDrivers { get; set; }  
     }
 }

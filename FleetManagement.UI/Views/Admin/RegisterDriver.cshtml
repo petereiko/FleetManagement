@@ -1,0 +1,209 @@
+﻿@using FleetManagement.UI.Models.DriverDTOs;
+
+@model Driver
+
+@{
+    ViewBag.Title = "Driver Onboarding";
+}
+
+
+<div class="card">
+    <div class="card-body pb-0">
+        <h4 class="card-title">Employee Assignment</h4>
+    </div>
+    <form class="form-horizontal r-separator" asp-action="RegisterDriver" method="post">
+        <div class="card-body">
+            <h5>Personal Info</h5>
+        </div>
+        <div class="form-group p-3 mb-3">
+            <div class="row">
+                <label asp-for="FirstName" class="col-sm-3 text-end  col-form-label">First Name</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" asp-for="FirstName" placeholder="First Name Here">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="MiddleName" class="col-sm-3 text-end  col-form-label">Middle Name</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" asp-for="MiddleName" placeholder="Middle Name Here">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="LastName" class="col-sm-3 text-end  col-form-label">Last Name</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" asp-for="LastName" placeholder="Last Name Here">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="Email" class="col-sm-3 text-end  col-form-label">Email</label>
+                <div class="col-sm-9">
+                    <input type="email" class="form-control" asp-for="Email" placeholder="Email Here">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="PhoneNumber" class="col-sm-3 text-end  col-form-label">Contact No</label>
+                <div class="col-sm-9">
+                    <input type="number" class="form-control" asp-for="PhoneNumber" placeholder="Contact No Here">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="Gender" class="col-sm-3 text-end  col-form-label">
+                    Gender
+                </label>
+                <div class="col-sm-9">
+                    <select class="form-select" asp-for="Gender">
+                        <option>--Select Gender--</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="DateHired" class="col-sm-3 text-end  col-form-label">Date of employment</label>
+                <div class="col-sm-9">
+                    <input type="date" class="form-control" asp-for="DateHired" placeholder="Pick date" id="datePicker">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="Address" class="col-sm-3 text-end  col-form-label">Address</label>
+                <div class="col-sm-9">
+                    <textarea type="text" class="form-control" asp-for="Address" placeholder="Home Address Here"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="EmploymentStatus" class="col-sm-3 text-end  col-form-label">
+                    Employment Status
+                </label>
+                <div class="col-sm-9">
+                    <select class="form-select" asp-for="EmploymentStatus">
+                        <option>--Select Status--</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactiive">Inactive</option>
+                        <option value="On-Leave">On-Leave</option>
+                        <option value="Suspended">Suspended</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-body text-bg-light">
+            <h4 class="card-title mt-2 pb-3">Driver's License and Vehicle</h4>
+        </div>
+        <div class="form-group p-3 text-bg-light">
+            <div class="row">
+                <label asp-for="LicenseNumber" class="col-sm-3 text-end  col-form-label">License Number</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" asp-for="LicenseNumber" placeholder="Driver's License Number'">
+                </div>
+            </div>
+        </div>
+        <div class="form-group p-3 text-bg-light">
+            <div class="row">
+                <label asp-for="LicenseCategory" class="col-sm-3 text-end  col-form-label">
+                    License Class
+                </label>
+                <div class="col-sm-9">
+                    <select class="form-select" asp-for="LicenseCategory">
+                        <option>--Select Class--</option>
+                        <option>Class A</option>
+                        <option>Cllass B</option>
+                        <option>Class C</option>
+                        <option>Class D</option>
+                        <option>Class E</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group p-3 text-bg-light">
+            <div class="row">
+                <label asp-for="AssignedVehicle" class="col-sm-3 text-end  col-form-label">Assign Vehicle to driver</label>
+                <div class="col-sm-9">
+                    <select class="form-select" asp-for="AssignedVehicle">
+                        <option>Select Vehicle To Assign driver</option>
+                        <option>Toyota Camry - ABC123</option>
+                        <option>Honda Civic - XYZ789</option>
+                        <option>Ford Focus - FOC456</option>
+                        <option>Nissan Altima - ALT654</option>
+                        <option>Toyota Tundra - VALL423</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body pb-0">
+            <h4 class="card-title">Next of kin info</h4>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="EmergencyContactName" class="col-sm-3 text-end  col-form-label">Next of kin's name</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" asp-for="EmergencyContactName" placeholder="Full Name Here">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="EmergencyContactPhone" class="col-sm-3 text-end  col-form-label">Next of kin's contact</label>
+                <div class="col-sm-9">
+                    <input type="number" class="form-control" asp-for="EmergencyContactPhone" placeholder="Contact Number Here">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="Relationship" class="col-sm-3 text-end  col-form-label">Relationship</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" asp-for="Relationship" placeholder="Please specify relationship here">
+                </div>
+            </div>
+        </div>
+
+        <div class="p-3">
+            <div class="form-group text-end">
+                <button type="submit" class="btn btn-primary">
+                    Submit
+                </button>
+                <button type="submit" class="btn bg-danger-subtle text-danger ms-6">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+            document.addEventListener("DOMContentLoaded", function () {
+        flatpickr("#datePicker", {
+            enableTime: false, // Set to true if you want time selection
+            dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+            altInput: true,
+            altFormat: "F j, Y", // Displayed as: January 1, 2025
+            weekNumbers: true,
+            theme: "material_blue", // Choose from light, dark, material_blue, etc.
+        });
+    });
+</script>

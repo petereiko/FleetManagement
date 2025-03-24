@@ -1,4 +1,5 @@
 ﻿using FleetManagement.UI.Models.CompanyAssetDto;
+using FleetManagement.UI.Models.DriverDTOs;
 
 namespace FleetManagement.UI.Models.DummyModels
 {

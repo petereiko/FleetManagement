@@ -1,0 +1,80 @@
+﻿@using FleetManagement.UI.Models.DriverDTOs
+
+@model List<Driver>
+
+@{
+    ViewBag.Title = "Driver List";
+}
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">Driver List</h4>
+        <div class="table-responsive">
+            <table id="driverTable" class="table table-striped table-bordered display text-nowrap">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Gender</th>
+                        <th>License Number</th>
+                        <th>License Category</th>
+                        <th>Employment Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var driver in Model)
+                    {
+                        <tr>
+                            <td>@driver.Id</td>
+                            <td>@driver.FullName</td>
+                            <td>@driver.Email</td>
+                            <td>@driver.PhoneNumber</td>
+                            <td>@driver.Address</td>
+                            <td>@driver.Gender</td>
+                            <td>@driver.LicenseNumber</td>
+                            <td>@driver.LicenseCategory</td>
+                            <td>@driver.EmploymentStatus</td>
+                            <td>
+                                <a asp-action="EditDriver" asp-route-id="@driver.Id" class="btn btn-sm btn-primary">Edit</a>
+                                <form method="post" asp-action="DeactivateDriver" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to deactivate this driver?');">
+                                    <input type="hidden" name="id" value="@driver.Id" />
+                                    <button type="submit" class="btn btn-sm btn-danger">Deactivate</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>ID</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Gender</th>
+                        <th>License Number</th>
+                        <th>License Category</th>
+                        <th>Employment Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Include DataTables (if not already loaded in your layout) -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#driverTable').DataTable();
+    });
+</script>
+
+
