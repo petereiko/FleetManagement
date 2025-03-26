@@ -6,7 +6,76 @@
     ViewData["Title"] = "Driver Profile";
 }
 
-<div class="container-fluid my-4">
+<style>
+    /* Overall container spacing */
+    .dashboard-container {
+        padding: 2rem;
+        background-color: #f7f7f7;
+    }
+
+    /* Sidebar styles */
+    .list-group-item {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+
+        .list-group-item.active {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+    /* Card styling */
+    .card {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        padding: 1rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Profile image */
+    .profile-img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 4px solid #fff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    /* Section titles */
+    h5.section-title {
+        border-bottom: 2px solid #eee;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    /* Table styling */
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    /* Badge styling */
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.75em;
+    }
+</style>
+
+<div class="container-fluid dashboard-container">
     <div class="row">
         <!-- Sidebar Navigation -->
         <nav class="col-md-3 mb-4">
@@ -24,28 +93,28 @@
         <!-- Main Dashboard Content -->
         <main class="col-md-9">
             <!-- Profile Overview -->
-            <div class="card mb-4 shadow-sm">
+            <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Profile Overview</h5>
                 </div>
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-md-3 text-center">
-                            <img src="~/images/driver-placeholder.png" class="img-fluid rounded-circle" alt="Driver Photo" />
+                            <img src="~/images/driver-placeholder.png" class="profile-img rounded-circle" alt="Driver Photo" />
                         </div>
                         <div class="col-md-9">
                             <h4>@Model.Driver.FullName</h4>
-                            <p>Email: @Model.Driver.Email</p>
-                            <p>Phone: @Model.Driver.PhoneNumber</p>
-                            <p>Address: @Model.Driver.Address</p>
-                            <p>Employment Status: <span class="badge bg-info">@Model.Driver.EmploymentStatus</span></p>
+                            <p><strong>Email:</strong> @Model.Driver.Email</p>
+                            <p><strong>Phone:</strong> @Model.Driver.PhoneNumber</p>
+                            <p><strong>Address:</strong> @Model.Driver.Address</p>
+                            <p><strong>Employment Status:</strong> <span class="badge bg-info">@Model.Driver.EmploymentStatus</span></p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Assigned Vehicle Section -->
-            <div class="card mb-4 shadow-sm">
+            <div class="card">
                 <div class="card-header bg-secondary text-white">
                     <h5 class="mb-0">Assigned Vehicle</h5>
                 </div>
@@ -54,13 +123,13 @@
                     {
                         <div class="row">
                             <div class="col-md-3 text-center">
-                                <img src="~/images/vehicle-placeholder.png" class="img-fluid" alt="Vehicle Photo" />
+                                <img src="~/images/vehicle-placeholder.png" class="img-fluid" alt="Vehicle Photo" style="max-height:120px;" />
                             </div>
                             <div class="col-md-9">
                                 <h5>@Model.AssignedVehicle.Make @Model.AssignedVehicle.Model</h5>
-                                <p>License Plate: @Model.AssignedVehicle.LicensePlate</p>
-                                <p>Year: @Model.AssignedVehicle.Year</p>
-                                <p>Status: <span class="badge bg-success">@Model.AssignedVehicle.Status</span></p>
+                                <p><strong>License Plate:</strong> @Model.AssignedVehicle.LicensePlate</p>
+                                <p><strong>Year:</strong> @Model.AssignedVehicle.Year</p>
+                                <p><strong>Status:</strong> <span class="badge bg-success">@Model.AssignedVehicle.Status</span></p>
                                 <a href="@Url.Action("VehicleDetails", "Driver", new { vehicleId = Model.AssignedVehicle.Id })" class="btn btn-outline-primary btn-sm">View Vehicle Details</a>
                             </div>
                         </div>
@@ -73,12 +142,12 @@
             </div>
 
             <!-- Trip Management Section -->
-            <div class="card mb-4 shadow-sm">
+            <div class="card">
                 <div class="card-header bg-warning text-dark">
                     <h5 class="mb-0">Trip Management</h5>
                 </div>
                 <div class="card-body">
-                    <h6>Upcoming Trips</h6>
+                    <h5 class="section-title">Upcoming Trips</h5>
                     @if (Model.UpcomingTrips.Any())
                     {
                         <table class="table table-sm table-striped">
@@ -110,7 +179,7 @@
                         <p>No upcoming trips scheduled.</p>
                     }
                     <hr />
-                    <h6>Completed Trips</h6>
+                    <h5 class="section-title">Completed Trips</h5>
                     @if (Model.CompletedTrips.Any())
                     {
                         <table class="table table-sm table-striped">
@@ -145,7 +214,7 @@
             </div>
 
             <!-- Earnings Section -->
-            <div class="card mb-4 shadow-sm">
+            <div class="card">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">Earnings Summary</h5>
                 </div>
@@ -164,7 +233,7 @@
             </div>
 
             <!-- Notifications Section -->
-            <div class="card mb-4 shadow-sm">
+            <div class="card">
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0">Notifications</h5>
                 </div>
@@ -174,7 +243,10 @@
                         <ul class="list-group">
                             @foreach (var note in Model.Notifications)
                             {
-                                <li class="list-group-item">@note.Message <small class="text-muted">(@note.Date.ToString("dd MMM yyyy HH:mm"))</small></li>
+                                <li class="list-group-item">
+                                    @note.Message
+                                    <small class="text-muted">(@note.Date.ToString("dd MMM yyyy HH:mm"))</small>
+                                </li>
                             }
                         </ul>
                     }
@@ -186,7 +258,7 @@
             </div>
 
             <!-- Performance & Feedback Section -->
-            <div class="card mb-4 shadow-sm">
+            <div class="card">
                 <div class="card-header bg-dark text-white">
                     <h5 class="mb-0">Performance & Feedback</h5>
                 </div>
