@@ -1,0 +1,313 @@
+﻿
+@using FleetManagement.UI.Models.DriverDTOs
+@using FleetManagement.UI.Models.DriverDTOs.DriverViewModels
+@model DriverProfileViewModel
+
+@{
+    ViewData["Title"] = "Driver Profile";
+}
+
+<style>
+    /* Overall container spacing */
+    .dashboard-container {
+        padding: 2rem;
+        background-color: #f7f7f7;
+    }
+
+    /* Sidebar styles */
+    .list-group-item {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+
+        .list-group-item.active {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+    /* Card styling */
+    .card {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        padding: 1rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Profile image */
+    .profile-img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 4px solid #fff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    /* Section titles */
+    h5.section-title {
+        border-bottom: 2px solid #eee;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    /* Table styling */
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    /* Badge styling */
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.75em;
+    }
+
+
+
+
+</style>
+
+<div class="container">
+    <div class="container-fluid dashboard-container">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <nav class="col-md-3 mb-4">
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action active">Dashboard</a>
+                    <a href="@Url.Action("Profile", "Driver")" class="list-group-item list-group-item-action">Profile</a>
+                    <a href="@Url.Action("Trips", "Driver")" class="list-group-item list-group-item-action">Trips</a>
+                    <a href="@Url.Action("Earnings", "Driver")" class="list-group-item list-group-item-action">Earnings</a>
+                    <a href="@Url.Action("Notifications", "Driver")" class="list-group-item list-group-item-action">Notifications</a>
+                    <a href="@Url.Action("Settings", "Driver")" class="list-group-item list-group-item-action">Settings</a>
+                    <a href="@Url.Action("Logout", "Driver")" class="list-group-item list-group-item-action text-danger">Logout</a>
+                </div>
+            </nav>
+
+            <!-- Main Dashboard Content -->
+            <main class="col-md-9">
+                <!-- Profile Overview -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Profile Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 text-center">
+                                <img src="~/images/driver-placeholder.png" class="profile-img rounded-circle" alt="Driver Photo" />
+                            </div>
+                            <div class="col-md-9">
+                                <h4>@Model.Driver.FullName</h4>
+                                <p><strong>Email:</strong> @Model.Driver.Email</p>
+                                <p><strong>Phone:</strong> @Model.Driver.PhoneNumber</p>
+                                <p><strong>Address:</strong> @Model.Driver.Address</p>
+                                <p><strong>Employment Status:</strong> <span class="badge bg-info">@Model.Driver.EmploymentStatus</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Assigned Vehicle Section -->
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Assigned Vehicle</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.AssignedVehicle != null)
+                        {
+                            <div class="row">
+                                <div class="col-md-3 text-center">
+                                    <img src="~/images/vehicle-placeholder.png" class="img-fluid" alt="Vehicle Photo" style="max-height:120px;" />
+                                </div>
+                                <div class="col-md-9">
+                                    <h5>@Model.AssignedVehicle.Make @Model.AssignedVehicle.Model</h5>
+                                    <p><strong>License Plate:</strong> @Model.AssignedVehicle.LicensePlate</p>
+                                    <p><strong>Year:</strong> @Model.AssignedVehicle.Year</p>
+                                    <p><strong>Status:</strong> <span class="badge bg-success">@Model.AssignedVehicle.Status</span></p>
+                                    <a href="@Url.Action("VehicleDetails", "Driver", new { vehicleId = Model.AssignedVehicle.Id })" class="btn btn-outline-primary btn-sm">View Vehicle Details</a>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <p>You have not been assigned a vehicle yet.</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Trip Management Section -->
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">Trip Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="section-title">Upcoming Trips</h5>
+                        @if (Model.UpcomingTrips.Any())
+                        {
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Trip ID</th>
+                                        <th>Pickup</th>
+                                        <th>Dropoff</th>
+                                        <th>Date</th>
+                                        <th>Fare</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var trip in Model.UpcomingTrips)
+                                    {
+                                        <tr>
+                                            <td>@trip.TripId</td>
+                                            <td>@trip.PickupLocation</td>
+                                            <td>@trip.DropoffLocation</td>
+                                            <td>@trip.TripDate.ToString("dd MMM yyyy HH:mm")</td>
+                                            <td>₦@trip.Fare.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p>No upcoming trips scheduled.</p>
+                        }
+                        <hr />
+                        <h5 class="section-title">Completed Trips</h5>
+                        @if (Model.CompletedTrips.Any())
+                        {
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Trip ID</th>
+                                        <th>Pickup</th>
+                                        <th>Dropoff</th>
+                                        <th>Date</th>
+                                        <th>Fare</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var trip in Model.CompletedTrips)
+                                    {
+                                        <tr>
+                                            <td>@trip.TripId</td>
+                                            <td>@trip.PickupLocation</td>
+                                            <td>@trip.DropoffLocation</td>
+                                            <td>@trip.TripDate.ToString("dd MMM yyyy HH:mm")</td>
+                                            <td>₦@trip.Fare.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p>No completed trips found.</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Earnings Section -->
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Earnings Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-6">
+                                <h6>Weekly Earnings</h6>
+                                <p class="fs-4 text-primary">₦@Model.Earnings.WeeklyEarnings.ToString("N2")</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Monthly Earnings</h6>
+                                <p class="fs-4 text-primary">₦@Model.Earnings.MonthlyEarnings.ToString("N2")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Section -->
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Notifications</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Notifications.Any())
+                        {
+                            <ul class="list-group">
+                                @foreach (var note in Model.Notifications)
+                                {
+                                    <li class="list-group-item">
+                                        @note.Message
+                                        <small class="text-muted">(@note.Date.ToString("dd MMM yyyy HH:mm"))</small>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p>No notifications at this time.</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Performance & Feedback Section -->
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Performance & Feedback</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Rating: <span class="badge bg-success">@Model.Performance.Rating.ToString("0.0")</span></p>
+                        <p>Completed Trips: @Model.Performance.CompletedTrips</p>
+                        <a href="@Url.Action("Feedback", "Driver")" class="btn btn-outline-light btn-sm">View Feedback</a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

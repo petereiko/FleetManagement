@@ -12,7 +12,7 @@
         public string EngineNumber { get; set; }
         public string ChassisNumber { get; set; }
         public DateTime RegistrationDate { get; set; }
-        public DateTime? LastServiceDate { get; set; }
+        public DateTime LastServiceDate { get; set; }
         public decimal Mileage { get; set; }
         public string FuelType { get; set; }
         public string Transmission { get; set; } // Manual/Automatic

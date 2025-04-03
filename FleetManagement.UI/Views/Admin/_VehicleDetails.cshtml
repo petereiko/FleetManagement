@@ -80,7 +80,7 @@
                     <dd class="col-sm-8">@Model.RegistrationDate.ToString("dd MMM yyyy")</dd>
 
                     <dt class="col-sm-4">Last Service:</dt>
-                    <dd class="col-sm-8">@Model.LastServiceDate?.ToString("dd MMM yyyy")</dd>
+                    <dd class="col-sm-8">@(Model.LastServiceDate.ToString("dd MMM yyyy") ?? "N/A")</dd>
 
                     <dt class="col-sm-4">Mileage:</dt>
                     <dd class="col-sm-8">@Model.Mileage.ToString("N0") km</dd>

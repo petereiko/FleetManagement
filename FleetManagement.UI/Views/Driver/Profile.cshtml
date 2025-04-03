@@ -7,267 +7,1882 @@
 }
 
 <style>
-    /* Overall container spacing */
-    .dashboard-container {
-        padding: 2rem;
-        background-color: #f7f7f7;
+    /* Cover overlay tint (optional) */
+    .cover-overlay {
+        background: rgba(0, 0, 0, 0.45);
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
     }
 
-    /* Sidebar styles */
-    .list-group-item {
-        font-size: 1rem;
-        padding: 0.75rem 1rem;
+    .cover-content {
+        position: relative;
+        z-index: 2;
     }
 
-        .list-group-item.active {
-            background-color: #007bff;
-            border-color: #007bff;
+    /* Progress Circle Styles */
+    .progress {
+        width: 150px;
+        height: 150px;
+        line-height: 150px;
+        background: none;
+        margin: 0 auto;
+        position: relative;
+        overflow: visible;
+    }
+
+        .progress:after {
+            content: "";
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
-    /* Card styling */
-    .card {
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
+        .progress > span {
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            position: absolute;
+            top: 0;
+            z-index: 1;
+        }
+
+        .progress .progress-left {
+            left: 0;
+        }
+
+        .progress .progress-bar {
+            width: 100%;
+            height: 100%;
+            background: none;
+            border-width: 5px;
+            border-style: solid;
+            position: absolute;
+            top: 0;
+        }
+
+        .progress .progress-left .progress-bar {
+            left: 100%;
+            border-top-right-radius: 80px;
+            border-bottom-right-radius: 80px;
+            border-left: 0;
+            transform-origin: center left;
+        }
+
+        .progress .progress-right {
+            right: 0;
+        }
+
+            .progress .progress-right .progress-bar {
+                left: -100%;
+                border-top-left-radius: 80px;
+                border-bottom-left-radius: 80px;
+                border-right: 0;
+                transform-origin: center right;
+                animation: loading-1 1.8s linear forwards;
+            }
+
+        .progress .inner-circle,
+        .progress .progress-value {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 5px solid #8e8e8e;
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 50px;
+            text-align: center;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            z-index: 1;
+        }
+
+        .progress .progress-value {
+            color: #049dff; /* Adjust for your color theme */
+        }
+
+        .progress.blue .progress-bar {
+            border-color: #049dff;
+        }
+
+        .progress.blue .progress-value {
+            color: #049dff;
+        }
+
+        .progress.blue .progress-left .progress-bar {
+            animation: loading-2 1.5s linear forwards 1.8s;
+        }
+    @@keyframes loading-1 {
+        0%
+
+    {
+        transform: rotate(0deg);
     }
 
-    .card-header {
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-        padding: 1rem;
+    100% {
+        transform: rotate(180deg);
     }
 
-    .card-body {
-        padding: 1.5rem;
+    }
+    @@keyframes loading-2 {
+        0%
+
+    {
+        transform: rotate(0deg);
     }
 
-    /* Profile image */
-    .profile-img {
-        width: 120px;
-        height: 120px;
-        object-fit: cover;
-        border: 4px solid #fff;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    100% {
+        transform: rotate(144deg);
     }
 
-    /* Section titles */
-    h5.section-title {
-        border-bottom: 2px solid #eee;
-        padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
-        color: #333;
-    }
-
-    /* Table styling */
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: #f9f9f9;
-    }
-
-    .table th, .table td {
-        vertical-align: middle;
-    }
-
-    /* Badge styling */
-    .badge {
-        font-size: 0.9rem;
-        padding: 0.5em 0.75em;
     }
 </style>
 
-<div class="container-fluid dashboard-container">
-    <div class="row">
-        <!-- Sidebar Navigation -->
-        <nav class="col-md-3 mb-4">
-            <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-action active">Dashboard</a>
-                <a href="@Url.Action("Profile", "Driver")" class="list-group-item list-group-item-action">Profile</a>
-                <a href="@Url.Action("Trips", "Driver")" class="list-group-item list-group-item-action">Trips</a>
-                <a href="@Url.Action("Earnings", "Driver")" class="list-group-item list-group-item-action">Earnings</a>
-                <a href="@Url.Action("Notifications", "Driver")" class="list-group-item list-group-item-action">Notifications</a>
-                <a href="@Url.Action("Settings", "Driver")" class="list-group-item list-group-item-action">Settings</a>
-                <a href="@Url.Action("Logout", "Driver")" class="list-group-item list-group-item-action text-danger">Logout</a>
-            </div>
-        </nav>
 
-        <!-- Main Dashboard Content -->
-        <main class="col-md-9">
-            <!-- Profile Overview -->
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Profile Overview</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-3 text-center">
-                            <img src="~/images/driver-placeholder.png" class="profile-img rounded-circle" alt="Driver Photo" />
-                        </div>
-                        <div class="col-md-9">
-                            <h4>@Model.Driver.FullName</h4>
-                            <p><strong>Email:</strong> @Model.Driver.Email</p>
-                            <p><strong>Phone:</strong> @Model.Driver.PhoneNumber</p>
-                            <p><strong>Address:</strong> @Model.Driver.Address</p>
-                            <p><strong>Employment Status:</strong> <span class="badge bg-info">@Model.Driver.EmploymentStatus</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Assigned Vehicle Section -->
-            <div class="card">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">Assigned Vehicle</h5>
-                </div>
-                <div class="card-body">
-                    @if (Model.AssignedVehicle != null)
-                    {
-                        <div class="row">
-                            <div class="col-md-3 text-center">
-                                <img src="~/images/vehicle-placeholder.png" class="img-fluid" alt="Vehicle Photo" style="max-height:120px;" />
-                            </div>
-                            <div class="col-md-9">
-                                <h5>@Model.AssignedVehicle.Make @Model.AssignedVehicle.Model</h5>
-                                <p><strong>License Plate:</strong> @Model.AssignedVehicle.LicensePlate</p>
-                                <p><strong>Year:</strong> @Model.AssignedVehicle.Year</p>
-                                <p><strong>Status:</strong> <span class="badge bg-success">@Model.AssignedVehicle.Status</span></p>
-                                <a href="@Url.Action("VehicleDetails", "Driver", new { vehicleId = Model.AssignedVehicle.Id })" class="btn btn-outline-primary btn-sm">View Vehicle Details</a>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <p>You have not been assigned a vehicle yet.</p>
-                    }
-                </div>
-            </div>
-
-            <!-- Trip Management Section -->
-            <div class="card">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">Trip Management</h5>
-                </div>
-                <div class="card-body">
-                    <h5 class="section-title">Upcoming Trips</h5>
-                    @if (Model.UpcomingTrips.Any())
-                    {
-                        <table class="table table-sm table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Trip ID</th>
-                                    <th>Pickup</th>
-                                    <th>Dropoff</th>
-                                    <th>Date</th>
-                                    <th>Fare</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var trip in Model.UpcomingTrips)
-                                {
-                                    <tr>
-                                        <td>@trip.TripId</td>
-                                        <td>@trip.PickupLocation</td>
-                                        <td>@trip.DropoffLocation</td>
-                                        <td>@trip.TripDate.ToString("dd MMM yyyy HH:mm")</td>
-                                        <td>₦@trip.Fare.ToString("N2")</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
-                    else
-                    {
-                        <p>No upcoming trips scheduled.</p>
-                    }
-                    <hr />
-                    <h5 class="section-title">Completed Trips</h5>
-                    @if (Model.CompletedTrips.Any())
-                    {
-                        <table class="table table-sm table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Trip ID</th>
-                                    <th>Pickup</th>
-                                    <th>Dropoff</th>
-                                    <th>Date</th>
-                                    <th>Fare</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var trip in Model.CompletedTrips)
-                                {
-                                    <tr>
-                                        <td>@trip.TripId</td>
-                                        <td>@trip.PickupLocation</td>
-                                        <td>@trip.DropoffLocation</td>
-                                        <td>@trip.TripDate.ToString("dd MMM yyyy HH:mm")</td>
-                                        <td>₦@trip.Fare.ToString("N2")</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
-                    else
-                    {
-                        <p>No completed trips found.</p>
-                    }
-                </div>
-            </div>
-
-            <!-- Earnings Section -->
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Earnings Summary</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-md-6">
-                            <h6>Weekly Earnings</h6>
-                            <p class="fs-4 text-primary">₦@Model.Earnings.WeeklyEarnings.ToString("N2")</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Monthly Earnings</h6>
-                            <p class="fs-4 text-primary">₦@Model.Earnings.MonthlyEarnings.ToString("N2")</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notifications Section -->
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Notifications</h5>
-                </div>
-                <div class="card-body">
-                    @if (Model.Notifications.Any())
-                    {
-                        <ul class="list-group">
-                            @foreach (var note in Model.Notifications)
-                            {
-                                <li class="list-group-item">
-                                    @note.Message
-                                    <small class="text-muted">(@note.Date.ToString("dd MMM yyyy HH:mm"))</small>
+<div class="body-wrapper">
+    <div class="container-fluid">
+        <div class="font-weight-medium shadow-none position-relative overflow-hidden mb-7">
+            <div class="card-body px-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="font-weight-medium fs-14 mb-0">User Profile</h4>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a class="text-muted text-decoration-none" href="#">
+                                        Home
+                                    </a>
                                 </li>
-                            }
+                                <li class="breadcrumb-item text-muted" aria-current="page">User Profile</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+<div class="card overflow-hidden position-relative cover-card">
+    <!-- Background Image -->
+            <img src="../assets/images/backgrounds/truck.jpg" alt="cover-image" class="img-fluid w-100" />
+
+    <!-- Overlay (Optional for tinted effect) -->
+    <div class="cover-overlay"></div>
+
+    <div class="row align-items-center justify-content-between cover-content px-4 py-3">
+        <!-- Left Section: Driver Name & Local Time -->
+        <div class="col-lg-4 col-md-6 order-lg-1 order-2 text-white mt-3">
+            <h4 class="fw-bold mb-1">@Model.Driver.FullName</h4>
+            <p class="mb-0">Local time: @DateTime.Now.ToString("dddd, dd MMM yyyy HH:mm")</p>
+        </div>
+
+        <!-- Middle Section: Circular Progress for Profile Completion -->
+        <div class="col-lg-4 col-md-6 text-center order-lg-2 order-1 mt-n4">
+            <!-- Progress Circle (adjust the “blue” class or color as needed) -->
+            <div class="progress blue">
+                <span class="progress-left">
+                    <span class="progress-bar"></span>
+                </span>
+                <span class="progress-right">
+                    <span class="progress-bar"></span>
+                </span>
+                <!-- The inner circle is behind the “progress-value” -->
+                <div class="inner-circle"></div>
+                <!-- Suppose profile completion is 72% -->
+                <div class="progress-value"><span>72</span>%</div>
+            </div>
+        </div>
+
+        <!-- Right Section: Action Buttons & Social Icons -->
+        <div class="col-lg-4 col-md-12 order-last d-flex align-items-center justify-content-center justify-content-lg-end my-3 gap-3">
+            <!-- Example social icons (remove if not needed) -->
+            <a class="btn btn-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle" href="javascript:void(0)">
+                <i class="ti ti-brand-facebook"></i>
+            </a>
+            <a class="btn btn-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle" href="javascript:void(0)">
+                <i class="ti ti-brand-dribbble"></i>
+            </a>
+            <a class="btn btn-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle" href="javascript:void(0)">
+                <i class="ti ti-brand-youtube"></i>
+            </a>
+
+            <!-- Action Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Take Action
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="javascript:void(0)">PrintPDF</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)">View Profile</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)">Org Chart</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)">Performance</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs navigation can go here or below the cover, if desired -->
+</div>
+
+
+
+
+
+@*         <div class="card overflow-hidden">
+            <div class="card-body p-0">
+                <img src="../assets/images/backgrounds/truck.jpg" alt="materialpro-img" class="img-fluid">
+                <div class="row align-items-center">
+                    <div class="col-lg-4 order-lg-1 order-2">
+                        <div class="d-flex align-items-center justify-content-around m-4">
+                            <div class="text-center">
+                                <i class="ti ti-file-description fs-6 d-block mb-2"></i>
+                                <h4 class="mb-0 fw-semibold lh-1">938</h4>
+                                <p class="mb-0 ">Posts</p>
+                            </div>
+                            <div class="text-center">
+                                <i class="ti ti-user-circle fs-6 d-block mb-2"></i>
+                                <h4 class="mb-0 fw-semibold lh-1">3,586</h4>
+                                <p class="mb-0 ">Followers</p>
+                            </div>
+                            <div class="text-center">
+                                <i class="ti ti-user-check fs-6 d-block mb-2"></i>
+                                <h4 class="mb-0 fw-semibold lh-1">2,659</h4>
+                                <p class="mb-0 ">Following</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mt-n3 order-lg-2 order-1">
+                        <div class="mt-n5">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <div class="d-flex align-items-center justify-content-center round-110">
+                                    <div class="border border-4 border-white d-flex align-items-center justify-content-center rounded-circle overflow-hidden round-100">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 order-last">
+                        <ul class="list-unstyled d-flex align-items-center justify-content-center justify-content-lg-end my-3 mx-4 pe-4 gap-3">
+                            <li>
+                                <a class="d-flex align-items-center justify-content-center btn btn-primary p-2 fs-4 rounded-circle" href="javascript:void(0)" width="30" height="30">
+                                    <i class="ti ti-brand-facebook"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="btn btn-secondary d-flex align-items-center justify-content-center p-2 fs-4 rounded-circle" href="javascript:void(0)">
+                                    <i class="ti ti-brand-dribbble"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="btn btn-danger d-flex align-items-center justify-content-center p-2 fs-4 rounded-circle" href="javascript:void(0)">
+                                    <i class="ti ti-brand-youtube"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <button class="btn btn-primary text-nowrap">Add To Story</button>
+                            </li>
                         </ul>
-                    }
-                    else
-                    {
-                        <p>No notifications at this time.</p>
-                    }
+                    </div>
+                </div>
+                <ul class="nav nav-pills user-profile-tab justify-content-end mt-2 bg-primary-subtle rounded-2 rounded-top-0" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link hstack gap-2 rounded-0 fs-12 py-6 active" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="true">
+                            <i class="ti ti-user-circle fs-5"></i>
+                            <span class="d-none d-md-block">Profile</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link hstack gap-2 rounded-0 fs-12 py-6" id="pills-followers-tab" data-bs-toggle="pill" data-bs-target="#pills-followers" type="button" role="tab" aria-controls="pills-followers" aria-selected="false" tabindex="-1">
+                            <i class="ti ti-heart fs-5"></i>
+                            <span class="d-none d-md-block">Assigned Vehicle Infomation</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link hstack gap-2 rounded-0 fs-12 py-6" id="pills-friends-tab" data-bs-toggle="pill" data-bs-target="#pills-friends" type="button" role="tab" aria-controls="pills-friends" aria-selected="false" tabindex="-1">
+                            <i class="ti ti-user-circle fs-5"></i>
+                            <span class="d-none d-md-block">Friends</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link hstack gap-2 rounded-0 fs-12 py-6" id="pills-gallery-tab" data-bs-toggle="pill" data-bs-target="#pills-gallery" type="button" role="tab" aria-controls="pills-gallery" aria-selected="false" tabindex="-1">
+                            <i class="ti ti-photo-plus fs-5"></i>
+                            <span class="d-none d-md-block">Gallery</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+ *@
+        @* Information Start *@
+
+        <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade active show" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab" tabindex="0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header text-bg-primary">
+                                <h5 class="mb-0 text-white">Personal Info</h5>
+                            </div>
+                            <form class="form-horizontal">
+                                <div class="form-body">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-0">Basic Details</h5>
+                                    </div>
+                                    <hr class="m-0">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">First Name:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.Driver.FirstName</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Last Name:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.Driver.LastName</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Gender:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">Male</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Date of Birth:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.Driver.DateOfBirth.ToString("dd MMMM yyyy")</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Employment Status:</label>
+                                                    <div class="col-md-9">
+                                                        <span class="badge text-bg-success">@Model.Driver.EmploymentStatus</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Assigned Vehicle:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.Make @Model.AssignedVehicle.Model</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+
+                                    </div>
+                                    <hr class="m-0">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-0">Address & Contact details</h5>
+                                    </div>
+                                    <hr class="m-0">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Address:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">
+                                                            @Model.Driver.Address
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">City:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">Lekki</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">State:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">Lagos</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Email:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.Driver.Email</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Phone Number:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.Driver.PhoneNumber</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                    </div>
+
+
+
+                                    <hr class="m-0">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-0">Emergency Contact details</h5>
+                                    </div>
+                                    <hr class="m-0">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Full Name:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">
+                                                            @Model.Driver.EmergencyContactName
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Contact Phone Number:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.Driver.EmergencyContactPhone</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Relationship with contact:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.Driver.Relationship</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                    </div>
+
+
+
+
+
+                                    <div class="form-actions border-top">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <div class="col-md-offset-3 col-md-9">
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <i class="ti ti-edit fs-5"></i>
+                                                                Edit
+                                                            </button>
+                                                            <button type="button" class="btn bg-danger-subtle text-danger ms-6">
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="card shadow-none border">
+                            <div class="card-body">
+                                <div class="form-floating mb-3">
+                                    <textarea class="form-control h-140" placeholder="Leave a comment here" id="floatingTextarea2"></textarea>
+                                    <label for="floatingTextarea2">Share your thoughts</label>
+                                </div>
+                                <div class="d-flex align-items-center gap-6 flex-wrap">
+                                    <a class="d-flex align-items-center round-32 justify-content-center btn btn-primary rounded-circle p-0" href="javascript:void(0)">
+                                        <i class="ti ti-photo"></i>
+                                    </a>
+                                    <a href="javascript:void(0)" class="text-dark link-primary pe-3 py-2">Photo / Video</a>
+
+                                    <a class="d-flex align-items-center round-32 justify-content-center btn btn-secondary rounded-circle p-0" href="javascript:void(0)">
+                                        <i class="ti ti-notebook"></i>
+                                    </a>
+                                    <a href="javascript:void(0)" class="text-dark link-secondary pe-3 py-2">Article</a>
+
+
+                                    <button class="btn btn-primary ms-auto">Post</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body border-bottom">
+                                <div class="d-flex align-items-center gap-6 flex-wrap">
+                                    <img src="../assets/images/profile/user-1.jpg" alt="materialpro-img" class="rounded-circle" width="40" height="40">
+                                    <h6 class="mb-0">Markarn Doe</h6>
+                                    <span class="fs-2 hstack gap-2">
+                                        <span class="round-10 text-bg-light rounded-circle d-inline-block"></span> 15 min
+                                        ago
+                                    </span>
+                                </div>
+                                <p class="text-dark my-3">
+                                    Nu kek vuzkibsu mooruno ejepogojo uzjon gag fa ezik disan he nah. Wij wo pevhij tumbug rohsa
+                                    ahpi ujisapse lo vap labkez eddu suk.
+                                </p>
+                                <img src="../assets/images/products/s1.jpg" alt="materialpro-img" height="360" class="rounded-4 w-100 object-fit-cover">
+                                <div class="d-flex align-items-center my-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <a class="round-32 rounded-circle btn btn-primary p-0 hstack justify-content-center" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Like">
+                                            <i class="ti ti-thumb-up"></i>
+                                        </a>
+                                        <span class="text-dark fw-semibold">67</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 ms-4">
+                                        <a class="round-32 rounded-circle btn btn-secondary p-0 hstack justify-content-center" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Comment">
+                                            <i class="ti ti-message-2"></i>
+                                        </a>
+                                        <span class="text-dark fw-semibold">2</span>
+                                    </div>
+                                    <a class="text-dark ms-auto d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Share">
+                                        <i class="ti ti-share"></i>
+                                    </a>
+                                </div>
+                                <div class="position-relative">
+                                    <div class="p-4 rounded-2 text-bg-light mb-3">
+                                        <div class="d-flex align-items-center gap-6 flex-wrap">
+                                            <img src="../assets/images/profile/user-3.jpg" alt="materialpro-img" class="rounded-circle" width="33" height="33">
+                                            <h6 class="mb-0">Deran Mac</h6>
+                                            <span class="fs-2">
+                                                <span class="p-1 text-bg-muted rounded-circle d-inline-block"></span> 8 min ago
+                                            </span>
+                                        </div>
+                                        <p class="my-3">
+                                            Lufo zizrap iwofapsuk pusar luc jodawbac zi op uvezojroj duwage vuhzoc ja
+                                            vawdud le furhez siva
+                                            fikavu ineloh. Zot afokoge si mucuve hoikpaf adzuk zileuda falohfek zoije fuka udune lub
+                                            annajor gazo
+                                            conis sufur gu.
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <a class="round-32 rounded-circle btn btn-primary p-0 hstack justify-content-center" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Like">
+                                                    <i class="ti ti-thumb-up"></i>
+                                                </a>
+                                                <span class="text-dark fw-semibold">55</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2 ms-4">
+                                                <a class="round-32 rounded-circle btn btn-secondary p-0 hstack justify-content-center" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Reply">
+                                                    <i class="ti ti-arrow-back-up"></i>
+                                                </a>
+                                                <span class="text-dark fw-semibold">0</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 rounded-2 text-bg-light mb-3">
+                                        <div class="d-flex align-items-center gap-6 flex-wrap">
+                                            <img src="../assets/images/profile/user-4.jpg" alt="materialpro-img" class="rounded-circle" width="33" height="33">
+                                            <h6 class="mb-0">Daisy Wilson</h6>
+                                            <span class="fs-2">
+                                                <span class="p-1 text-bg-muted rounded-circle d-inline-block"></span> 5
+                                                min
+                                                ago
+                                            </span>
+                                        </div>
+                                        <p class="my-3">
+                                            Zumankeg ba lah lew ipep tino tugjekoj hosih fazjid wotmila durmuri buf hi sigapolu joit
+                                            ebmi joge vo.
+                                            Horemo vogo hat na ejednu sarta afaamraz zi cunidce peroido suvan podene igneve.
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <a class="round-32 rounded-circle btn btn-primary p-0 hstack justify-content-center" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Like">
+                                                    <i class="ti ti-thumb-up"></i>
+                                                </a>
+                                                <span class="text-dark fw-semibold">68</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2 ms-4">
+                                                <a class="round-32 rounded-circle btn btn-secondary p-0 hstack justify-content-center" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Reply">
+                                                    <i class="ti ti-arrow-back-up"></i>
+                                                </a>
+                                                <span class="text-dark fw-semibold">1</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 rounded-2 text-bg-light ms-7">
+                                        <div class="d-flex align-items-center gap-6 flex-wrap">
+                                            <img src="../assets/images/profile/user-5.jpg" alt="materialpro-img" class="rounded-circle" width="40" height="40">
+                                            <h6 class="mb-0">Carry minati</h6>
+                                            <span class="fs-2">
+                                                <span class="p-1 text-bg-muted rounded-circle d-inline-block"></span>
+                                                just
+                                                now
+                                            </span>
+                                        </div>
+                                        <p class="my-3">
+                                            Olte ni somvukab ugura ovaobeco hakgoc miha peztajo tawosu udbacas kismakin hi. Dej
+                                            zetfamu cevufi sokbid bud mun soimeuha pokahram vehurpar keecris pepab voegmud
+                                            zundafhef hej pe.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-6 flex-wrap p-3 flex-lg-nowrap">
+                                <img src="../assets/images/profile/user-1.jpg" alt="materialpro-img" class="rounded-circle" width="33" height="33">
+                                <input type="text" class="form-control py-8" id="exampleInputtext" aria-describedby="textHelp" placeholder="Comment">
+                                <button class="btn btn-primary">Comment</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Performance & Feedback Section -->
-            <div class="card">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Performance & Feedback</h5>
-                </div>
-                <div class="card-body">
-                    <p>Rating: <span class="badge bg-success">@Model.Performance.Rating.ToString("0.0")</span></p>
-                    <p>Completed Trips: @Model.Performance.CompletedTrips</p>
-                    <a href="@Url.Action("Feedback", "Driver")" class="btn btn-outline-light btn-sm">View Feedback</a>
+
+
+
+
+
+
+            @*2nd Tab*@
+            <div class="tab-pane fade" id="pills-followers" role="tabpanel" aria-labelledby="pills-followers-tab" tabindex="0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header text-bg-primary">
+                                <h5 class="mb-0 text-white">Vehicle Information</h5>
+                            </div>
+                            <form class="form-horizontal">
+                                <div class="form-body">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-0">Vehicle Details</h5>
+                                    </div>
+                                    <hr class="m-0">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Brand Name:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.Make @Model.AssignedVehicle.Model</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Year:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.Year</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Vehicle Identification Number:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.VIN</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Color of Vehicle:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.Color</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Chassis Number:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.ChassisNumber</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Date Registered:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.RegistrationDate.ToString("dd MMMM yyyy")</p>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Engine Number:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.EngineNumber</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Engine Type:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.FuelType</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">License Plate Number:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.LicensePlate</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Transmission:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.Transmission</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Insufrance Company:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.InsuranceCompany</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Insurance Expiry Date:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.InsuranceExpiryDate.ToString("dd MMMM yyyy")</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Mileage:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.Mileage</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Last Serviced Date:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@(Model.AssignedVehicle.LastServiceDate.ToString("dd MMMM yyyy") ?? "N/A")</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Vehicle Status:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.Status</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Road Worthy Expiration Date:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AssignedVehicle.RoadWorthyExpiryDate.ToString("dd MMMM yyyy")</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+
+                                    </div>
+
+
+
+                                    <div class="form-actions border-top">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <div class="col-md-offset-3 col-md-9">
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <i class="ti ti-edit fs-5"></i>
+                                                                Edit
+                                                            </button>
+                                                            <button type="button" class="btn bg-danger-subtle text-danger ms-6">
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
                 </div>
             </div>
-        </main>
+
+
+
+            @*3rd Tabb*@
+
+            <div class="tab-pane fade" id="pills-friends" role="tabpanel" aria-labelledby="pills-friends-tab" tabindex="0">
+                <div class="d-sm-flex align-items-center justify-content-between mt-3 mb-4">
+                    <h3 class="mb-3 mb-sm-0 fw-semibold d-flex align-items-center">
+                        Friends <span class="badge text-bg-secondary fs-2 rounded-4 py-1 px-2 ms-2">20</span>
+                    </h3>
+                    <form class="position-relative">
+                        <input type="text" class="form-control search-chat py-2 ps-5" id="text-srh" placeholder="Search Friends">
+                        <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y text-dark ms-3"></i>
+                    </form>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-3.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Betty Adams</h5>
+                                <span class="text-dark fs-2">Medical Secretary</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-2.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Inez Lyons</h5>
+                                <span class="text-dark fs-2">Medical Technician</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-3.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Lydia Bryan</h5>
+                                <span class="text-dark fs-2">Preschool Teacher</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-4.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Carolyn Bryant</h5>
+                                <span class="text-dark fs-2">Legal Secretary</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-8.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Paul Benson</h5>
+                                <span class="text-dark fs-2">Safety Engineer</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-6.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Robert Francis</h5>
+                                <span class="text-dark fs-2">Nursing Administrator</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-7.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Billy Rogers</h5>
+                                <span class="text-dark fs-2">Legal Secretary</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-8.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Rosetta Brewer</h5>
+                                <span class="text-dark fs-2">Comptroller</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-9.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Patrick Knight</h5>
+                                <span class="text-dark fs-2">Retail Store Manager</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-10.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Francis Sutton</h5>
+                                <span class="text-dark fs-2">Astronomer</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-11.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Bernice Henry</h5>
+                                <span class="text-dark fs-2">Security Consultant</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-2.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Estella Garcia</h5>
+                                <span class="text-dark fs-2">Lead Software Test Engineer</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-3.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Norman Moran</h5>
+                                <span class="text-dark fs-2">Engineer Technician</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-5.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Jessie Matthews</h5>
+                                <span class="text-dark fs-2">Lead Software Engineer</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-5.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Elijah Perez</h5>
+                                <span class="text-dark fs-2">Special Education Teacher</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-6.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Robert Martin</h5>
+                                <span class="text-dark fs-2">Transportation Manager</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-7.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Elva Wong</h5>
+                                <span class="text-dark fs-2">Logistics Manager</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-8.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Edith Taylor</h5>
+                                <span class="text-dark fs-2">Union Representative</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-9.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Violet Jackson</h5>
+                                <span class="text-dark fs-2">Agricultural Inspector</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card hover-img">
+                            <div class="card-body p-4 text-center border-bottom">
+                                <img src="../assets/images/profile/user-10.jpg" alt="materialpro-img" class="rounded-circle mb-3" width="80" height="80">
+                                <h5 class="fw-semibold mb-0">Phoebe Owens</h5>
+                                <span class="text-dark fs-2">Safety Engineer</span>
+                            </div>
+                            <ul class="px-2 py-2 bg-light list-unstyled d-flex align-items-center justify-content-center mb-0">
+                                <li class="position-relative">
+                                    <a class="text-primary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold" href="javascript:void(0)">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-danger d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-info d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-github"></i>
+                                    </a>
+                                </li>
+                                <li class="position-relative">
+                                    <a class="text-secondary d-flex align-items-center justify-content-center p-2 fs-5 rounded-circle fw-semibold " href="javascript:void(0)">
+                                        <i class="ti ti-brand-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pills-gallery" role="tabpanel" aria-labelledby="pills-gallery-tab" tabindex="0">
+                <div class="d-sm-flex align-items-center justify-content-between mt-3 mb-4">
+                    <h3 class="mb-3 mb-sm-0 fw-semibold d-flex align-items-center">
+                        Gallery <span class="badge text-bg-secondary fs-2 rounded-4 py-1 px-2 ms-2">12</span>
+                    </h3>
+                    <form class="position-relative">
+                        <input type="text" class="form-control search-chat py-2 ps-5" id="text-srh" placeholder="Search Friends">
+                        <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y text-dark ms-3"></i>
+                    </form>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s1.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Isuava wakceajo fe.jpg</h6>
+                                        <span class="text-dark fs-2">Wed, Dec 14, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Isuava wakceajo fe.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s2.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Ip docmowe vemremrif.jpg</h6>
+                                        <span class="text-dark fs-2">Wed, Dec 14, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Ip docmowe vemremrif.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s3.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Duan cosudos utaku.jpg</h6>
+                                        <span class="text-dark fs-2">Wed, Dec 14, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Duan cosudos utaku.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s4.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Fu netbuv oggu.jpg</h6>
+                                        <span class="text-dark fs-2">Wed, Dec 14, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Fu netbuv oggu.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s5.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Di sekog do.jpg</h6>
+                                        <span class="text-dark fs-2">Wed, Dec 14, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Di sekog do.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s6.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Lo jogu camhiisi.jpg</h6>
+                                        <span class="text-dark fs-2">Thu, Dec 15, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Lo jogu camhiisi.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s7.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Orewac huosazud robuf.jpg</h6>
+                                        <span class="text-dark fs-2">Fri, Dec 16, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Orewac huosazud robuf.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s8.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Nira biolaizo tuzi.jpg</h6>
+                                        <span class="text-dark fs-2">Sat, Dec 17, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Nira biolaizo tuzi.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s9.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Peri metu ejvu.jpg</h6>
+                                        <span class="text-dark fs-2">Sun, Dec 18, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Peri metu ejvu.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s10.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Vurnohot tajraje isusufuj.jpg</h6>
+                                        <span class="text-dark fs-2">Mon, Dec 19, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Vurnohot tajraje isusufuj.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s11.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Juc oz ma.jpg</h6>
+                                        <span class="text-dark fs-2">Tue, Dec 20, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Juc oz ma.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card hover-img overflow-hidden rounded-2">
+                            <div class="card-body p-0">
+                                <img src="../assets/images/products/s12.jpg" alt="materialpro-img" height="220" class="w-100 object-fit-cover">
+                                <div class="p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Povipvez marjelliz zuuva.jpg</h6>
+                                        <span class="text-dark fs-2">Wed, Dec 21, 2023</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="text-muted fw-semibold d-flex align-items-center p-1" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </a>
+                                        <ul class="dropdown-menu overflow-hidden">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)">Povipvez marjelliz zuuva.jpg</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('.progress-value > span').each(function(){
+            $(this).prop('Counter',0).animate({
+                Counter: $(this).text()
+            },{
+                duration: 3500,
+                easing: 'swing',
+                step: function (now){
+                    $(this).text(Math.ceil(now));
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
