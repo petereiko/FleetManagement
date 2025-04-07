@@ -120,6 +120,13 @@ namespace FleetManagement.UI.Controllers
             return tickets;
         }
 
+        public IActionResult Invoice()
+        {
+            var tickets = GetTicketsFromSession();
+            return View(tickets);
+        }
+
+
         private void SaveTicketsToSession(List<MaintenanceTicket> tickets)
         {
             HttpContext.Session.SetString(SessionKey, JsonSerializer.Serialize(tickets));
