@@ -1,0 +1,87 @@
+﻿@using FleetManagement.UI.Models.Dto
+@model MaintenanceTicket
+
+<div class="invoice-header d-flex align-items-center border-bottom p-3">
+    <h4 class="text-uppercase mb-0">Invoice</h4>
+    <div class="ms-auto">
+        <h4 class="invoice-number">#@Model.TicketNumber</h4>
+    </div>
+</div>
+<div class="p-3" id="custom-invoice">
+    <div class="invoice-details" id="printableArea">
+        <div class="row pt-3">
+            <div class="col-md-12 d-flex justify-content-between">
+                <div>
+                    <address>
+                        <h6>From,</h6>
+                        <h6 class="fw-bold">@Model.DriverName</h6>
+                        <p>
+                            
+                            License Plate: @Model.CarLicense,<br>
+                            Part Replacement<br />
+                            
+                        </p>
+                    </address>
+                </div>
+            </div>
+            <div class="col-md-12 text-end">
+                    <address>
+                        <h6>To,</h6>
+                        <h6 class="fw-bold invoice-customer">HR/Admin</h6>
+                        <p>
+                            Comapny's Name, Lagos<br />
+                            <span>Invoice Date:</span> @Model.DateLogged.ToString("dd MMM yyyy")<br>
+                            <span>Due Date:</span> @Model.DateLogged.AddDays(7).ToString("dd MMM yyyy").
+                        </p>
+                    </address>
+                </div>
+            <div class="col-md-12">
+                <div class="table-responsive mt-5">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Description</th>
+                                <th class="text-end">Qty</th>
+                                <th class="text-end">Unit Cost</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Items.Count; i++)
+                            {
+                                var item = Model.Items[i];
+                                <tr>
+                                    <td class="text-center">@(i + 1)</td>
+                                    <td>@item.Part</td>
+                                    <td class="text-end">@item.Quantity</td>
+                                    <td class="text-end">₦@item.UnitPrice.ToString("N2")</td>
+                                    <td class="text-end">₦@((item.Quantity * item.UnitPrice).ToString("N2"))</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="text-end mt-4">
+                  <p>Sub - Total amount: ₦@Model.Items.Sum(i => i.Quantity * i.UnitPrice).ToString("N2")</p>
+                  <p>VAT (10%): ₦@((Model.Items.Sum(i => i.Quantity * i.UnitPrice) * 0.10m).ToString("N2"))</p>
+                  <hr>
+                  <h3>
+                    <b>Total: </b> ₦@((Model.Items.Sum(i => i.Quantity * i.UnitPrice) * 1.10m).ToString("N2"))
+                  </h3>
+                </div>
+                <hr>
+                <div class="text-end action-buttons">
+                  <a class="btn btn-success" href="@Url.Action("ProceedWithInvoice", "Maintenance", new { ticketNumber = Model.TicketNumber })">
+                    <i class="fa fa-check me-1"></i> Proceed with Invoice
+                  </a>
+                  <button class="btn btn-secondary ms-2" type="button" onclick="window.print()">
+                    <i class="fa fa-print me-1"></i> Print Ticket
+                  </button>
+                </div>
+              </div>
+        </div>
+    </div>
+</div>

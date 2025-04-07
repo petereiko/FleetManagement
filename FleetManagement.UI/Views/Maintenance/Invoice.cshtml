@@ -1,4 +1,140 @@
-﻿<div class="container-fluid">
+﻿
+@using FleetManagement.UI.Models.Dto
+@model MaintenanceTicket
+
+@{
+    // Get all tickets from ViewBag (set in the controller)
+    var tickets = ViewBag.AllTickets as List<MaintenanceTicket>;
+    // For active highlighting in sidebar, use current ticket's number.
+    var currentTicketNumber = Model.TicketNumber;
+}
+
+<!-- Main Container -->
+<div class="container-fluid">
+  <!-- Breadcrumb / Header -->
+  <div class="font-weight-medium shadow-none position-relative overflow-hidden mb-7">
+    <div class="card-body px-0">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h4 class="font-weight-medium fs-14 mb-0">Invoice</h4>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a class="text-muted text-decoration-none" href="#">Home</a>
+              </li>
+              <li class="breadcrumb-item text-muted" aria-current="page">Invoice</li>
+            </ol>
+          </nav>
+        </div>
+        <div><!-- Additional header actions if needed --></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Invoice Application Card -->
+  <div class="card overflow-hidden invoice-application">
+    <div class="d-flex">
+      <!-- Sidebar: Ticket List -->
+      <div class="w-25 d-none d-lg-block border-end user-chat-box invoice-list-container" style="max-height:80vh; overflow-y:auto;">
+        <div class="p-3 border-bottom">
+          <form class="position-relative">
+            <input type="search" class="form-control search-invoice ps-5" placeholder="Search Invoice">
+            <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y fs-6 text-dark ms-3"></i>
+          </form>
+        </div>
+        <div class="app-invoice">
+          <ul class="list-unstyled">
+            @foreach (var ticket in tickets)
+            {
+              var isActive = ticket.TicketNumber == currentTicketNumber ? "bg-light-subtle" : "";
+              <li>
+                <a href="@Url.Action("Invoice", "Maintenance", new { ticketNumber = ticket.TicketNumber })"
+                   class="d-block text-decoration-none p-3 border-bottom invoice-user listing-user @isActive"
+                   data-ticket-number="@ticket.TicketNumber">
+                  <div class="d-flex align-items-center">
+                    <div class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center me-2">
+                      <i class="fa fa-user fs-6"></i>
+                    </div>
+                    <div>
+                      <h6 class="mb-0 invoice-customer">@ticket.DriverName</h6>
+                      <small class="invoice-id">Id: #@ticket.TicketNumber</small><br />
+                      <small class="invoice-date">@ticket.DateLogged.ToString("dd MMM yyyy")</small>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+
+      <!-- Invoice Details Section -->
+            <div class="w-75 w-xs-100 chat-container">
+                <div class="invoice-inner-part h-100" id="invoiceing-box">
+                    @* Initially render the current invoice detail *@
+                    @Html.Partial("_InvoicePartial", Model)
+                </div>
+            </div>
+     
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Include Bootstrap JS if not already in your layout -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Include jQuery if not already loaded (for AJAX) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $(".invoice-user").on("click", function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+
+            // Load the selected ticket's invoice details via AJAX into the invoiceing-box
+            $.ajax({
+                url: url,
+                type: "GET",
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+                success: function (data) {
+                    $("#invoiceing-box").html(data);
+                },
+                error: function () {
+                    alert("Failed to load invoice details.");
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* @using FleetManagement.UI.Models.Dto
+
+
+@model MaintenanceTicket
+@{
+    var tickets = ViewBag.AllTickets as List<MaintenanceTicket>;
+}
+
+
+
+<div class="container-fluid">
           <div class="font-weight-medium shadow-none position-relative overflow-hidden mb-7">
             <div class="card-body px-0">
               <div class="d-flex justify-content-between align-items-center">
@@ -41,19 +177,23 @@
                 </div>
                 <div class="app-invoice">
                   <ul class="overflow-auto invoice-users simplebar-scrollable-y" data-simplebar="init"><div class="simplebar-wrapper" style="margin: 0px;"><div class="simplebar-height-auto-observer-wrapper"><div class="simplebar-height-auto-observer"></div></div><div class="simplebar-mask"><div class="simplebar-offset" style="right: 0px; bottom: 0px;"><div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content" style="height: 100%; overflow: hidden scroll;"><div class="simplebar-content" style="padding: 0px;">
-                    <li>
-                      <a href="javascript:void(0)" class="p-3 bg-hover-light-black border-bottom d-flex align-items-start invoice-user listing-user bg-light-subtle" id="invoice-123" data-invoice-id="123">
+                    
+                    @foreach (var ticket in tickets)
+                    {
+                      <li>
+                      <a href="@Url.Action("Invoice", "Maintenance", new { ticketNumber = ticket.TicketNumber })" class="d-block text-decoration-none p-3 border-bottom invoice-user listing-user @isActive">
                         <div class="btn btn-primary round rounded-circle d-flex align-items-center justify-content-center">
                           <i class="ti ti-user fs-6"></i>
                         </div>
                         <div class="ms-3 d-inline-block w-75">
-                          <h6 class="mb-0 invoice-customer">James Anderson</h6>
+                          <h6 class="mb-0 invoice-customer">@ticket.DriverName</h6>
 
-                          <span class="fs-3 invoice-id text-truncate text-body-color d-block w-85">Id: #123</span>
-                          <span class="fs-3 invoice-date text-nowrap text-body-color d-block">9 Fab 2020</span>
+                          <span class="fs-3 invoice-id text-truncate text-body-color d-block w-85">Id: #@ticket.TicketNumber</span>
+                          <span class="fs-3 invoice-date text-nowrap text-body-color d-block">@ticket.DateLogged.ToString("dd MMM yyyy")</span>
                         </div>
                       </a>
                     </li>
+                    }
                     
                     <li></li>
                   </div></div></div></div><div class="simplebar-placeholder" style="width: 302px; height: 458px;"></div></div><div class="simplebar-track simplebar-horizontal" style="visibility: hidden;"><div class="simplebar-scrollbar" style="width: 0px; display: none;"></div></div><div class="simplebar-track simplebar-vertical" style="visibility: visible;"><div class="simplebar-scrollbar" style="height: 25px; transform: translate3d(0px, 0px, 0px); display: block;"></div></div></ul>
@@ -65,7 +205,7 @@
                     <div class="invoice-header d-flex align-items-center border-bottom p-3">
                       <h4 class=" text-uppercase mb-0">Invoice</h4>
                       <div class="ms-auto">
-                        <h4 class="invoice-number"></h4>
+                        <h4 class="invoice-number">#@ticket.TicketNumber</h4>
                       </div>
                     </div>
                     <div class="p-3" id="custom-invoice">
@@ -87,7 +227,7 @@
                               <address>
                                 <h6>To,</h6>
                                 <h6 class="fw-bold invoice-customer">
-                                  James Anderson,
+                                  @ticket.DriverName,
                                 </h6>
                                 <p class="ms-4">
                                   455, Shobe Lane,
@@ -98,7 +238,7 @@
                                 <p class="mt-4 mb-1">
                                   <span>Invoice Date :</span>
                                   <i class="ti ti-calendar"></i>
-                                  23rd Jan 2021
+                                  @ticket.DateLogged.ToString("dd MMM yyyy")
                                 </p>
                                 <p>
                                   <span>Due Date :</span>
@@ -123,42 +263,19 @@
                                   <!-- end row -->
                                 </thead>
                                 <tbody>
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">1</td>
-                                    <td>Milk Powder</td>
-                                    <td class="text-end">2</td>
-                                    <td class="text-end">$24</td>
-                                    <td class="text-end">$48</td>
-                                  </tr>
-                                  <!-- end row -->
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">2</td>
-                                    <td>Air Conditioner</td>
-                                    <td class="text-end">5</td>
-                                    <td class="text-end">$500</td>
-                                    <td class="text-end">$2500</td>
-                                  </tr>
-                                  <!-- end row -->
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">3</td>
-                                    <td>RC Cars</td>
-                                    <td class="text-end">30</td>
-                                    <td class="text-end">$600</td>
-                                    <td class="text-end">$18000</td>
-                                  </tr>
-                                  <!-- end row -->
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">4</td>
-                                    <td>Down Coat</td>
-                                    <td class="text-end">62</td>
-                                    <td class="text-end">$5</td>
-                                    <td class="text-end">$310</td>
-                                  </tr>
-                                  <!-- end row -->
+
+                                    @for (int i = 0; i < Model.Items.Count; i++)
+                            {
+                                var item = Model.Items[i];
+                                <tr>
+                                    <td class="text-center">@(i + 1)</td>
+                                    <td>@item.Part</td>
+                                    <td class="text-end">@item.Quantity</td>
+                                    <td class="text-end">@item.UnitPrice.ToString("C")</td>
+                                    <td class="text-end">@((item.Quantity * item.UnitPrice).ToString("C"))</td>
+                                </tr>
+                            }
+                                 
                                 </tbody>
                               </table>
                             </div>
@@ -169,248 +286,7 @@
                               <p>vat (10%) : $2,085</p>
                               <hr>
                               <h3>
-                                <b>Total :</b> $22,943
-                              </h3>
-                            </div>
-                            <div class="clearfix"></div>
-                            <hr>
-                            <div class="text-end">
-                              <button class="btn bg-danger-subtle text-danger" type="submit">
-                                Proceed to payment
-                              </button>
-                              <button class="btn btn-primary btn-default print-page ms-6" type="button">
-                                <span>
-                                  <i class="ti ti-printer fs-5"></i>
-                                  Print
-                                </span>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                     
-                      <!-- 4 -->
-                      <div class="invoice-126" id="printableArea">
-                        <div class="row pt-3">
-                          <div class="col-md-12">
-                            <div>
-                              <address>
-                                <h6>&nbsp;From,</h6>
-                                <h6 class="fw-bold">&nbsp;Steve Jobs</h6>
-                                <p class="ms-1">
-                                  1108, Clair Street,
-                                  <br>Massachusetts,
-                                  <br>Woods Hole - 02543
-                                </p>
-                              </address>
-                            </div>
-                            <div class="text-end">
-                              <address>
-                                <h6>To,</h6>
-                                <h6 class="fw-bold invoice-customer">
-                                  Samuel Smith,
-                                </h6>
-                                <p class="ms-4">
-                                  455, Shobe Lane,
-                                  <br>Colorado,
-                                  <br>Fort
-                                  Collins - 80524
-                                </p>
-                                <p class="mt-4 mb-1">
-                                  <span>Invoice Date :</span>
-                                  <i class="ti ti-calendar"></i>
-                                  23rd Jan 2021
-                                </p>
-                                <p>
-                                  <span>Due Date :</span>
-                                  <i class="ti ti-calendar"></i>
-                                  25th Jan 2021
-                                </p>
-                              </address>
-                            </div>
-                          </div>
-                          <div class="col-md-12">
-                            <div class="table-responsive mt-5">
-                              <table class="table table-hover">
-                                <thead>
-                                  <!-- start row -->
-                                  <tr>
-                                    <th class="text-center">#</th>
-                                    <th>Description</th>
-                                    <th class="text-end">Quantity</th>
-                                    <th class="text-end">Unit Cost</th>
-                                    <th class="text-end">Total</th>
-                                  </tr>
-                                  <!-- end row -->
-                                </thead>
-                                <tbody>
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">1</td>
-                                    <td>Milk Powder</td>
-                                    <td class="text-end">2</td>
-                                    <td class="text-end">$24</td>
-                                    <td class="text-end">$48</td>
-                                  </tr>
-                                  <!-- end row -->
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">2</td>
-                                    <td>Air Conditioner</td>
-                                    <td class="text-end">5</td>
-                                    <td class="text-end">$500</td>
-                                    <td class="text-end">$2500</td>
-                                  </tr>
-                                  <!-- end row -->
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">3</td>
-                                    <td>RC Cars</td>
-                                    <td class="text-end">30</td>
-                                    <td class="text-end">$600</td>
-                                    <td class="text-end">$18000</td>
-                                  </tr>
-                                  <!-- end row -->
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">4</td>
-                                    <td>Down Coat</td>
-                                    <td class="text-end">62</td>
-                                    <td class="text-end">$5</td>
-                                    <td class="text-end">$310</td>
-                                  </tr>
-                                  <!-- end row -->
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                          <div class="col-md-12">
-                            <div class="pull-right mt-4 text-end">
-                              <p>Sub - Total amount: $20,858</p>
-                              <p>vat (10%) : $2,085</p>
-                              <hr>
-                              <h3>
-                                <b>Total :</b> $22,943
-                              </h3>
-                            </div>
-                            <div class="clearfix"></div>
-                            <hr>
-                            <div class="text-end">
-                              <button class="btn bg-danger-subtle text-danger" type="submit">
-                                Proceed to payment
-                              </button>
-                              <button class="btn btn-primary btn-default print-page ms-6" type="button">
-                                <span>
-                                  <i class="ti ti-printer fs-5"></i>
-                                  Print
-                                </span>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <!-- 5 -->
-                      <div class="invoice-127" id="printableArea">
-                        <div class="row pt-3">
-                          <div class="col-md-12">
-                            <div>
-                              <address>
-                                <h6>&nbsp;From,</h6>
-                                <h6 class="fw-bold">&nbsp;Steve Jobs</h6>
-                                <p class="ms-1">
-                                  1108, Clair Street,
-                                  <br>Massachusetts,
-                                  <br>Woods Hole - 02543
-                                </p>
-                              </address>
-                            </div>
-                            <div class="text-end">
-                              <address>
-                                <h6>To,</h6>
-                                <h6 class="fw-bold invoice-customer">
-                                  Gabriel Jobs,
-                                </h6>
-                                <p class="ms-4">
-                                  455, Shobe Lane,
-                                  <br>Colorado,
-                                  <br>Fort
-                                  Collins - 80524
-                                </p>
-                                <p class="mt-4 mb-1">
-                                  <span>Invoice Date :</span>
-                                  <i class="ti ti-calendar"></i>
-                                  23rd Jan 2021
-                                </p>
-                                <p>
-                                  <span>Due Date :</span>
-                                  <i class="ti ti-calendar"></i>
-                                  25th Jan 2021
-                                </p>
-                              </address>
-                            </div>
-                          </div>
-                          <div class="col-md-12">
-                            <div class="table-responsive mt-5">
-                              <table class="table table-hover">
-                                <thead>
-                                  <!-- start row -->
-                                  <tr>
-                                    <th class="text-center">#</th>
-                                    <th>Description</th>
-                                    <th class="text-end">Quantity</th>
-                                    <th class="text-end">Unit Cost</th>
-                                    <th class="text-end">Total</th>
-                                  </tr>
-                                  <!-- end row -->
-                                </thead>
-                                <tbody>
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">1</td>
-                                    <td>Milk Powder</td>
-                                    <td class="text-end">2</td>
-                                    <td class="text-end">$24</td>
-                                    <td class="text-end">$48</td>
-                                  </tr>
-                                  <!-- end row -->
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">2</td>
-                                    <td>Air Conditioner</td>
-                                    <td class="text-end">5</td>
-                                    <td class="text-end">$500</td>
-                                    <td class="text-end">$2500</td>
-                                  </tr>
-                                  <!-- end row -->
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">3</td>
-                                    <td>RC Cars</td>
-                                    <td class="text-end">30</td>
-                                    <td class="text-end">$600</td>
-                                    <td class="text-end">$18000</td>
-                                  </tr>
-                                  <!-- end row -->
-                                  <!-- start row -->
-                                  <tr>
-                                    <td class="text-center">4</td>
-                                    <td>Down Coat</td>
-                                    <td class="text-end">62</td>
-                                    <td class="text-end">$5</td>
-                                    <td class="text-end">$310</td>
-                                  </tr>
-                                  <!-- end row -->
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                          <div class="col-md-12">
-                            <div class="pull-right mt-4 text-end">
-                              <p>Sub - Total amount: $20,858</p>
-                              <p>vat (10%) : $2,085</p>
-                              <hr>
-                              <h3>
-                                <b>Total :</b> $22,943
+                                <b>Total :</b>  @Model.Items.Sum(i => i.Quantity * i.UnitPrice).ToString("C")
                               </h3>
                             </div>
                             <div class="clearfix"></div>
@@ -469,3 +345,7 @@
             </div>
           </div>
         </div>
+
+
+
+ *@

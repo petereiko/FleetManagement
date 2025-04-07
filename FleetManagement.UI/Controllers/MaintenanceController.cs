@@ -120,10 +120,29 @@ namespace FleetManagement.UI.Controllers
             return tickets;
         }
 
-        public IActionResult Invoice()
+        public IActionResult Invoice(string ticketNumber = null)
         {
-            var tickets = GetTicketsFromSession();
-            return View(tickets);
+            var allTickets = GetTicketsFromSession();
+            if (!allTickets.Any())
+            {
+                return PartialView("_InvoiceEmpty");
+            }
+            var selectedTicket = string.IsNullOrEmpty(ticketNumber)
+                ? allTickets.First()
+                : allTickets.FirstOrDefault(t => t.TicketNumber == ticketNumber);
+
+            if (selectedTicket == null)
+                return NotFound("Ticket not found.");
+
+            ViewBag.AllTickets = allTickets;
+
+            // When called via AJAX, return a partial view.
+            // Otherwise, return the full view.
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_InvoicePartial", selectedTicket);
+            }
+            return View(selectedTicket);
         }
 
 

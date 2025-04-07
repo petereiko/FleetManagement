@@ -1,0 +1,47 @@
+﻿
+@{
+    Layout = null; // No layout for the partial view, so it only renders the message
+}
+<style>
+    .invoice-empty-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 50vh; /* Adjust this as needed */
+        background-color: #f7f7f7;
+    }
+    .invoice-empty-message {
+        background: #ffffff;
+        padding: 2rem 3rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        max-width: 400px;
+    }
+    .invoice-empty-message h4 {
+        margin-bottom: 1rem;
+        color: #007bff;
+    }
+    .invoice-empty-message p {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+    .invoice-empty-message a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .invoice-empty-message a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="invoice-empty-container">
+    <div class="invoice-empty-message">
+        <h4>No Tickets Available</h4>
+        <p>There are currently no maintenance tickets available.</p>
+        <p>
+            <a href="@Url.Action("AddTicket", "Maintenance")">Create a new ticket</a>
+        </p>
+    </div>
+</div>
