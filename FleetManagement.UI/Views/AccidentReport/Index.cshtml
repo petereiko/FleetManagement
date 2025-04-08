@@ -1,0 +1,85 @@
+﻿@using FleetManagement.UI.Models.Dto;
+
+@model List<AccidentReportDto>
+@{
+    ViewData["Title"] = "Accident Reports";
+}
+
+<style>
+    .table-responsive {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.75em;
+    }
+</style>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Accident Report Management</h2>
+
+    <!-- Filter Form -->
+    <form method="get" asp-action="Index" class="row g-3 mb-3">
+        <div class="col-md-4">
+            <input type="text" name="search" value="@ViewBag.Search" placeholder="Search by Driver or Car License" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <select name="damage" class="form-control">
+                <option value="">All Damage Levels</option>
+                <option value="Mild">Mild</option>
+                <option value="Average">Average</option>
+                <option value="High">High</option>
+                <option value="Fatal">Fatal</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+
+    <!-- Accident Report Table -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Report #</th>
+                    <th>Date</th>
+                    <th>Driver</th>
+                    <th>Vehicle</th>
+                    <th>State</th>
+                    <th>LGA</th>
+                    <th>Landmark</th>
+                    <th>Damage Level</th>
+                    <th>Manage</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rpt in Model)
+                {
+                    <tr>
+                        <td>@rpt.ReportNumber</td>
+                        <td>@rpt.AccidentDate.ToString("dd MMM yyyy")</td>
+                        <td>@rpt.DriverName</td>
+                        <td>@rpt.VehicleLicense</td>
+                        <td>@rpt.State</td>
+                        <td>@rpt.LGA</td>
+                        <td>@rpt.Landmark</td>
+                        <td><span class="badge bg-info">@rpt.LevelOfDamage</span></td>
+                        <td>
+                            <a asp-action="ReportDetails" asp-route-id="@rpt.ReportNumber" class="btn btn-outline-primary btn-sm">
+                                <i class="fa fa-eye"></i> View Full Details
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@rpt.ReportNumber" class="btn btn-sm btn-warning">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@rpt.ReportNumber" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this report?');">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

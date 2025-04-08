@@ -8,8 +8,7 @@ namespace FleetManagement.UI.Controllers.Account
 {
     public class DriverController : BaseController
     {
-        // GET: /Driver/Profile
-        // GET: /Driver/Profile
+        
         public IActionResult Profile()
         {
             // For demonstration, use the shared methods from BaseController.
@@ -18,7 +17,6 @@ namespace FleetManagement.UI.Controllers.Account
             var driver = drivers[0];
             var vehicle = GetVehiclesFromSession().Find(v => v.AssignedDriverId.ToString() == driver.Id.ToString());
 
-            // For demonstration, create mock lists for trips, earnings, notifications, etc.
             var model = new DriverProfileViewModel
             {
                 Driver = driver,
@@ -44,7 +42,14 @@ namespace FleetManagement.UI.Controllers.Account
 
             return View(model);
         }
-    
-      
+
+        public IActionResult AccidentReport()
+        {
+            
+            return View();
+        }
+
+
+
     }
 }

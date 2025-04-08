@@ -1,0 +1,59 @@
+﻿@using FleetManagement.UI.Models.Dto;
+
+@model AccidentReportDto
+
+@{
+    ViewBag.Title = "File Report";
+}
+
+
+<div class="card">
+    <div class="card-body pb-0">
+        <h4 class="card-title">Edit accident details</h4>
+    </div>
+    <form class="form-horizontal r-separator" asp-action="Edit" method="post">
+       @Html.Partial("_AccidentReportForm", Model)
+
+        <div class="p-3">
+            <div class="form-group text-end">
+                <button type="submit" class="btn btn-primary">
+                    Submit
+                </button>
+                <button type="submit" class="btn bg-danger-subtle text-danger ms-6">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+            document.addEventListener("DOMContentLoaded", function () {
+        flatpickr("#datePicker", {
+            enableTime: false, // Set to true if you want time selection
+            dateFormat: "Y-m-d", // Format: YYYY-MM-DD
+            altInput: true,
+            altFormat: "F j, Y", // Displayed as: January 1, 2025
+            weekNumbers: true,
+            theme: "material_blue", // Choose from light, dark, material_blue, etc.
+        });
+    });
+
+
+    // Populate LGAs based on selected state
+        const lgaMap = @Html.Raw(Json.Serialize(ViewBag.LGAs));
+        document.getElementById("StateSelect").addEventListener("change", function() {
+            const lgSelect = document.getElementById("LGASelect");
+            lgSelect.innerHTML = "<option value=''>Choose LGA...</option>";
+            (lgaMap[this.value] || []).forEach(lga => {
+                let opt = document.createElement("option");
+                opt.value = lga;
+                opt.text = lga;
+                lgSelect.appendChild(opt);
+            });
+        });
+</script>

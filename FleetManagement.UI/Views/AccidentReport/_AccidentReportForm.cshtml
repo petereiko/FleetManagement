@@ -1,0 +1,144 @@
+﻿@using FleetManagement.UI.Models.Dto;
+
+@model AccidentReportDto 
+
+<div class="card-body">
+            <h5>Report Details</h5>
+        </div>
+        <div class="form-group p-3 mb-3">
+            <div class="row">
+                <label asp-for="DriverName" class="col-sm-3 text-end  col-form-label">Driver's Name</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" asp-for="DriverName" placeholder="Driver's Name Here">
+                </div>
+            </div>
+        </div>
+       
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="VehicleLicense" class="col-sm-3 text-end  col-form-label">Vehicle's License</label>
+                <div class="col-sm-9">
+                    <input class="form-control" asp-for="VehicleLicense" placeholder="License Here">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="AccidentDate" class="col-sm-3 text-end  col-form-label">Date of accident</label>
+                <div class="col-sm-9">
+                    <input type="date" class="form-control" asp-for="AccidentDate" placeholder="Pick date" id="datePicker">
+                </div>
+            </div>
+        </div>
+       
+     
+        <div class="form-group p-3 text-bg-light">
+            <div class="row">
+                <label asp-for="State" class="col-sm-3 text-end  col-form-label">
+                    States
+                </label>
+                <div class="col-sm-9">
+                    <select asp-for="State" class="form-select" id="StateSelect">
+                        <option value="">Choose state...</option>
+                        @foreach (var s in ViewBag.States as List<string>)
+                        {
+                            <option>@s</option>
+                        }
+                    </select>
+                    <span asp-validation-for="State" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group p-3 text-bg-light">
+            <div class="row">
+                <label asp-for="LGA" class="col-sm-3 text-end  col-form-label">
+                    Local Government Areas
+                </label>
+                <div class="col-sm-9">
+                    <select asp-for="LGA" class="form-select" id="LGASelect">
+                        <option value="">Choose LGA...</option>
+                    </select>
+                    <span asp-validation-for="LGA" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="Landmark" class="col-sm-3 text-end  col-form-label">Landmark</label>
+                <div class="col-sm-9">
+                    <textarea type="text" class="form-control" asp-for="Landmark" placeholder="Enter Landmark info Here"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group p-3 text-bg-light">
+            <div class="row">
+                <label asp-for="LevelOfDamage" class="col-sm-3 text-end  col-form-label">
+                    Level of damage *
+                </label>
+                <div class="col-sm-9">
+                    <select asp-for="LevelOfDamage" class="form-select" >
+                        <option value="">Choose...</option>
+                        @foreach (var dl in ViewBag.DamageLevels as List<SelectListItem>)
+                        {
+                            <option value="@dl.Value">@dl.Text</option>
+                        }
+                    </select>
+                    <span asp-validation-for="LevelOfDamage" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <br>
+
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="Description" class="col-sm-3 text-end  col-form-label">Extra Information</label>
+                <div class="col-sm-9">
+                    <textarea type="text" class="form-control" asp-for="Description" placeholder="Extra Details Here"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="Photos" class="col-sm-3 text-end  col-form-label">Add an upload</label>
+                <div class="col-sm-9">
+                    <input type="file" class="form-control" asp-for="Photos" placeholder="Select File">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="Photos" class="col-sm-3 text-end  col-form-label">Add an upload</label>
+                <div class="col-sm-9">
+                    <input type="file" class="form-control" asp-for="Photos" placeholder="Select File">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="Photos" class="col-sm-3 text-end  col-form-label">Add an upload</label>
+                <div class="col-sm-9">
+                    <input type="file" class="form-control" asp-for="Photos" placeholder="Select File">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="Photos" class="col-sm-3 text-end  col-form-label">Add an upload</label>
+                <div class="col-sm-9">
+                    <input type="file" class="form-control" asp-for="Photos" placeholder="Select File">
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3 p-3 pt-0">
+            <div class="row">
+                <label asp-for="Photos" class="col-sm-3 text-end  col-form-label">Add an upload</label>
+                <div class="col-sm-9">
+                    <input type="file" class="form-control" asp-for="Photos" placeholder="Select File">
+                </div>
+            </div>
+        </div>

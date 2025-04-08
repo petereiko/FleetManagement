@@ -1,0 +1,138 @@
+﻿@using FleetManagement.UI.Models.Dto;
+
+@{
+    ViewBag.Title = "Full Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model AccidentReportDto
+
+
+                    <div class="card">
+                            <div class="card-header text-bg-primary">
+                                <h5 class="mb-0 text-white">Full Accident Report Details</h5>
+                            </div>
+                            <form class="form-horizontal">
+                                <div class="form-body">
+                                    <div class="card-body">
+                                    </div>
+                                    <hr class="m-0">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Driver Name:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.DriverName</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Vehicle License:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.VehicleLicense</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Report Number:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.ReportNumber</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Accident Date:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.AccidentDate.ToString("dd MMM yyyy")</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">State:</label>
+                                                    <div class="col-md-9">
+                                                        <span class="badge text-bg-success">@Model.State</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">LGA:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.LGA</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/span-->
+                                        </div>
+                                        <!--/row-->
+
+                                    </div>
+                                    <hr class="m-0">
+                                   
+                                    <hr class="m-0">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Level of damage:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">
+                                                            @Model.LevelOfDamage.ToString()
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group row">
+                                                    <label class="form-label text-end col-md-3">Description:</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">@Model.Description</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+
+
+                                    <div class="form-actions border-top">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <div class="col-md-offset-3 col-md-9">
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <i class="ti ti-edit fs-5"></i>
+                                                                Edit
+                                                            </button>
+                                                            <button type="button" class="btn bg-danger-subtle text-danger ms-6">
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
