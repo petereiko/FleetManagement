@@ -1,0 +1,119 @@
+﻿@using FleetManagement.UI.Models.DriverDTOs.DriverViewModels
+@model DriverScheduleViewModel
+
+@{
+    ViewData["Title"] = "Driver Schedule";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Include FullCalendar CSS and Global JS from CDN -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/index.global.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/index.global.min.js"></script>
+
+
+<!-- Include jQuery before any script that uses it -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Font Awesome if needed -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+<style>
+    /* Overall dashboard container */
+    .schedule-container {
+        background-color: #f7f7f7;
+        padding: 2rem;
+        min-height: 80vh;
+    }
+    /* Calendar container styling with explicit height and border for debugging */
+    .calendar-container {
+        max-width: 800px;
+        margin: 0 auto 2rem auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        padding: 1rem;
+        min-height: 400px;  /* Ensures visibility even with no events */
+        /* Remove the border later once confirmed working */
+        border: 2px dashed #007bff;
+    }
+    /* Leave Request Form styling */
+    .leave-request-form {
+        max-width: 500px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .leave-request-form h4 {
+        text-align: center;
+        margin-bottom: 1.25rem;
+    }
+</style>
+
+<div class="container schedule-container">
+    <!-- Calendar Section -->
+    <div class="calendar-container">
+        <div id="calendar"></div>
+    </div>
+
+    <!-- Leave Request Section -->
+    <div class="leave-request-form">
+        <h4 class="mb-3">Leave Request</h4>
+        <form asp-action="SubmitLeaveRequest" method="post">
+            @Html.AntiForgeryToken()
+            <div class="mb-3">
+                <label for="LeaveDate" class="form-label">Leave Start Date</label>
+                <input type="date" id="LeaveDate" name="LeaveDate" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label for="LeaveDays" class="form-label">Number of Days</label>
+                <input type="number" id="LeaveDays" name="LeaveDays" class="form-control" min="1" required />
+            </div>
+            <div class="mb-3">
+                <label for="LeaveType" class="form-label">Type of Leave</label>
+                <select id="LeaveType" name="LeaveType" class="form-select" required>
+                    <option value="">--Select Leave Type--</option>
+                    <option value="Annual">Annual Leave</option>
+                    <option value="Sick">Sick Leave</option>
+                    <option value="Casual">Casual Leave</option>
+                    <option value="Maternity">Maternity/Paternity Leave</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="Reason" class="form-label">Reason (Optional)</label>
+                <textarea id="Reason" name="Reason" class="form-control" rows="3" placeholder="Provide reason for leave request"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fa fa-paper-plane me-2"></i>Submit Leave Request
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        console.log("Calendar Element:", calendarEl);
+        if (!calendarEl) {
+            console.error("Calendar element not found!");
+            return;
+        }
+
+        // Ensure events is an array; use an empty List<CalendarEvent> if null.
+        var events = @Html.Raw(Json.Serialize(Model.Events ?? new List<FleetManagement.UI.Models.DriverDTOs.DriverViewModels.CalendarEvent>()));
+        console.log("Events data:", events);
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: events
+        });
+        calendar.render();
+        console.log("Calendar rendered");
+    });
+</script>
