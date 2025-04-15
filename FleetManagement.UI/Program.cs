@@ -1,3 +1,5 @@
+using FleetManagement.UI.Models.ServiceHubs;
+
 namespace FleetManagement.UI
 {
     public class Program
@@ -9,8 +11,12 @@ namespace FleetManagement.UI
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddHostedService<VehiclePositionSimulator>();
+
+
 
             // Add session services
+            builder.Services.AddSignalR();
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(options =>
             {
@@ -47,6 +53,17 @@ namespace FleetManagement.UI
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
+
+            app.MapHub<VehicleTrackerHub>("/vehicleTrackerHub");
+
+
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapControllerRoute(
+            //        name: "default",
+            //        pattern: "{controller=Home}/{action=Index}/{id?}");
+            //    endpoints.MapHub<FleetManagement.UI.Models.ServiceHubs.VehicleTrackerHub>("/vehicleTrackerHub");
+            //});
 
             app.Run();
         }

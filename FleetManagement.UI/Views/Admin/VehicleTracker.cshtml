@@ -1,56 +1,313 @@
 ﻿@using FleetManagement.UI.Models.CompanyAssetDto;
-@model List<Vehicle>  // Passing a list of vehicles that we want to display on the map
+@model List<Vehicle>  
 
 @{
     ViewData["Title"] = "Vehicle Tracker";
-    Layout = "~/Views/Shared/_Layout.cshtml";  // or your dedicated layout
+    Layout = "~/Views/Shared/_Layout.cshtml";  
 }
 
-<!-- Container for the map -->
-<div id="map" style="height: 500px; width: 100%;"></div>
+<style>
+    .map-wrapper {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 1rem;
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e0e0e0;
+    }
 
-<!-- Optionally, add a legend or controls below the map -->
-<!-- Include the Google Maps JavaScript API -->
+     #map {
+        height: 600px;
+        width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        margin-bottom: 30px;
+        transition: box-shadow 0.3s ease;
+    }
+
+        #map:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+    @@media (max-width: 768px) {
+        #map
+
+    {
+        height: 400px;
+    }
+    
+    }
+</style>
+
+<!-- Container for the map -->
+<div class="map-wrapper">
+    <div id="map"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+
 <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgRzgqRQPMuBq-XOmtkrpP5Pk9d7nmtAc&callback=initMap">
 </script>
 
 <script>
-    // Initialize the map when the API loads
+
+    // Global variables accessible throughout your page.
+    var map;
+    var vehicleMarkers = {};
+
     function initMap() {
-        // Set a default center (example: Lagos)
-        var center = { lat: 6.5244, lng: 3.3792 };
-        var map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 12,
-            center: center
+        var vehicles = @Html.Raw(Json.Serialize(Model ?? new List<Vehicle>()));
+        console.log("Vehicles data:", vehicles);
+
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 10,
+            center: { lat: 6.5244, lng: 3.3792 },
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false
         });
 
-        // Parse the model into a JavaScript variable.
-        // Ensure Model is not null. If you have no vehicles, you can pass an empty array.
-        var vehicles = @Html.Raw(Json.Serialize(Model ?? new List<Vehicle>()));
+        var bounds = new google.maps.LatLngBounds();
 
-        // Iterate over vehicles to add markers to the map.
-        vehicles.forEach(function(vehicle) {
-            // Create marker only if valid latitude/longitude exist.
-            if (vehicle.Latitude && vehicle.Longitude) {
+        vehicles.forEach(function (vehicle) {
+            var lat = parseFloat(vehicle.latitude || vehicle.Latitude);
+            var lng = parseFloat(vehicle.longitude || vehicle.Longitude);
+
+            var licensePlate = vehicle.licensePlate || vehicle.LicensePlate || "Unknown Plate";
+            var assignedDriverName = vehicle.assignedDriverName || vehicle.AssignedDriverName || "Unknown Driver";
+            var make = vehicle.make || vehicle.Make || "Unknown Make";
+            var modelName = vehicle.model || vehicle.Model || "Unknown Model";
+
+            if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
+                var position = { lat: lat, lng: lng };
+
                 var marker = new google.maps.Marker({
-                    position: { lat: vehicle.Latitude, lng: vehicle.Longitude },
+                    position: position,
                     map: map,
-                    title: vehicle.LicensePlate + " - " + vehicle.AssignedDriverName,
+                    title: (licensePlate + " - " + assignedDriverName).trim(),
                     icon: {
-                        // You can use a custom icon URL or default marker
-                        url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                        url: "/images/car_front_vehicle_icon.svg",
+                        scaledSize: new google.maps.Size(32, 32)
                     }
                 });
 
-                // Optional: add an info window for each marker
+                var infoContent = "<strong>" + (make + " " + modelName).trim() + "</strong><br/>" +
+                    "Plate: " + licensePlate + "<br/>" +
+                    "Driver: " + assignedDriverName;
+
                 var infowindow = new google.maps.InfoWindow({
-                    content: `<strong>${vehicle.Make} ${vehicle.Model}</strong><br/>Plate: ${vehicle.LicensePlate}<br/>Driver: ${vehicle.AssignedDriverName}`
+                    content: infoContent
                 });
+
                 marker.addListener("click", function () {
                     infowindow.open(map, marker);
                 });
+
+                bounds.extend(position);
+                vehicleMarkers[vehicle.Id] = marker;
+            } else {
+                console.warn("Invalid coordinates for vehicle", licensePlate);
             }
         });
+
+        if (!bounds.isEmpty()) {
+            map.fitBounds(bounds);
+        } else {
+            console.warn("No valid vehicle markers found; using default center.");
+        }
+
+        console.log("Map initialized.");
     }
+
+    // Smooth marker animation helper
+    function animateMarker(marker, targetPosition, duration = 1000) {
+        const startPosition = marker.getPosition();
+        const startTime = performance.now();
+
+        console.log("Animating from:", startPosition.toUrlValue(), "to:", targetPosition.toUrlValue());
+
+        function step(timestamp) {
+            const progress = Math.min((timestamp - startTime) / duration, 1);
+            const lat = startPosition.lat() + (targetPosition.lat() - startPosition.lat()) * progress;
+            const lng = startPosition.lng() + (targetPosition.lng() - startPosition.lng()) * progress;
+
+            const intermediatePos = new google.maps.LatLng(lat, lng);
+            marker.setPosition(intermediatePos);
+
+            console.log("Step progress:", progress.toFixed(2), "Position:", intermediatePos.toUrlValue());
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                marker.setPosition(targetPosition); // ensure final accuracy
+                console.log("Final position set to:", targetPosition.toUrlValue());
+            }
+        }
+
+        requestAnimationFrame(step);
+    }
+
+    // SignalR connection setup
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/vehicleTrackerHub")
+        .build();
+
+    connection.on("ReceivePositionUpdate", (vehicleId, latitude, longitude) => {
+        console.log("Update received:", vehicleId, latitude, longitude);
+
+        const lat = parseFloat(latitude);
+        const lng = parseFloat(longitude);
+
+        if (isNaN(lat) || isNaN(lng)) {
+            console.warn("Invalid coordinates received:", latitude, longitude);
+            return;
+        }
+
+        const newPosition = new google.maps.LatLng(lat, lng);
+
+        const marker = vehicleMarkers[vehicleId];
+
+        if (marker) {
+            // Animate the marker from current to new position
+            animateMarker(marker, newPosition);
+            map.panTo(newPosition);
+        } else {
+            // Create a new marker (can restore your SVG here if needed)
+            const newMarker = new google.maps.Marker({
+                position: newPosition,
+                map: map,
+                title: vehicleId,
+                icon: {
+                    url: "/images/car_front_vehicle_icon.svg",
+                    scaledSize: new google.maps.Size(32, 32)
+                }
+            });
+            vehicleMarkers[vehicleId] = newMarker;
+        }
+    });
+
+
+
+
+    // connection.on("ReceivePositionUpdate", (vehicleId, latitude, longitude) => {
+    //     console.log("Update received:", vehicleId, latitude, longitude);
+
+    //     const newPos = { lat: latitude, lng: longitude };
+
+    //     if (vehicleMarkers[vehicleId]) {
+    //         animateMarker(vehicleMarkers[vehicleId], newPos, 800, false); // Set true to pan map
+    //     } else {
+    //         // If marker didn't exist, create a new one
+    //         const marker = new google.maps.Marker({
+    //             position: newPos,
+    //             map: map,
+    //             title: vehicleId,
+    //             icon: {
+    //                 url: "/images/white-car-icon.svg",
+    //                 scaledSize: new google.maps.Size(32, 32)
+    //             },
+    //             animation: google.maps.Animation.DROP
+    //         });
+    //         vehicleMarkers[vehicleId] = marker;
+    //     }
+    // });
+
+    connection.start().then(() => {
+        console.log("SignalR connected.");
+    }).catch(err => console.error("SignalR Connection Error: ", err));
+
+
+
 </script>
+
+
+
+
+
+
+
+
+
+
+@*                 <script>
+                        // function initMap() {
+    //     // Parse your vehicles from the model (ensure Model is not null)
+    //     var vehicles = @Html.Raw(Json.Serialize(Model ?? new List<Vehicle>()));
+    //     console.log("Vehicles data:", vehicles);
+
+    //     // Create the map with a default center; note fullscreenControl disabled.
+    //     var map = new google.maps.Map(document.getElementById("map"), {
+    //         zoom: 10,
+    //         center: { lat: 6.5244, lng: 3.3792 },
+    //         mapTypeControl: false,
+    //         streetViewControl: false,
+    //         fullscreenControl: false  // Disable full-screen control
+    //     });
+
+    //     // Create bounds to include all markers
+    //     var bounds = new google.maps.LatLngBounds();
+
+    //     vehicles.forEach(function(vehicle) {
+    //         // Parse coordinates (check both camelCase and PascalCase)
+    //         var lat = parseFloat(vehicle.latitude || vehicle.Latitude);
+    //         var lng = parseFloat(vehicle.longitude || vehicle.Longitude);
+
+    //         // Parse additional properties (checking both naming conventions)
+    //         var licensePlate = vehicle.licensePlate || vehicle.LicensePlate || "Unknown Plate";
+    //         var assignedDriverName = vehicle.assignedDriverName || vehicle.AssignedDriverName || "Unknown Driver";
+    //         var make = vehicle.make || vehicle.Make || "Unknown Make";
+    //         var modelName = vehicle.model || vehicle.Model || "Unknown Model";
+
+    //         console.log("Processing vehicle", licensePlate, "Lat:", lat, "Lng:", lng);
+
+    //         if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
+    //             var position = { lat: lat, lng: lng };
+
+    //             // Use a custom vehicle icon (example using a car icon from Icons8)
+    //             var marker = new google.maps.Marker({
+    //                 position: position,
+    //                 map: map,
+    //                 title: (licensePlate + " - " + assignedDriverName).trim(),
+    //                 icon: {
+    //                     url: "/images/car_front_vehicle_icon.svg",
+    //                     scaledSize: new google.maps.Size(32, 32)  // Scale to 32x32 pixels
+    //                 }
+    //             });
+
+    //             // Construct the information window content
+    //             var infoContent = "<strong>" + (make + " " + modelName).trim() + "</strong><br/>" +
+    //                               "Plate: " + licensePlate + "<br/>" +
+    //                               "Driver: " + assignedDriverName;
+
+    //             var infowindow = new google.maps.InfoWindow({
+    //                 content: infoContent
+    //             });
+
+    //             marker.addListener("click", function () {
+    //                 infowindow.open(map, marker);
+    //             });
+
+    //             // Extend bounds to include this marker’s position
+    //             bounds.extend(position);
+    //         } else {
+    //             console.warn("Invalid coordinates for vehicle", licensePlate);
+    //         }
+    //     });
+
+    //     // Auto-adjust map to fit all markers if available
+    //     if (!bounds.isEmpty()) {
+    //         map.fitBounds(bounds);
+    //     } else {
+    //         console.warn("No valid vehicle markers found, map will use the default center.");
+    //     }
+    //     console.log("Map initialized.");
+    // }
+
+    //_________________________________________________________________________________//
+
+    // SignalR connection setup
+
+                </script> *@
