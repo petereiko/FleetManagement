@@ -4,6 +4,18 @@
     {
         // The events for the calendar – shifts, off-duty dates etc.
         public List<CalendarEvent> Events { get; set; } = new List<CalendarEvent>();
+        public List<DriverScheduleInfo> OtherDrivers { get; set; } = new List<DriverScheduleInfo>();
+        public int AllowedLeaveDays { get; set; } = 30; // e.g., maximum leave days allowed in the year
+        public List<TimeOffInfo> UpcomingTimeOff { get; set; } = new List<TimeOffInfo>();
+
+    }
+
+    public class DriverScheduleInfo
+    {
+        public string DriverName { get; set; } = "";
+        public DateTime ShiftStart { get; set; }
+        public DateTime ShiftEnd { get; set; }
+        public bool IsOnDuty { get; set; }
     }
 
     public class CalendarEvent
@@ -24,4 +36,11 @@
         public DateTime SubmittedOn { get; set; }
     }
 
+    public class TimeOffInfo
+    {
+        public string Title { get; set; } = "";   // e.g. "Easter Monday"
+        public DateTime StartDate { get; set; }   // e.g. new DateTime(2025, 04, 21)
+        public DateTime EndDate { get; set; }     // e.g. new DateTime(2025, 04, 21)
+        public string Status { get; set; } = "";  // e.g. "Approved", "Holiday", "Pending"
+    }
 }

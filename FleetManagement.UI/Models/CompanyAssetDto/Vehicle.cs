@@ -24,7 +24,9 @@
         public string AssignedDriverId { get; set; }
         public string AssignedDriverName { get; set; }
 
-
+        // New properties for geolocation
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         public List<VehicleDocument> Documents { get; set; } = new List<VehicleDocument>();
 
     }

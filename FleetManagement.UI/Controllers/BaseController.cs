@@ -139,41 +139,74 @@ namespace FleetManagement.UI.Controllers
         protected List<Vehicle> GetVehiclesFromSession()
         {
             var json = HttpContext.Session.GetString("Vehicles");
-            if (string.IsNullOrEmpty(json))
+            if (string.IsNullOrEmpty(json)) 
             {
                 var vehicles = new List<Vehicle>
                 {
                     new Vehicle {
-                        Id = "V1", Make = "Toyota", Model = "Camry", Year = 2020, VIN = "VIN001", LicensePlate = "ABC123", Color = "White",
-                        EngineNumber = "ENG001", ChassisNumber = "CHS001", RegistrationDate = DateTime.Now.AddYears(-1),
-                        LastServiceDate = DateTime.Now.AddMonths(-3), Mileage = 15000, FuelType = "Petrol", Transmission = "Automatic",
-                        InsuranceCompany = "InsureCo", InsuranceExpiryDate = DateTime.Now.AddMonths(6),
-                        RoadWorthyExpiryDate = DateTime.Now.AddMonths(4), Status = "Active", IsAssigned = true,
-                        AssignedDriverId = "D1", AssignedDriverName = "Eddie Hoyte"
-                    },
+                            Id = "V1", Make = "Toyota", Model = "Camry", Year = 2020, VIN = "VIN001", LicensePlate = "ABC123", Color = "White",
+                            EngineNumber = "ENG001", ChassisNumber = "CHS001", RegistrationDate = DateTime.Now.AddYears(-1),
+                            LastServiceDate = DateTime.Now.AddMonths(-3), Mileage = 15000, FuelType = "Petrol", Transmission = "Automatic",
+                            InsuranceCompany = "InsureCo", InsuranceExpiryDate = DateTime.Now.AddMonths(6),
+                            RoadWorthyExpiryDate = DateTime.Now.AddMonths(4), Status = "Active", IsAssigned = true,
+                            AssignedDriverId = "D1", AssignedDriverName = "Eddie Hoyte", Latitude = 6.5244, Longitude = 3.3792 // Lagos
+                        },
                     new Vehicle {
-                        Id = "V2", Make = "Honda", Model = "Civic", Year = 2019, VIN = "VIN002", LicensePlate = "XYZ789", Color = "Black",
-                        EngineNumber = "ENG002", ChassisNumber = "CHS002", RegistrationDate = DateTime.Now.AddYears(-2),
-                        LastServiceDate = DateTime.Now.AddMonths(-2), Mileage = 20000, FuelType = "Petrol", Transmission = "Manual",
-                        InsuranceCompany = "SafeInsure", InsuranceExpiryDate = DateTime.Now.AddMonths(8),
-                        RoadWorthyExpiryDate = DateTime.Now.AddMonths(5), Status = "Active", IsAssigned = true,
-                        AssignedDriverId = "D2", AssignedDriverName = "Jane Smith"
-                    },
+                            Id = "V2", Make = "Honda", Model = "Civic", Year = 2019, VIN = "VIN002", LicensePlate = "XYZ789", Color = "Black",
+                            EngineNumber = "ENG002", ChassisNumber = "CHS002", RegistrationDate = DateTime.Now.AddYears(-2),
+                            LastServiceDate = DateTime.Now.AddMonths(-2), Mileage = 20000, FuelType = "Petrol", Transmission = "Manual",
+                            InsuranceCompany = "SafeInsure", InsuranceExpiryDate = DateTime.Now.AddMonths(8),
+                            RoadWorthyExpiryDate = DateTime.Now.AddMonths(5), Status = "Active", IsAssigned = true,
+                            AssignedDriverId = "D2", AssignedDriverName = "Jane Smith", Latitude = 9.0579, Longitude = 7.4951 // Abuja
+                        },
                     new Vehicle {
-                        Id = "V3", Make = "Ford", Model = "Focus", Year = 2021, VIN = "VIN003", LicensePlate = "FOC456", Color = "Blue",
-                        EngineNumber = "ENG003", ChassisNumber = "CHS003", RegistrationDate = DateTime.Now.AddMonths(-10),
-                        LastServiceDate = DateTime.Now.AddMonths(-1), Mileage = 10000, FuelType = "Diesel", Transmission = "Automatic",
-                        InsuranceCompany = "InsureCo", InsuranceExpiryDate = DateTime.Now.AddMonths(10),
-                        RoadWorthyExpiryDate = DateTime.Now.AddMonths(6), Status = "Active", IsAssigned = true,
-                        AssignedDriverId = "D3", AssignedDriverName = "Gbenga Tokunbo"
-                    },
-                    new Vehicle { Id = "V4", Make = "Chevrolet", Model = "Malibu", Year = 2018, VIN = "VIN004", LicensePlate = "MAL321", Color = "Silver", EngineNumber = "ENG004", ChassisNumber = "CHS004", RegistrationDate = DateTime.Now.AddYears(-3), LastServiceDate = DateTime.Now.AddMonths(-4), Mileage = 30000, FuelType = "Petrol", Transmission = "Automatic", InsuranceCompany = "AutoSafe", InsuranceExpiryDate = DateTime.Now.AddMonths(5), RoadWorthyExpiryDate = DateTime.Now.AddMonths(3), Status = "Active", IsAssigned = false },
-                    new Vehicle { Id = "V5", Make = "Nissan", Model = "Altima", Year = 2022, VIN = "VIN005", LicensePlate = "ALT654", Color = "Red", EngineNumber = "ENG005", ChassisNumber = "CHS005", RegistrationDate = DateTime.Now.AddMonths(-2), LastServiceDate = DateTime.Now.AddMonths(-1), Mileage = 5000, FuelType = "Petrol", Transmission = "Automatic", InsuranceCompany = "InsureCo", InsuranceExpiryDate = DateTime.Now.AddMonths(12), RoadWorthyExpiryDate = DateTime.Now.AddMonths(7), Status = "Active", IsAssigned = false },
-                    new Vehicle { Id = "V6", Make = "Mercedes Benz", Model = "E360", Year = 2022, VIN = "VIN006", LicensePlate = "GBV856", Color = "Gray", EngineNumber = "ENG006", ChassisNumber = "CHS006", RegistrationDate = DateTime.Now.AddMonths(-3), LastServiceDate = DateTime.Now.AddMonths(-2), Mileage = 8000, FuelType = "Diesel", Transmission = "Automatic", InsuranceCompany = "PremiumInsure", InsuranceExpiryDate = DateTime.Now.AddMonths(9), RoadWorthyExpiryDate = DateTime.Now.AddMonths(8), Status = "Active", IsAssigned = false },
-                    new Vehicle { Id = "V7", Make = "Toyota", Model = "Tundra", Year = 2018, VIN = "VIN007", LicensePlate = "VALL423", Color = "Blue", EngineNumber = "ENG007", ChassisNumber = "CHS007", RegistrationDate = DateTime.Now.AddYears(-4), LastServiceDate = DateTime.Now.AddMonths(-6), Mileage = 40000, FuelType = "Diesel", Transmission = "Manual", InsuranceCompany = "SafeInsure", InsuranceExpiryDate = DateTime.Now.AddMonths(7), RoadWorthyExpiryDate = DateTime.Now.AddMonths(4), Status = "Active", IsAssigned = false },
-                    new Vehicle { Id = "V8", Make = "Honda", Model = "Crosstour", Year = 2022, VIN = "VIN008", LicensePlate = "JUH664", Color = "White", EngineNumber = "ENG008", ChassisNumber = "CHS008", RegistrationDate = DateTime.Now.AddMonths(-1), LastServiceDate = DateTime.Now.AddDays(-20), Mileage = 3000, FuelType = "Petrol", Transmission = "Automatic", InsuranceCompany = "AutoSafe", InsuranceExpiryDate = DateTime.Now.AddMonths(11), RoadWorthyExpiryDate = DateTime.Now.AddMonths(6), Status = "Active", IsAssigned = false }
-
-                    // Add additional vehicles as needed...
+                            Id = "V3", Make = "Ford", Model = "Focus", Year = 2021, VIN = "VIN003", LicensePlate = "FOC456", Color = "Blue",
+                            EngineNumber = "ENG003", ChassisNumber = "CHS003", RegistrationDate = DateTime.Now.AddMonths(-10),
+                            LastServiceDate = DateTime.Now.AddMonths(-1), Mileage = 10000, FuelType = "Diesel", Transmission = "Automatic",
+                            InsuranceCompany = "InsureCo", InsuranceExpiryDate = DateTime.Now.AddMonths(10),
+                            RoadWorthyExpiryDate = DateTime.Now.AddMonths(6), Status = "Active", IsAssigned = true,
+                            AssignedDriverId = "D3", AssignedDriverName = "Gbenga Tokunbo", Latitude = 4.8156, Longitude = 7.0498 // Port Harcourt
+                        },
+                    new Vehicle {
+                            Id = "V4", Make = "Chevrolet", Model = "Malibu", Year = 2018, VIN = "VIN004", LicensePlate = "MAL321", Color = "Silver",
+                            EngineNumber = "ENG004", ChassisNumber = "CHS004", RegistrationDate = DateTime.Now.AddYears(-3),
+                            LastServiceDate = DateTime.Now.AddMonths(-4), Mileage = 30000, FuelType = "Petrol", Transmission = "Automatic",
+                            InsuranceCompany = "AutoSafe", InsuranceExpiryDate = DateTime.Now.AddMonths(5),
+                            RoadWorthyExpiryDate = DateTime.Now.AddMonths(3), Status = "Active", IsAssigned = false,
+                            Latitude = 6.4531, Longitude = 3.3958 // Victoria Island
+                        },
+                    new Vehicle {
+                            Id = "V5", Make = "Nissan", Model = "Altima", Year = 2022, VIN = "VIN005", LicensePlate = "ALT654", Color = "Red",
+                            EngineNumber = "ENG005", ChassisNumber = "CHS005", RegistrationDate = DateTime.Now.AddMonths(-2),
+                            LastServiceDate = DateTime.Now.AddMonths(-1), Mileage = 5000, FuelType = "Petrol", Transmission = "Automatic",
+                            InsuranceCompany = "InsureCo", InsuranceExpiryDate = DateTime.Now.AddMonths(12),
+                            RoadWorthyExpiryDate = DateTime.Now.AddMonths(7), Status = "Active", IsAssigned = false,
+                            Latitude = 7.3775, Longitude = 3.9470 // Ibadan
+                        },
+                    new Vehicle {
+                            Id = "V6", Make = "Mercedes Benz", Model = "E360", Year = 2022, VIN = "VIN006", LicensePlate = "GBV856", Color = "Gray",
+                            EngineNumber = "ENG006", ChassisNumber = "CHS006", RegistrationDate = DateTime.Now.AddMonths(-3),
+                            LastServiceDate = DateTime.Now.AddMonths(-2), Mileage = 8000, FuelType = "Diesel", Transmission = "Automatic",
+                            InsuranceCompany = "PremiumInsure", InsuranceExpiryDate = DateTime.Now.AddMonths(9),
+                            RoadWorthyExpiryDate = DateTime.Now.AddMonths(8), Status = "Active", IsAssigned = false,
+                            Latitude = 6.1730, Longitude = 6.7884 // Asaba
+                        },
+                    new Vehicle {
+                            Id = "V7", Make = "Toyota", Model = "Tundra", Year = 2018, VIN = "VIN007", LicensePlate = "VALL423", Color = "Blue",
+                            EngineNumber = "ENG007", ChassisNumber = "CHS007", RegistrationDate = DateTime.Now.AddYears(-4),
+                            LastServiceDate = DateTime.Now.AddMonths(-6), Mileage = 40000, FuelType = "Diesel", Transmission = "Manual",
+                            InsuranceCompany = "SafeInsure", InsuranceExpiryDate = DateTime.Now.AddMonths(7),
+                            RoadWorthyExpiryDate = DateTime.Now.AddMonths(4), Status = "Active", IsAssigned = false,
+                            Latitude = 7.7697, Longitude = 5.5096 // Akure
+                        },
+                    new Vehicle {
+                            Id = "V8", Make = "Honda", Model = "Crosstour", Year = 2022, VIN = "VIN008", LicensePlate = "JUH664", Color = "White",
+                            EngineNumber = "ENG008", ChassisNumber = "CHS008", RegistrationDate = DateTime.Now.AddMonths(-1),
+                            LastServiceDate = DateTime.Now.AddDays(-20), Mileage = 3000, FuelType = "Petrol", Transmission = "Automatic",
+                            InsuranceCompany = "AutoSafe", InsuranceExpiryDate = DateTime.Now.AddMonths(11),
+                            RoadWorthyExpiryDate = DateTime.Now.AddMonths(6), Status = "Active", IsAssigned = false,
+                            Latitude = 5.6037, Longitude = -0.1870 // Accra (for variety)
+                        }
                 };
 
                 HttpContext.Session.SetString("Vehicles", JsonSerializer.Serialize(vehicles));

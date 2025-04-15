@@ -16,9 +16,67 @@ namespace FleetManagement.UI.Controllers
                 new CalendarEvent { Title = "Night Shift", Start = DateTime.Today.AddDays(4).AddHours(20), End = DateTime.Today.AddDays(5).AddHours(4), Color = "#ffc107" }
             };
 
+            // Generate a mock list for other drivers' schedules.
+            var otherDrivers = new List<DriverScheduleInfo>
+            {
+                new DriverScheduleInfo
+                {
+                    DriverName = "Jane Doe",
+                    ShiftStart = DateTime.Today.AddHours(9),
+                    ShiftEnd = DateTime.Today.AddHours(17),
+                    IsOnDuty = true
+                },
+                new DriverScheduleInfo
+                {
+                    DriverName = "Mark Spencer",
+                    ShiftStart = DateTime.Today.AddHours(10),
+                    ShiftEnd = DateTime.Today.AddHours(18),
+                    IsOnDuty = false
+                },
+                new DriverScheduleInfo
+                {
+                    DriverName = "Alice Johnson",
+                    ShiftStart = DateTime.Today.AddHours(7),
+                    ShiftEnd = DateTime.Today.AddHours(15),
+                    IsOnDuty = true
+                }
+            };
+
+            // Populate upcoming time off/holidays
+            var upcoming = new List<TimeOffInfo>
+            {
+                new TimeOffInfo
+                {
+                    Title = "Holiday (4 days)",
+                    StartDate = new DateTime(2025, 3, 1),
+                    EndDate = new DateTime(2025, 3, 4),
+                    Status = "Approved"
+                },
+                new TimeOffInfo
+                {
+                    Title = "Public Friday",
+                    StartDate = new DateTime(2025, 4, 18),
+                    EndDate = new DateTime(2025, 4, 18),
+                    Status = "Holiday"
+                },
+                new TimeOffInfo
+                {
+                    Title = "Easter Monday",
+                    StartDate = new DateTime(2025, 4, 21),
+                    EndDate = new DateTime(2025, 4, 21),
+                    Status = "Holiday"
+                }
+            };
+
+            // Set allowed leave days (for the notice on the dashboard)
+            int allowedLeaveDays = 30;  // for example, 30 days per year
+
             var model = new DriverScheduleViewModel
             {
-                Events = events
+                Events = events,
+                OtherDrivers = otherDrivers,
+                AllowedLeaveDays = allowedLeaveDays,
+                UpcomingTimeOff = upcoming
             };
 
             return View("DriverSchedule", model);

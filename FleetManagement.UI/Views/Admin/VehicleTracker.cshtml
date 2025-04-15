@@ -1,0 +1,56 @@
+﻿@using FleetManagement.UI.Models.CompanyAssetDto;
+@model List<Vehicle>  // Passing a list of vehicles that we want to display on the map
+
+@{
+    ViewData["Title"] = "Vehicle Tracker";
+    Layout = "~/Views/Shared/_Layout.cshtml";  // or your dedicated layout
+}
+
+<!-- Container for the map -->
+<div id="map" style="height: 500px; width: 100%;"></div>
+
+<!-- Optionally, add a legend or controls below the map -->
+<!-- Include the Google Maps JavaScript API -->
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgRzgqRQPMuBq-XOmtkrpP5Pk9d7nmtAc&callback=initMap">
+</script>
+
+<script>
+    // Initialize the map when the API loads
+    function initMap() {
+        // Set a default center (example: Lagos)
+        var center = { lat: 6.5244, lng: 3.3792 };
+        var map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 12,
+            center: center
+        });
+
+        // Parse the model into a JavaScript variable.
+        // Ensure Model is not null. If you have no vehicles, you can pass an empty array.
+        var vehicles = @Html.Raw(Json.Serialize(Model ?? new List<Vehicle>()));
+
+        // Iterate over vehicles to add markers to the map.
+        vehicles.forEach(function(vehicle) {
+            // Create marker only if valid latitude/longitude exist.
+            if (vehicle.Latitude && vehicle.Longitude) {
+                var marker = new google.maps.Marker({
+                    position: { lat: vehicle.Latitude, lng: vehicle.Longitude },
+                    map: map,
+                    title: vehicle.LicensePlate + " - " + vehicle.AssignedDriverName,
+                    icon: {
+                        // You can use a custom icon URL or default marker
+                        url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                    }
+                });
+
+                // Optional: add an info window for each marker
+                var infowindow = new google.maps.InfoWindow({
+                    content: `<strong>${vehicle.Make} ${vehicle.Model}</strong><br/>Plate: ${vehicle.LicensePlate}<br/>Driver: ${vehicle.AssignedDriverName}`
+                });
+                marker.addListener("click", function () {
+                    infowindow.open(map, marker);
+                });
+            }
+        });
+    }
+</script>
