@@ -54,9 +54,18 @@
 </style>
 
 <div class="container mt-4">
-    <h2>Driver-Vehicle Assignments</h2>
 
-    <!-- Current Assignment Table -->
+    <div class="row">
+        <h2>Driver-Vehicle Assignments</h2>
+
+        <!-- Current Assignment Table -->
+        <div class="apply-leave-btn text-center mb-3 align-items-end">
+            <a asp-controller="Admin" asp-action="ViewAvailability" class="btn btn-outline-primary">
+                <i class="fa fa-calendar-alt me-2"></i>View Availability
+            </a>
+        </div>
+    </div>
+
     <h4>Current Assignments</h4>
     <table class="table table-bordered">
         <thead>

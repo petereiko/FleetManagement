@@ -1,0 +1,167 @@
+﻿@using FleetManagement.UI.Models.DriverDTOs
+@using System.Text.Json
+
+
+@model List<Driver>
+
+@{
+    ViewData["Title"] = "ViewAvailability";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Check Driver's availability and activities</h1>
+
+
+
+<style>
+    .driver-list {
+        border-right: 1px solid #dee2e6;
+        height: 100%;
+    }
+
+    .driver-item {
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s ease;
+    }
+
+        .driver-item:hover,
+        .driver-item.active {
+            background-color: #f0f8ff;
+        }
+
+    .driver-details {
+        padding: 2rem;
+    }
+
+    .status-badge {
+        padding: 0.3rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .Available {
+        background-color: #e6f9ec;
+        color: #198754;
+    }
+
+    .OnDuty {
+        background-color: #e0f0ff;
+        color: #0d6efd;
+    }
+
+    .OffDuty {
+        background-color: #fde2e2;
+        color: #dc3545;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Driver List -->
+        <div class="col-md-4 driver-list">
+            <h5><strong>Driver List</strong></h5>
+            @foreach (var driver in Model)
+            {
+                <div class="driver-item" onclick="showDriverDetails('@driver.Id')" id="driver-@driver.Id">
+                    <div>
+                        <div><strong>@driver.FirstName @driver.LastName</strong></div>
+                        <span class="text-muted">@driver.LicenseCategory</span>
+                    </div>
+                    <span class="status-badge @driver.ShiftStatus.Replace(" ", "")">
+                        @driver.ShiftStatus
+                    </span>
+                </div>
+            }
+        </div>
+
+        <!-- Driver Details -->
+        <div class="col-md-8">
+            <div class="driver-details border rounded shadow-sm bg-white" id="driverDetails">
+                <h5 class="mb-3 fw-bold">Driver Details</h5>
+                <div id="driverDetailContent" class="text-muted">Select a driver to view details.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
+<script>
+    const drivers = @Html.Raw(JsonSerializer.Serialize(Model));
+
+    function showDriverDetails(driverId) {
+        const selected = drivers.find(d => d.Id === driverId);
+        if (!selected) return;
+
+        // Remove active class from all, add to selected
+        document.querySelectorAll('.driver-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('driver-' + driverId)?.classList.add('active');
+
+        const fullName = `${selected.FirstName} ${selected.MiddleName} ${selected.LastName}`;
+        const lastSeen = new Date(selected.LastSeen).toLocaleString("en-GB", {
+            day: "2-digit", month: "short", year: "numeric",
+            hour: "2-digit", minute: "2-digit", second: "2-digit"
+        });
+
+        document.getElementById("driverDetailContent").innerHTML = `
+            <div class="row">
+                 <div class="col-md-9">
+                 
+                      <div class="row mb-3">
+                         <div class="col-md-6"><strong>Full Name:</strong><br/> ${fullName}</div>
+                         <div class="col-md-6"><strong>Contact Number:</strong><br/> ${selected.PhoneNumber}</div>
+                     </div>
+                     <div class="row mb-3">
+                         <div class="col-md-6"><strong>License Number:</strong><br/> ${selected.LicenseNumber}</div>
+                         <div class="col-md-6"><strong>License Category:</strong><br/> ${selected.LicenseCategory}</div>
+                     </div>
+                     <div class="row mb-3">
+                         <div class="col-md-6"><strong>Shift Status:</strong><br/>
+                             <span class="status-badge ${selected.ShiftStatus.replace(" ", "")}">${selected.ShiftStatus}</span>
+                         </div>
+                         <div class="col-md-6"><strong>Last Seen:</strong><br/>
+                             <i class="fas fa-clock text-secondary me-1"></i> ${lastSeen}
+                         </div>
+                     </div>
+                 </div>
+
+                 <div class="col-md-3 d-flex flex-column align-items-end">
+                             <img src="/images/drivers/${selected.Id}.jpg"
+                                  onerror="this.onerror=null;this.src='/images/drivers/default-placeholder.png';"
+                                  alt="Driver Photo"
+                                  class="img-fluid border"
+                                  style="width: 120px; height: 150px; object-fit: cover;">
+
+                             <div class="small align-items-center text-muted mt-2">Driver Passport</div>
+                 </div>
+            </div>
+
+
+             <hr class="my-4" />
+
+            <!-- Driver Activity Section -->
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 fw-semibold">Driver Activity</h6>
+                        <p class="text-muted mb-0 small">Click below to view detailed history of this driver's recent trips, availability, and shifts.</p>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-route me-1"></i> View Driver Activity
+                    </button>
+                </div>
+            </div>
+
+        `;
+    }
+</script>
+

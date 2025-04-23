@@ -37,9 +37,10 @@ namespace FleetManagement.UI.Models.DriverDTOs
         public string EmergencyContactName { get; set; }
         public string EmergencyContactPhone { get; set; } 
         public string Relationship { get; set; }
-        
-    }
 
+        public string ShiftStatus { get; set; }
+        public DateTime LastSeen { get; set; }
+    }
 
     public class DriverDocument
     {
@@ -53,4 +54,14 @@ namespace FleetManagement.UI.Models.DriverDTOs
     }
 
 
+    //public enum ShifStatus
+    //{
+
+    //    OnDuty = 1,
+    //    Available = 2,
+    //    OffDuty = 3,
+    //    OnBreak = 4,
+    //    InMeeting = 5,
+    //    Remote = 6
+    //}
 }

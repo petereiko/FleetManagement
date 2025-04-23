@@ -9,6 +9,7 @@ namespace FleetManagement.UI.Models.ServiceHubs
         {
             await Clients.All.SendAsync("ReceivePositionUpdate", vehicleId, latitude, longitude);
         }
+
     }
 }
 

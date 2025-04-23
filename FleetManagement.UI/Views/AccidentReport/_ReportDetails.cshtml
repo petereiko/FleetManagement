@@ -1,4 +1,278 @@
-﻿@using FleetManagement.UI.Models.Dto;
+﻿@using FleetManagement.UI.Models.Dto
+@{
+    ViewBag.Title = "Full Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model AccidentReportDto
+
+<div class="card">
+    <div class="card-header text-bg-primary">
+        <h5 class="mb-0 text-white">Full Accident Report Details</h5>
+    </div>
+    <form class="form-horizontal">
+        <div class="form-body">
+
+            <!-- Section 1: Basic Accident Info -->
+            <div class="card-body">
+                <h5 class="card-title mb-0">Basic Accident Info</h5>
+            </div>
+            <hr class="m-0">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-3">Driver Name:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.DriverName</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/span-->
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-3">Vehicle License:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.VehicleLicense</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/span-->
+                </div>
+                <!--/row-->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-3">Report Number:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.ReportNumber</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/span-->
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-3">Accident Date:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.AccidentDate.ToString("dd MMM yyyy")</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/span-->
+                </div>
+            </div>
+
+            <!-- Section 2: Location Details -->
+            <hr class="m-0">
+            <div class="card-body">
+                <h5 class="card-title mb-0">Location Details</h5>
+            </div>
+            <hr class="m-0">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-3">State:</label>
+                            <div class="col-md-9">
+                                <span class="badge text-bg-success">@Model.State</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/span-->
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-3">LGA:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.LGA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--/row-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-2">Landmark:</label>
+                            <div class="col-md-10">
+                                <p class="form-control-static">@Model.Landmark</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Accident Environment -->
+            <hr class="m-0">
+            <div class="card-body">
+                <h5 class="card-title mb-0">Accident Environment</h5>
+            </div>
+            <hr class="m-0">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-5">Road Condition:</label>
+                            <div class="col-md-7">
+                                <p class="form-control-static">@Model.RoadCondition</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/span-->
+                    <div class="col-md-4">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-5">Visibility:</label>
+                            <div class="col-md-7">
+                                <p class="form-control-static">@Model.Visibility</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/span-->
+                    <div class="col-md-4">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-5">Weather:</label>
+                            <div class="col-md-7">
+                                <p class="form-control-static">@Model.WeatherCondition</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Narrative & Impact -->
+            <hr class="m-0">
+            <div class="card-body">
+                <h5 class="card-title mb-0">Narrative & Impact</h5>
+            </div>
+            <hr class="m-0">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-2">Movement:</label>
+                            <div class="col-md-10">
+                                <p class="form-control-static">@Model.VehicleMovementDescription</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-2">Driver Statement:</label>
+                            <div class="col-md-10">
+                                <p class="form-control-static">@Model.DriverStatement</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: Law Enforcement Details -->
+            <hr class="m-0">
+            <div class="card-body">
+                <h5 class="card-title mb-0">Law Enforcement Details</h5>
+            </div>
+            <hr class="m-0">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-3">Police Station:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.PoliceStationReportedTo</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/span-->
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-3">Officer In Charge:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.OfficerInCharge</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 6: Witness Details -->
+            <hr class="m-0">
+            <div class="card-body">
+                <h5 class="card-title mb-0">Witness Details</h5>
+            </div>
+            <hr class="m-0">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-3">Witness Name:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.WitnessName</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/span-->
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="form-label text-end col-md-3">Witness Phone:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static">@Model.WitnessPhone</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 7: Internal Comments (Optional) -->
+            <hr class="m-0">
+            <div class="card-body">
+                <h5 class="card-title mb-0">Internal Comments</h5>
+            </div>
+            <hr class="m-0">
+            <div class="card-body">
+                <p class="form-control-static">@Model.InternalComment</p>
+            </div>
+        </div>
+        <div class="form-actions border-top">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-offset-3 col-md-9">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-edit fs-5"></i> Edit
+                                </button>
+                                <button type="button" class="btn bg-danger-subtle text-danger ms-6">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* @using FleetManagement.UI.Models.Dto;
 
 @{
     ViewBag.Title = "Full Report";
@@ -136,3 +410,4 @@
                                 </div>
                             </form>
                         </div>
+ *@

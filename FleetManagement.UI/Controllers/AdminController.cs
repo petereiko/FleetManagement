@@ -186,6 +186,15 @@ namespace FleetManagement.UI.Controllers
                 return View(drivers);
             }
 
+
+            public IActionResult ViewAvailability()
+            {
+                var drivers = GetDriversFromSession();
+                return View(drivers);
+            }
+
+            
+
             // NEW: GET: /Admin/EditDriver?id=...
             public IActionResult EditDriver(string id)
             {
