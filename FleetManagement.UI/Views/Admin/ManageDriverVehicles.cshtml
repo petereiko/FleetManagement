@@ -6,13 +6,269 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Custom CSS for professional look -->
 <style>
     body {
         background: #f4f7fa;
     }
 
     h2 {
+        color: #343a40;
+    }
+
+    .card-header {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .assignment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+        gap: 1rem;
+    }
+
+    .driver-card {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 0.4rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        padding: 1rem;
+        transition: transform 0.2s ease;
+    }
+
+        .driver-card:hover {
+            transform: scale(1.02);
+        }
+
+    .driver-name {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .vehicle-entry {
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .vehicle-image {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .assign-form .form-control,
+    .assign-form .form-select {
+        border-radius: 0.3rem;
+    }
+
+    .scroll-box {
+        max-height: 250px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        padding: 1rem;
+        background-color: #fff;
+        border-radius: 0.25rem;
+    }
+
+    .view-link {
+        cursor: pointer;
+        color: #007bff;
+        font-size: 0.85rem;
+        text-decoration: underline;
+    }
+
+    .section-title {
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Driver-Vehicle Assignments</h2>
+        <a asp-controller="Admin" asp-action="ViewAvailability" class="btn btn-outline-primary">
+            <i class="fa fa-calendar-alt me-1"></i> View Availability
+        </a>
+    </div>
+
+    <!-- Assignment Cards -->
+    <div class="card mb-4">
+        <div class="card-header">Current Assignments</div>
+        <div class="card-body">
+            <div class="assignment-grid">
+                @foreach (var driver in Model.Drivers)
+                {
+                    var assignedVehicles = Model.Vehicles.Where(v => v.AssignedDriverId == driver.Id).ToList();
+                    <div class="driver-card">
+                        <div class="driver-name">@driver.FullName</div>
+                        @if (assignedVehicles.Any())
+                        {
+                            @foreach (var vehicle in assignedVehicles)
+                            {
+                                <div class="vehicle-entry">
+                                    <img src="@($"/images/vehicles/{vehicle.Id}.jpg")"
+                                         onerror="this.onerror=null;this.src='/images/vehicles/default-vehicle.png';"
+                                         alt="Vehicle Image"
+                                         class="vehicle-image mb-2" />
+                                    <div><strong>@vehicle.Make @vehicle.Model</strong></div>
+                                    <div class="text-muted small">@vehicle.LicensePlate</div>
+                                    <span class="view-link" data-vehicle-id="@vehicle.Id">[View Details]</span>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <em class="text-muted">No vehicles assigned</em>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignment Form -->
+    <div class="card">
+        <div class="card-header">Map Vehicles to Driver</div>
+        <div class="card-body assign-form">
+            <div class="form-group mb-3">
+                <label class="section-title" for="driverSelect">Select Driver</label>
+                <select id="driverSelect" class="form-select">
+                    <option value="">-- Select Driver --</option>
+                    @foreach (var driver in Model.Drivers)
+                    {
+                        <option value="@driver.Id" selected="@(driver.Id == Model.SelectedDriverId ? "selected" : null)">
+                            @driver.FullName
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="section-title">Available Vehicles</label>
+                <div id="vehiclesCheckboxes" class="scroll-box">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+
+            <div class="text-end">
+                <button id="updateAssignment" class="btn btn-success">
+                    <i class="fa fa-check-circle me-1"></i> Update Assignment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="vehicleDetailsModal" tabindex="-1" aria-labelledby="vehicleDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="vehicleDetailsContent">
+            <!-- AJAX-loaded -->
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script>
+    const allVehicles = @Html.Raw(Json.Serialize(Model.Vehicles));
+
+    function updateVehicleCheckboxes(driverId) {
+        const container = $("#vehiclesCheckboxes");
+        container.empty();
+
+        const available = allVehicles.filter(v => !v.isAssigned || v.assignedDriverId === driverId);
+        if (!available.length) {
+            container.append("<p class='text-muted'>No vehicles available for assignment.</p>");
+        } else {
+            available.forEach(v => {
+                const isChecked = v.isAssigned && v.assignedDriverId === driverId ? "checked" : "";
+                const html = `
+                    <div class="form-check mb-2">
+                        <input class="form-check-input vehicle-checkbox" type="checkbox" data-vehicle-id="${v.id}" ${isChecked}>
+                        <label class="form-check-label">${v.make} ${v.model} (${v.licensePlate})</label>
+                    </div>`;
+                container.append(html);
+            });
+        }
+    }
+
+    $(document).ready(function () {
+        const selectedDriverId = $("#driverSelect").val();
+        if (selectedDriverId) updateVehicleCheckboxes(selectedDriverId);
+
+        $("#driverSelect").change(function () {
+            updateVehicleCheckboxes($(this).val());
+        });
+
+        $("#updateAssignment").click(function () {
+            const driverId = $("#driverSelect").val();
+            if (!driverId) {
+                Toastify({ text: "Please select a driver.", duration: 3000, backgroundColor: "#dc3545" }).showToast();
+                return;
+            }
+
+            const vehicleIds = $(".vehicle-checkbox:checked").map((_, el) => $(el).data("vehicle-id")).get();
+            $.ajax({
+                url: '@Url.Action("AssignVehicles", "Admin")',
+                method: 'POST',
+                data: { selectedDriverId: driverId, vehicleIds: vehicleIds },
+                traditional: true,
+                success: function (res) {
+                    Toastify({
+                        text: res.success ? "Assignment updated successfully!" : "Failed to update assignment.",
+                        backgroundColor: res.success ? "#28a745" : "#dc3545",
+                        duration: 3000
+                    }).showToast();
+                    if (res.success) location.reload();
+                },
+                error: function () {
+                    Toastify({ text: "Error updating assignment.", duration: 3000, backgroundColor: "#dc3545" }).showToast();
+                }
+            });
+        });
+
+        $(document).on("click", ".view-link", function () {
+            const vehicleId = $(this).data("vehicle-id");
+            $.get('@Url.Action("VehicleDetails", "Admin")', { vehicleId }, function (data) {
+                $("#vehicleDetailsContent").html(data);
+                new bootstrap.Modal(document.getElementById("vehicleDetailsModal")).show();
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* @using FleetManagement.UI.Models.DummyModels
+@model DriverVehicleMappingViewModel
+
+@{
+    ViewBag.Title = "Manage Driver-Vehicle Assignments";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        background: #f4f7fa;
+    }
+
+    h2, h4 {
         color: #343a40;
     }
 
@@ -25,11 +281,7 @@
         color: #fff;
     }
 
-    .table {
-        background: #fff;
-    }
-
-    .form-control {
+    .form-control, .form-select {
         border-radius: 0.25rem;
     }
 
@@ -51,67 +303,84 @@
         color: #007bff;
         text-decoration: underline;
     }
+
+    .scroll-box {
+        max-height: 250px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        padding: 1rem;
+        background-color: #fff;
+        border-radius: 0.25rem;
+    }
+
+    .section-title {
+        font-weight: 600;
+        font-size: 1.15rem;
+        margin-bottom: 0.5rem;
+    }
 </style>
 
 <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Driver-Vehicle Assignments</h2>
+        <a asp-controller="Admin" asp-action="ViewAvailability" class="btn btn-outline-primary">
+            <i class="fa fa-calendar-alt me-2"></i>View Availability
+        </a>
+    </div>
 
-    <div class="row">
-        <h2>Driver-Vehicle Assignments</h2>
-
-        <!-- Current Assignment Table -->
-        <div class="apply-leave-btn text-center mb-3 align-items-end">
-            <a asp-controller="Admin" asp-action="ViewAvailability" class="btn btn-outline-primary">
-                <i class="fa fa-calendar-alt me-2"></i>View Availability
-            </a>
+    <!-- Current Assignment Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Current Assignments
+        </div>
+        <div class="card-body scroll-box">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Driver</th>
+                        <th>Assigned Vehicles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var driver in Model.Drivers)
+                    {
+                        var assignedVehicles = Model.Vehicles.Where(v => v.AssignedDriverId == driver.Id).ToList();
+                        <tr>
+                            <td>@driver.FullName</td>
+                            <td>
+                                @if (assignedVehicles.Any())
+                                {
+                                    <ul class="mb-0">
+                                        @foreach (var vehicle in assignedVehicles)
+                                        {
+                                            <li>
+                                                @vehicle.Make @vehicle.Model (@vehicle.LicensePlate)
+                                                <span class="view-vehicle-details" data-vehicle-id="@vehicle.Id">[View Details]</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <em>None</em>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <h4>Current Assignments</h4>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Driver</th>
-                <th>Assigned Vehicles</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var driver in Model.Drivers)
-            {
-                var assignedVehicles = Model.Vehicles.Where(v => v.AssignedDriverId == driver.Id).ToList();
-                <tr>
-                    <td>@driver.FullName</td>
-                    <td>
-                        @if (assignedVehicles.Any())
-                        {
-                            <ul>
-                                @foreach (var vehicle in assignedVehicles)
-                                {
-                                    <li>
-                                        @vehicle.Make @vehicle.Model (@vehicle.LicensePlate)
-                                        <span class="view-vehicle-details" data-vehicle-id="@vehicle.Id">[View Details]</span>
-                                    </li>
-                                }
-                            </ul>
-                        }
-                        else
-                        {
-                            <em>None</em>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
     <!-- Assignment Form -->
-    <div class="card mt-4">
+    <div class="card">
         <div class="card-header">
             Map Vehicles to Driver
         </div>
         <div class="card-body">
             <div class="form-group mb-3">
-                <label for="driverSelect">Select Driver</label>
-                <select id="driverSelect" class="form-control">
+                <label for="driverSelect" class="section-title">Select Driver</label>
+                <select id="driverSelect" class="form-select">
                     <option value="">-- Select Driver --</option>
                     @foreach (var driver in Model.Drivers)
                     {
@@ -123,13 +392,17 @@
             </div>
 
             <div class="form-group mb-3">
-                <label>Available Vehicles</label>
-                <div id="vehiclesCheckboxes">
-                    <!-- Dynamic checkboxes will be populated here -->
+                <label class="section-title">Available Vehicles</label>
+                <div id="vehiclesCheckboxes" class="scroll-box">
+                    <!-- Populated dynamically -->
                 </div>
             </div>
 
-            <button id="updateAssignment" class="btn btn-success">Update Assignment</button>
+            <div class="text-end">
+                <button id="updateAssignment" class="btn btn-success">
+                    <i class="fa fa-check-circle me-1"></i>Update Assignment
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -138,121 +411,92 @@
 <div class="modal fade" id="vehicleDetailsModal" tabindex="-1" aria-labelledby="vehicleDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" id="vehicleDetailsContent">
-            <!-- Partial view content will load here dynamically -->
+            <!-- AJAX-loaded partial view -->
         </div>
     </div>
 </div>
 
-<!-- Include jQuery and Toastify if not already in layout -->
+<!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
 <script>
-    // Pass the vehicles list to JavaScript
     var allVehicles = @Html.Raw(Json.Serialize(Model.Vehicles));
 
-    // Function to update checkboxes based on selected driver
     function updateVehicleCheckboxes(selectedDriverId) {
         var container = $("#vehiclesCheckboxes");
         container.empty();
 
-        // Filter vehicles that are unassigned or assigned to the selected driver
-        var availableVehicles = allVehicles.filter(function(vehicle) {
+        var availableVehicles = allVehicles.filter(function (vehicle) {
             return (!vehicle.isAssigned) || (vehicle.assignedDriverId === selectedDriverId);
         });
 
         if (availableVehicles.length === 0) {
-            container.append("<p>No vehicles available for assignment.</p>");
+            container.append("<p class='text-muted'>No vehicles available for assignment.</p>");
         } else {
-            availableVehicles.forEach(function(vehicle) {
+            availableVehicles.forEach(function (vehicle) {
                 var isChecked = (vehicle.isAssigned && vehicle.assignedDriverId === selectedDriverId) ? "checked" : "";
-                var checkboxHtml = "<div class='form-check'>" +
-                                   "<input type='checkbox' class='form-check-input vehicle-checkbox' data-vehicle-id='" + vehicle.id + "' " + isChecked + ">" +
-                                   "<label class='form-check-label'>" + vehicle.make + " " + vehicle.model + " (" + vehicle.licensePlate + ")</label>" +
-                                   "</div>";
+                var checkboxHtml = `
+                    <div class='form-check mb-2'>
+                        <input type='checkbox' class='form-check-input vehicle-checkbox' data-vehicle-id='${vehicle.id}' ${isChecked}>
+                        <label class='form-check-label'>${vehicle.make} ${vehicle.model} (${vehicle.licensePlate})</label>
+                    </div>`;
                 container.append(checkboxHtml);
             });
         }
     }
 
-    // On driver selection change
-    $("#driverSelect").on("change", function() {
-        var selectedDriverId = $(this).val();
-        updateVehicleCheckboxes(selectedDriverId);
-    });
-
-    // On update assignment button click
-    $("#updateAssignment").on("click", function() {
+    $(document).ready(function () {
         var selectedDriverId = $("#driverSelect").val();
-        if (!selectedDriverId) {
-            Toastify({
-                text: "Please select a driver.",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "#dc3545",
-            }).showToast();
-            return;
-        }
-        var assignedVehicleIds = [];
-        $(".vehicle-checkbox:checked").each(function() {
-            assignedVehicleIds.push($(this).data("vehicle-id"));
+        if (selectedDriverId) updateVehicleCheckboxes(selectedDriverId);
+
+        $("#driverSelect").on("change", function () {
+            updateVehicleCheckboxes($(this).val());
         });
 
-        $.ajax({
-            url: '@Url.Action("AssignVehicles", "Admin")',
-            type: 'POST',
-            data: {
-                selectedDriverId: selectedDriverId,
-                vehicleIds: assignedVehicleIds
-            },
-            traditional: true, // Important for sending array data
-            success: function(response) {
-                if (response.success) {
+        $("#updateAssignment").on("click", function () {
+            var selectedDriverId = $("#driverSelect").val();
+            if (!selectedDriverId) {
+                Toastify({ text: "Please select a driver.", duration: 3000, backgroundColor: "#dc3545" }).showToast();
+                return;
+            }
+
+            var assignedVehicleIds = [];
+            $(".vehicle-checkbox:checked").each(function () {
+                assignedVehicleIds.push($(this).data("vehicle-id"));
+            });
+
+            $.ajax({
+                url: '@Url.Action("AssignVehicles", "Admin")',
+                type: 'POST',
+                data: {
+                    selectedDriverId: selectedDriverId,
+                    vehicleIds: assignedVehicleIds
+                },
+                traditional: true,
+                success: function (response) {
                     Toastify({
-                        text: "Assignment updated successfully!",
+                        text: response.success ? "Assignment updated successfully!" : "Failed to update assignment.",
                         duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: "#28a745",
+                        backgroundColor: response.success ? "#28a745" : "#dc3545"
                     }).showToast();
-                    // Reload page to update the assignments table and global data
-                    location.reload();
-                } else {
+
+                    if (response.success) location.reload();
+                },
+                error: function () {
                     Toastify({
-                        text: "Failed to update assignment.",
+                        text: "Error updating assignment.",
                         duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: "#dc3545",
+                        backgroundColor: "#dc3545"
                     }).showToast();
                 }
-            },
-            error: function() {
-                Toastify({
-                    text: "Error updating assignment.",
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "#dc3545",
-                }).showToast();
-            }
+            });
         });
-    });
 
-    // On page load, update checkboxes for the default selected driver
-    $(document).ready(function() {
-        var selectedDriverId = $("#driverSelect").val();
-        if(selectedDriverId) {
-            updateVehicleCheckboxes(selectedDriverId);
-        }
-
-        // Attach click event for view details link (delegated event)
-        $(document).on("click", ".view-vehicle-details", function() {
+        $(document).on("click", ".view-vehicle-details", function () {
             var vehicleId = $(this).data("vehicle-id");
-            // Load partial view for vehicle details via AJAX
-            $.get('@Url.Action("VehicleDetails", "Admin")', { vehicleId: vehicleId }, function(data) {
+            $.get('@Url.Action("VehicleDetails", "Admin")', { vehicleId: vehicleId }, function (data) {
                 $("#vehicleDetailsContent").html(data);
                 var modal = new bootstrap.Modal(document.getElementById('vehicleDetailsModal'));
                 modal.show();
@@ -260,3 +504,6 @@
         });
     });
 </script>
+
+
+ *@

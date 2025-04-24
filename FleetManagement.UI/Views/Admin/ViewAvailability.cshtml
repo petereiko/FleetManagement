@@ -1,6 +1,284 @@
 ﻿@using FleetManagement.UI.Models.DriverDTOs
 @using System.Text.Json
 
+@model List<Driver>
+
+@{
+    ViewData["Title"] = "ViewAvailability";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var total = Model.Count;
+    var available = Model.Count(x => x.ShiftStatus == "Available");
+    var onDuty = Model.Count(x => x.ShiftStatus == "On Duty");
+    var offDuty = Model.Count(x => x.ShiftStatus == "Off Duty");
+}
+
+<h3 class="mb-4 fw-semibold">Check Driver's Availability & Activities</h3>
+
+<style>
+    .driver-item {
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s ease;
+    }
+
+        .driver-item:hover,
+        .driver-item.active {
+            background-color: #f0f8ff;
+        }
+
+    .driver-details {
+        padding: 2rem;
+    }
+
+    .status-badge {
+        padding: 0.3rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .Available {
+        background-color: #e6f9ec;
+        color: #198754;
+    }
+
+    .OnDuty {
+        background-color: #e0f0ff;
+        color: #0d6efd;
+    }
+
+    .OffDuty {
+        background-color: #fde2e2;
+        color: #dc3545;
+    }
+
+    .status-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 6px;
+    }
+
+    .bg-success {
+        background-color: #198754;
+    }
+
+    .bg-primary {
+        background-color: #0d6efd;
+    }
+
+    .bg-danger {
+        background-color: #dc3545;
+    }
+
+    .driver-list-controls {
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 10;
+        padding-bottom: 10px;
+    }
+
+    #driverDetailContent {
+        transition: all 0.3s ease-in-out;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Driver Summary and Controls -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="d-flex flex-wrap gap-3">
+                <div>Total Drivers: <strong>@total</strong></div>
+                <div>Available: <span class="badge bg-success">@available</span></div>
+                <div>On Duty: <span class="badge bg-primary">@onDuty</span></div>
+                <div>Off Duty: <span class="badge bg-danger">@offDuty</span></div>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex gap-2 justify-content-end">
+            <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search driver by name..." style="max-width: 200px;" />
+            <select id="statusFilter" class="form-select form-select-sm" style="max-width: 150px;">
+                <option value="">All Status</option>
+                <option value="Available">Available</option>
+                <option value="On Duty">On Duty</option>
+                <option value="Off Duty">Off Duty</option>
+            </select>
+            <select id="sortSelect" class="form-select form-select-sm" style="max-width: 180px;">
+                <option value="recent">Sort by: Recently Seen</option>
+                <option value="oldest">Sort by: Least Recent</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Driver List -->
+        <div class="col-md-4 pe-4">
+            <div id="driverListContainer" style="max-height: 70vh; overflow-y: auto;"></div>
+        </div>
+
+        <!-- Driver Details -->
+        <div class="col-md-8">
+            <div class="driver-details border rounded shadow-sm bg-white" id="driverDetails">
+                <h5 class="mb-3 fw-bold">Driver Details</h5>
+                <div id="driverDetailContent" class="text-muted">Select a driver to view details.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<script>
+    const drivers = @Html.Raw(JsonSerializer.Serialize(Model));
+    const driverListContainer = document.getElementById('driverListContainer');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const sortSelect = document.getElementById('sortSelect');
+
+    function renderDriverList(filteredDrivers) {
+        driverListContainer.innerHTML = '';
+
+        filteredDrivers.forEach(driver => {
+            const dotClass = driver.ShiftStatus === "Available" ? "bg-success"
+                            : driver.ShiftStatus === "On Duty" ? "bg-primary"
+                            : "bg-danger";
+
+            const div = document.createElement('div');
+            div.className = 'driver-item';
+            div.id = `driver-${driver.Id}`;
+            div.onclick = () => showDriverDetails(driver.Id);
+            div.innerHTML = `
+                <div>
+                    <div><strong>${driver.FirstName} ${driver.LastName}</strong></div>
+                    <span class="text-muted">${driver.LicenseCategory}</span>
+                </div>
+                <span class="status-badge ${driver.ShiftStatus.replace(/\s/g, '')}" data-bs-toggle="tooltip" title="${driver.ShiftStatus}">
+                    <span class="status-dot ${dotClass}"></span> ${driver.ShiftStatus}
+                </span>
+            `;
+            driverListContainer.appendChild(div);
+        });
+
+        bootstrap.Tooltip && bootstrap.Tooltip.getInstance(document.body)?.dispose();
+        new bootstrap.Tooltip(document.body);
+    }
+
+    function filterDrivers() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const status = statusFilter.value;
+        const sortOrder = sortSelect.value;
+
+        let filtered = drivers.filter(d => {
+            const nameMatch = `${d.FirstName} ${d.LastName}`.toLowerCase().includes(searchTerm);
+            const statusMatch = !status || d.ShiftStatus === status;
+            return nameMatch && statusMatch;
+        });
+
+        filtered.sort((a, b) => {
+            const timeA = new Date(a.LastSeen).getTime();
+            const timeB = new Date(b.LastSeen).getTime();
+            return sortOrder === 'recent' ? timeB - timeA : timeA - timeB;
+        });
+
+        renderDriverList(filtered);
+    }
+
+    searchInput.addEventListener('input', filterDrivers);
+    statusFilter.addEventListener('change', filterDrivers);
+    sortSelect.addEventListener('change', filterDrivers);
+
+    renderDriverList(drivers);
+
+    function showDriverDetails(driverId) {
+        const selected = drivers.find(d => d.Id === driverId);
+        if (!selected) return;
+
+        document.querySelectorAll('.driver-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('driver-' + driverId)?.classList.add('active');
+
+        const fullName = `${selected.FirstName} ${selected.MiddleName} ${selected.LastName}`;
+        const lastSeen = new Date(selected.LastSeen).toLocaleString("en-GB", {
+            day: "2-digit", month: "short", year: "numeric",
+            hour: "2-digit", minute: "2-digit", second: "2-digit"
+        });
+
+        document.getElementById("driverDetailContent").innerHTML = `
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="row mb-3">
+                        <div class="col-md-6"><strong>Full Name:</strong><br/> ${fullName}</div>
+                        <div class="col-md-6"><strong>Contact Number:</strong><br/> ${selected.PhoneNumber}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><strong>License Number:</strong><br/> ${selected.LicenseNumber}</div>
+                        <div class="col-md-6"><strong>License Category:</strong><br/> ${selected.LicenseCategory}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><strong>Shift Status:</strong><br/>
+                            <span class="status-badge ${selected.ShiftStatus.replace(/\s/g, '')}">${selected.ShiftStatus}</span>
+                        </div>
+                        <div class="col-md-6"><strong>Last Seen:</strong><br/>
+                            <i class="fas fa-clock text-secondary me-1"></i> ${lastSeen}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 d-flex flex-column align-items-end">
+                    <img src="/images/drivers/${selected.Id}.jpg"
+                         onerror="this.onerror=null;this.src='/images/drivers/default-placeholder.png';"
+                         alt="Driver Photo"
+                         class="img-fluid border"
+                         style="width: 120px; height: 150px; object-fit: cover;">
+                    <div class="small text-muted mt-2">Driver Passport</div>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 fw-semibold">Driver Activity</h6>
+                        <p class="text-muted mb-0 small">Click below to view history of this driver's assignments, status & trips.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-route me-1"></i> View Driver Activity
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Assign Trip</a></li>
+                                <li><a class="dropdown-item" href="#">Message Driver</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+@* 
+@using FleetManagement.UI.Models.DriverDTOs
+@using System.Text.Json
 
 @model List<Driver>
 
@@ -10,8 +288,6 @@
 }
 
 <h1>Check Driver's availability and activities</h1>
-
-
 
 <style>
     .driver-list {
@@ -68,18 +344,20 @@
         <!-- Driver List -->
         <div class="col-md-4 driver-list">
             <h5><strong>Driver List</strong></h5>
-            @foreach (var driver in Model)
-            {
-                <div class="driver-item" onclick="showDriverDetails('@driver.Id')" id="driver-@driver.Id">
-                    <div>
-                        <div><strong>@driver.FirstName @driver.LastName</strong></div>
-                        <span class="text-muted">@driver.LicenseCategory</span>
-                    </div>
-                    <span class="status-badge @driver.ShiftStatus.Replace(" ", "")">
-                        @driver.ShiftStatus
-                    </span>
-                </div>
-            }
+
+            <!-- Filter and Search Controls -->
+            <div class="mb-3">
+                <input type="text" id="searchInput" class="form-control form-control-sm mb-2" placeholder="Search driver by name..." />
+                <select id="statusFilter" class="form-select form-select-sm">
+                    <option value="">All Status</option>
+                    <option value="Available">Available</option>
+                    <option value="On Duty">On Duty</option>
+                    <option value="Off Duty">Off Duty</option>
+                </select>
+            </div>
+
+            <!-- Scrollable Driver Container -->
+            <div id="driverListContainer" style="max-height: 70vh; overflow-y: auto;"></div>
         </div>
 
         <!-- Driver Details -->
@@ -94,15 +372,56 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-
 <script>
     const drivers = @Html.Raw(JsonSerializer.Serialize(Model));
+    const driverListContainer = document.getElementById('driverListContainer');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+
+    function renderDriverList(filteredDrivers) {
+        driverListContainer.innerHTML = '';
+        filteredDrivers.forEach(driver => {
+            const div = document.createElement('div');
+            div.className = 'driver-item';
+            div.id = `driver-${driver.Id}`;
+            div.onclick = () => showDriverDetails(driver.Id);
+            div.innerHTML = `
+                <div>
+                    <div><strong>${driver.FirstName} ${driver.LastName}</strong></div>
+                    <span class="text-muted">${driver.LicenseCategory}</span>
+                </div>
+                <span class="status-badge ${driver.ShiftStatus.replace(/\s/g, '')}">
+                    ${driver.ShiftStatus}
+                </span>
+            `;
+            driverListContainer.appendChild(div);
+        });
+    }
+
+    function filterDrivers() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const status = statusFilter.value;
+
+        const filtered = drivers.filter(d => {
+            const nameMatch = `${d.FirstName} ${d.LastName}`.toLowerCase().includes(searchTerm);
+            const statusMatch = !status || d.ShiftStatus === status;
+            return nameMatch && statusMatch;
+        });
+
+        renderDriverList(filtered);
+    }
+
+    searchInput.addEventListener('input', filterDrivers);
+    statusFilter.addEventListener('change', filterDrivers);
+
+    // Initial render
+    renderDriverList(drivers);
 
     function showDriverDetails(driverId) {
         const selected = drivers.find(d => d.Id === driverId);
         if (!selected) return;
 
-        // Remove active class from all, add to selected
+        // Remove active class
         document.querySelectorAll('.driver-item').forEach(el => el.classList.remove('active'));
         document.getElementById('driver-' + driverId)?.classList.add('active');
 
@@ -114,41 +433,37 @@
 
         document.getElementById("driverDetailContent").innerHTML = `
             <div class="row">
-                 <div class="col-md-9">
-                 
-                      <div class="row mb-3">
-                         <div class="col-md-6"><strong>Full Name:</strong><br/> ${fullName}</div>
-                         <div class="col-md-6"><strong>Contact Number:</strong><br/> ${selected.PhoneNumber}</div>
-                     </div>
-                     <div class="row mb-3">
-                         <div class="col-md-6"><strong>License Number:</strong><br/> ${selected.LicenseNumber}</div>
-                         <div class="col-md-6"><strong>License Category:</strong><br/> ${selected.LicenseCategory}</div>
-                     </div>
-                     <div class="row mb-3">
-                         <div class="col-md-6"><strong>Shift Status:</strong><br/>
-                             <span class="status-badge ${selected.ShiftStatus.replace(" ", "")}">${selected.ShiftStatus}</span>
-                         </div>
-                         <div class="col-md-6"><strong>Last Seen:</strong><br/>
-                             <i class="fas fa-clock text-secondary me-1"></i> ${lastSeen}
-                         </div>
-                     </div>
-                 </div>
+                <div class="col-md-9">
+                    <div class="row mb-3">
+                        <div class="col-md-6"><strong>Full Name:</strong><br/> ${fullName}</div>
+                        <div class="col-md-6"><strong>Contact Number:</strong><br/> ${selected.PhoneNumber}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><strong>License Number:</strong><br/> ${selected.LicenseNumber}</div>
+                        <div class="col-md-6"><strong>License Category:</strong><br/> ${selected.LicenseCategory}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><strong>Shift Status:</strong><br/>
+                            <span class="status-badge ${selected.ShiftStatus.replace(/\s/g, '')}">${selected.ShiftStatus}</span>
+                        </div>
+                        <div class="col-md-6"><strong>Last Seen:</strong><br/>
+                            <i class="fas fa-clock text-secondary me-1"></i> ${lastSeen}
+                        </div>
+                    </div>
+                </div>
 
-                 <div class="col-md-3 d-flex flex-column align-items-end">
-                             <img src="/images/drivers/${selected.Id}.jpg"
-                                  onerror="this.onerror=null;this.src='/images/drivers/default-placeholder.png';"
-                                  alt="Driver Photo"
-                                  class="img-fluid border"
-                                  style="width: 120px; height: 150px; object-fit: cover;">
-
-                             <div class="small align-items-center text-muted mt-2">Driver Passport</div>
-                 </div>
+                <div class="col-md-3 d-flex flex-column align-items-end">
+                    <img src="/images/drivers/${selected.Id}.jpg"
+                        onerror="this.onerror=null;this.src='/images/drivers/default-placeholder.png';"
+                        alt="Driver Photo"
+                        class="img-fluid border"
+                        style="width: 120px; height: 150px; object-fit: cover;">
+                    <div class="small text-muted mt-2">Driver Passport</div>
+                </div>
             </div>
 
+            <hr class="my-4" />
 
-             <hr class="my-4" />
-
-            <!-- Driver Activity Section -->
             <div class="row">
                 <div class="col-md-12 d-flex justify-content-between align-items-center">
                     <div>
@@ -160,8 +475,10 @@
                     </button>
                 </div>
             </div>
-
         `;
     }
 </script>
 
+
+
+ *@
