@@ -1,0 +1,43 @@
+﻿@model string
+<form asp-action="AddContact" method="post">
+    <input type="hidden" name="driverId" value="@Model" />
+    <div class="modal fade" id="addContactModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Add Emergency Contact</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-user me-1 text-secondary"></i> Full Name</label>
+                        <input name="Name" class="form-control" placeholder="e.g., John Doe" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-users me-1 text-secondary"></i> Relationship</label>
+                        <input name="Relationship" class="form-control" placeholder="e.g., Brother, Wife" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-phone me-1 text-secondary"></i> Phone Number</label>
+                        <input name="PhoneNumber" class="form-control" placeholder="e.g., 08012345678" required />
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="IsPrimary" id="IsPrimaryContact" />
+                        <label class="form-check-label" for="IsPrimaryContact">
+                            Mark as Primary Contact
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-check-circle me-1"></i>Save Contact</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

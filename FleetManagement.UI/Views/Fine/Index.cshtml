@@ -1,0 +1,336 @@
+﻿@model List<FineDto>
+@using FleetManagement.UI.Models.DriverDTOs
+@using FleetManagement.UI.Models.Dto
+
+@{
+    ViewData["Title"] = "Tolls & Fines";
+    var total = Model.Sum(f => f.Amount);
+    var unpaid = Model.Where(f => f.Status == "Unpaid").Sum(f => f.Amount);
+    var reimbursed = Model.Where(f => f.Status == "Reimbursed").Sum(f => f.Amount);
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+
+<style>
+    .summary-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        height: 100%;
+    }
+
+    .summary-icon {
+        font-size: 28px;
+        margin-bottom: 0.5rem;
+        opacity: 0.7;
+    }
+
+    .badge-status {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.75rem;
+        border-radius: 20px;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container mt-4">
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="summary-card">
+                <div class="summary-icon text-dark"><i class="fas fa-money-check-alt"></i></div>
+                <h5>Total Fines</h5>
+                <h4 class="fw-bold text-dark">₦@total.ToString("N0")</h4>
+                <span class="text-muted">@Model.Count() fines recorded</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-card">
+                <div class="summary-icon text-danger"><i class="fas fa-exclamation-circle"></i></div>
+                <h5>Outstanding</h5>
+                <h4 class="fw-bold text-danger">₦@unpaid.ToString("N0")</h4>
+                <span class="text-muted">@Model.Count(f => f.Status == "Unpaid") unpaid fines</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-card">
+                <div class="summary-icon text-success"><i class="fas fa-check-circle"></i></div>
+                <h5>Reimbursed</h5>
+                <h4 class="fw-bold text-success">₦@reimbursed.ToString("N0")</h4>
+                <span class="text-muted">@Model.Count(f => f.Status == "Reimbursed") reimbursed</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter & Add -->
+    <div class="row mb-3 align-items-center">
+        <div class="col-md-3">
+            <select class="form-select" id="statusFilter">
+                <option value="">All Statuses</option>
+                @foreach (var status in ViewBag.Statuses as List<string>)
+                {
+                    <option value="@status">@status</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="driverFilter">
+                <option value="">All Drivers</option>
+                @foreach (var driver in ViewBag.Drivers as List<Driver>)
+                {
+                    <option value="@driver.FullName()">@driver.FullName()</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search by type, description..." />
+        </div>
+        <div class="col-md-2 text-end">
+            <button class="btn btn-dark w-100" data-bs-toggle="modal" data-bs-target="#addFineModal">
+                <i class="fas fa-plus me-1"></i> Add Fine
+            </button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-striped" id="finesTable">
+            <thead class="table-light">
+                <tr>
+                    <th>Driver</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fine in Model)
+                {
+                    <tr>
+                        <td class="driver">@fine.DriverName</td>
+                        <td class="type">
+                            <i class="fas @(fine.Type == "Toll" ? "fa-dollar-sign" : "fa-file") me-1"></i>
+                            @fine.Type
+                        </td>
+                        <td class="amount">₦@fine.Amount.ToString("N0")</td>
+                        <td class="date">@fine.DateIssued.ToString("yyyy-MM-dd")</td>
+                        <td class="due">@fine.DueDate.ToString("yyyy-MM-dd")</td>
+                        <td class="status">
+                            <span class="badge badge-status bg-@(
+                                fine.Status == "Unpaid" ? "danger" :
+                                fine.Status == "Paid" ? "success" : "secondary"
+                            )">@fine.Status</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Fine Modal -->
+<partial name="_AddFineModal" model="@ViewBag.Drivers" />
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        flatpickr(".date-picker", {
+            altInput: true,
+            altFormat: "F j, Y",
+            dateFormat: "Y-m-d"
+        });
+
+        $(document).ready(function () {
+            function applyFilter() {
+                const status = $("#statusFilter").val().toLowerCase();
+                const driver = $("#driverFilter").val().toLowerCase();
+                const search = $("#searchInput").val().toLowerCase();
+
+                let visibleCount = 0;
+
+                $("#finesTable tbody tr").each(function () {
+                    const row = $(this);
+                    const rowStatus = row.find(".status").text().toLowerCase();
+                    const rowDriver = row.find(".driver").text().toLowerCase();
+                    const rowText = row.text().toLowerCase();
+
+                    const matchStatus = !status || rowStatus.includes(status);
+                    const matchDriver = !driver || rowDriver.includes(driver);
+                    const matchSearch = !search || rowText.includes(search);
+
+                    const isVisible = matchStatus && matchDriver && matchSearch;
+                    row.toggle(isVisible);
+                    if (isVisible) visibleCount++;
+                });
+
+                // Show "No results found" row if no match
+                if ($("#finesTable tbody tr.no-data").length === 0) {
+                    $("#finesTable tbody").append(`
+                        <tr class="no-data text-center text-muted">
+                            <td colspan="7" class="py-4">No matching fines or tolls found.</td>
+                        </tr>
+                    `);
+                }
+
+                $(".no-data").toggle(visibleCount === 0);
+            }
+
+            $("#statusFilter, #driverFilter, #searchInput").on("input change", applyFilter);
+
+            applyFilter(); // Run on load
+        });
+</script>
+}
+
+
+
+
+
+@* @model List<FineDto>
+@using FleetManagement.UI.Models.DriverDTOs
+@using FleetManagement.UI.Models.Dto
+
+@{
+    ViewData["Title"] = "Tolls & Fines";
+    var total = Model.Sum(f => f.Amount);
+    var unpaid = Model.Where(f => f.Status == "Unpaid").Sum(f => f.Amount);
+    var reimbursed = Model.Where(f => f.Status == "Reimbursed").Sum(f => f.Amount);
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+
+<div class="p-3 bg-light rounded border mb-4">
+    <form method="get" class="row g-2 mb-4 align-items-end">
+    <div class="col-md-3">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select">
+            @foreach (var status in ViewBag.Statuses as List<string>)
+            {
+                <option value="@status" @@(ViewBag.CurrentStatus == status ? "selected" : "")>@status</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Driver</label>
+        <select name="driverId" class="form-select">
+            <option value="All" @@(ViewBag.CurrentDriver == "All" ? "selected" : "")>All Drivers</option>
+            @foreach (var driver in ViewBag.Drivers as List<Driver>)
+            {
+                <option value="@driver.Id" @@(ViewBag.CurrentDriver == driver.Id ? "selected" : "")>@driver.FullName()</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Search</label>
+        <input name="search" class="form-control" placeholder="Search by type, description..." value="@ViewBag.SearchTerm" />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-dark w-100">
+            <i class="fas fa-filter me-1"></i> Apply Filters
+        </button>
+    </div>
+</form>
+
+</div>
+
+
+<div class="container mt-4">
+    <!-- Summary -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="bg-white p-3 rounded shadow-sm text-center">
+                <h5 class="text-muted">Total Fines</h5>
+                <h4 class="fw-bold text-dark">₦@total.ToString("N0")</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bg-white p-3 rounded shadow-sm text-center">
+                <h5 class="text-muted">Outstanding</h5>
+                <h4 class="fw-bold text-danger">₦@unpaid.ToString("N0")</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bg-white p-3 rounded shadow-sm text-center">
+                <h5 class="text-muted">Reimbursed</h5>
+                <h4 class="fw-bold text-success">₦@reimbursed.ToString("N0")</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header and Button -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold">Fines & Tolls</h3>
+        <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addFineModal">+ Add Fine</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Driver</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fine in Model)
+                {
+                    <tr>
+                        <td>@fine.DriverName</td>
+                        <td><i class="fas @(fine.Type == "Toll" ? "fa-dollar-sign" : "fa-file") me-1"></i>@fine.Type</td>
+                        <td>₦@fine.Amount.ToString("N0")</td>
+                        <td>@fine.DateIssued.ToString("yyyy-MM-dd")</td>
+                        <td>@fine.DueDate.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <span class="badge bg-@(
+                                fine.Status == "Unpaid" ? "danger" :
+                                fine.Status == "Paid" ? "success" : "secondary"
+                            )">@fine.Status</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<partial name="_AddFineModal" model="@ViewBag.Drivers" />
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        flatpickr(".date-picker", {
+            altInput: true,
+            altFormat: "F j, Y",
+            dateFormat: "Y-m-d"
+        });
+    </script>
+}
+ *@

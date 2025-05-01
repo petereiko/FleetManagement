@@ -16,6 +16,8 @@ namespace FleetManagement.UI
 
 
             // Add session services
+            builder.Services.AddHttpContextAccessor();
+
             builder.Services.AddSignalR();
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(options =>

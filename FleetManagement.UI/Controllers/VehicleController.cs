@@ -63,26 +63,76 @@ namespace FleetManagement.UI.Controllers
             // If session is empty, initialize with mock data
             var mockExpenses = new List<FuelExpenseDto>
             {
-                new FuelExpenseDto { Amount = 5000, State = "Lagos", LGA = "Ikeja", FillingStation = "Total", Date = new DateOnly(2024, 3, 10) },
-                new FuelExpenseDto { Amount = 7000, State = "Abuja", LGA = "Garki", FillingStation = "Mobil", Date = new DateOnly(2024, 3, 9) },
-                new FuelExpenseDto { Amount = 3500, State = "Kano", LGA = "Nassarawa", FillingStation = "NNPC", Date = new DateOnly(2024, 3, 8) },
-                new FuelExpenseDto { Amount = 4800, State = "Lagos", LGA = "Lekki", FillingStation = "Oando", Date = new DateOnly(2024, 3, 7) },
-                new FuelExpenseDto { Amount = 6000, State = "Rivers", LGA = "Port Harcourt", FillingStation = "Total", Date = new DateOnly(2024, 3, 6) },
-                new FuelExpenseDto { Amount = 8000, State = "Ogun", LGA = "Abeokuta", FillingStation = "Conoil", Date = new DateOnly(2024, 3, 5) },
-                new FuelExpenseDto { Amount = 9000, State = "Kaduna", LGA = "Kaduna North", FillingStation = "NNPC", Date = new DateOnly(2024, 3, 4) },
-                new FuelExpenseDto { Amount = 5500, State = "Kogi", LGA = "Lokoja", FillingStation = "Mobil", Date = new DateOnly(2024, 3, 3) },
-                new FuelExpenseDto { Amount = 7200, State = "Enugu", LGA = "Enugu East", FillingStation = "Total", Date = new DateOnly(2024, 3, 2) },
-                new FuelExpenseDto { Amount = 6500, State = "Benue", LGA = "Makurdi", FillingStation = "Oando", Date = new DateOnly(2024, 3, 1) },
-                new FuelExpenseDto { Amount = 4800, State = "Delta", LGA = "Warri", FillingStation = "Conoil", Date = new DateOnly(2024, 2, 28) },
-                new FuelExpenseDto { Amount = 5200, State = "Osun", LGA = "Osogbo", FillingStation = "Total", Date = new DateOnly(2024, 2, 27) },
-                new FuelExpenseDto { Amount = 7800, State = "Ekiti", LGA = "Ado Ekiti", FillingStation = "Mobil", Date = new DateOnly(2024, 2, 26) },
-                new FuelExpenseDto { Amount = 6700, State = "Edo", LGA = "Benin City", FillingStation = "NNPC", Date = new DateOnly(2024, 2, 25) },
-                new FuelExpenseDto { Amount = 7300, State = "Cross River", LGA = "Calabar", FillingStation = "Oando", Date = new DateOnly(2024, 2, 24) },
-                new FuelExpenseDto { Amount = 6900, State = "Plateau", LGA = "Jos", FillingStation = "Total", Date = new DateOnly(2024, 2, 23) },
-                new FuelExpenseDto { Amount = 8200, State = "Bauchi", LGA = "Bauchi", FillingStation = "Conoil", Date = new DateOnly(2024, 2, 22) },
-                new FuelExpenseDto { Amount = 8700, State = "Ondo", LGA = "Akure", FillingStation = "Mobil", Date = new DateOnly(2024, 2, 21) },
-                new FuelExpenseDto { Amount = 9100, State = "Taraba", LGA = "Jalingo", FillingStation = "NNPC", Date = new DateOnly(2024, 2, 20) },
-                new FuelExpenseDto { Amount = 5600, State = "Niger", LGA = "Minna", FillingStation = "Total", Date = new DateOnly(2024, 2, 19) }
+                new FuelExpenseDto {
+                    Vehicle = "ABC123XY (Toyota Hilux)", Driver = "Adebayo Ogunlesi",
+                    FuelType = "Diesel", Liters = 45, PricePerLiter = 650,
+                    Amount = 29250, Odometer = 12500,
+                    State = "Lagos", LGA = "Ikeja", FillingStation = "Total",
+                    ReceiptNumber = "REC-001", Date = new DateOnly(2024, 3, 10)
+                },
+                new FuelExpenseDto {
+                    Vehicle = "DEF456UV (Ford Ranger)", Driver = "Chinyere Obi",
+                    FuelType = "Petrol", Liters = 50, PricePerLiter = 620,
+                    Amount = 31000, Odometer = 14000,
+                    State = "Abuja", LGA = "Garki", FillingStation = "Mobil",
+                    ReceiptNumber = "REC-002", Date = new DateOnly(2024, 3, 9)
+                },
+                new FuelExpenseDto {
+                    Vehicle = "GHI789WX (Nissan Navara)", Driver = "Ibrahim Musa",
+                    FuelType = "Diesel", Liters = 40, PricePerLiter = 630,
+                    Amount = 25200, Odometer = 9800,
+                    State = "Kano", LGA = "Nassarawa", FillingStation = "NNPC",
+                    ReceiptNumber = "REC-003", Date = new DateOnly(2024, 3, 8)
+                },
+                new FuelExpenseDto {
+                    Vehicle = "JKL012YZ (Toyota Land Cruiser)", Driver = "Amaka Nwosu",
+                    FuelType = "Petrol", Liters = 55, PricePerLiter = 615,
+                    Amount = 33825, Odometer = 17800,
+                    State = "Lagos", LGA = "Lekki", FillingStation = "Oando",
+                    ReceiptNumber = "REC-004", Date = new DateOnly(2024, 3, 7)
+                },
+                new FuelExpenseDto {
+                    Vehicle = "MNO345AB (Ford Everest)", Driver = "Peter Okon",
+                    FuelType = "Diesel", Liters = 60, PricePerLiter = 640,
+                    Amount = 38400, Odometer = 21000,
+                    State = "Rivers", LGA = "Port Harcourt", FillingStation = "Total",
+                    ReceiptNumber = "REC-005", Date = new DateOnly(2024, 3, 6)
+                },
+                new FuelExpenseDto {
+                    Vehicle = "PQR678CD (Toyota Prado)", Driver = "Samuel Johnson",
+                    FuelType = "Petrol", Liters = 48, PricePerLiter = 600,
+                    Amount = 28800, Odometer = 15500,
+                    State = "Ogun", LGA = "Abeokuta", FillingStation = "Conoil",
+                    ReceiptNumber = "REC-006", Date = new DateOnly(2024, 3, 5)
+                },
+                new FuelExpenseDto {
+                    Vehicle = "STU901EF (Mitsubishi Pajero)", Driver = "Maryam Bello",
+                    FuelType = "Diesel", Liters = 53, PricePerLiter = 645,
+                    Amount = 34185, Odometer = 17200,
+                    State = "Kaduna", LGA = "Kaduna North", FillingStation = "NNPC",
+                    ReceiptNumber = "REC-007", Date = new DateOnly(2024, 3, 4)
+                },
+                new FuelExpenseDto {
+                    Vehicle = "VWX234GH (Toyota Tacoma)", Driver = "Yusuf Adamu",
+                    FuelType = "Petrol", Liters = 49, PricePerLiter = 610,
+                    Amount = 29890, Odometer = 14600,
+                    State = "Kogi", LGA = "Lokoja", FillingStation = "Mobil",
+                    ReceiptNumber = "REC-008", Date = new DateOnly(2024, 3, 3)
+                },
+                new FuelExpenseDto {
+                    Vehicle = "YZA567IJ (Ford F-150)", Driver = "Ngozi Eze",
+                    FuelType = "Diesel", Liters = 46, PricePerLiter = 625,
+                    Amount = 28750, Odometer = 16800,
+                    State = "Enugu", LGA = "Enugu East", FillingStation = "Total",
+                    ReceiptNumber = "REC-009", Date = new DateOnly(2024, 3, 2)
+                },
+                new FuelExpenseDto {
+                    Vehicle = "BCD890KL (Nissan Titan)", Driver = "Emmanuel Chukwu",
+                    FuelType = "Petrol", Liters = 52, PricePerLiter = 635,
+                    Amount = 33020, Odometer = 15900,
+                    State = "Benue", LGA = "Makurdi", FillingStation = "Oando",
+                    ReceiptNumber = "REC-010", Date = new DateOnly(2024, 3, 1)
+                },
             };
 
             // Store mock data in session

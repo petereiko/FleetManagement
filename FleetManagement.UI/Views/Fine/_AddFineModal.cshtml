@@ -1,0 +1,69 @@
+﻿@using FleetManagement.UI.Models.DriverDTOs
+@model List<Driver>
+<form asp-action="AddFine" method="post">
+    <div class="modal fade" id="addFineModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">Add New Fine/Toll</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Driver</label>
+                        <select name="DriverId" class="form-select">
+                            @foreach (var d in Model)
+                            {
+                                <option value="@d.Id">@d.FirstName @d.LastName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Type</label>
+                        <select name="Type" class="form-select">
+                            <option>Parking</option>
+                            <option>Speeding</option>
+                            <option>Toll</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Amount (₦)</label>
+                        <input name="Amount" type="number" class="form-control" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Status</label>
+                        <select name="Status" class="form-select">
+                            <option>Unpaid</option>
+                            <option>Paid</option>
+                            <option>Disputed</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Date Issued</label>
+                        <input name="DateIssued" class="form-control date-picker" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Due Date</label>
+                        <input name="DueDate" class="form-control date-picker" />
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Description</label>
+                        <textarea name="Description" class="form-control"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-dark" type="submit">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

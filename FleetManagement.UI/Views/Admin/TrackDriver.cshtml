@@ -1,0 +1,446 @@
+﻿@using FleetManagement.UI.Models.CompanyAssetDto
+@model Vehicle
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Track Driver</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            height: 100%;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
+        #map {
+            height: 70%;
+            width: 100%;
+        }
+
+        .info-panel {
+            background: #fff;
+            padding: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            margin: 10px;
+            font-size: 0.9rem;
+        }
+
+        #streetView {
+            height: 30%;
+            width: 100%;
+        }
+
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 5;
+        }
+
+        .recent-log {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: #fff;
+            padding: 8px;
+            border-radius: 6px;
+            max-height: 150px;
+            overflow-y: auto;
+            width: 220px;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+    <div id="streetView"></div>
+
+    <div class="controls">
+        <label><input type="checkbox" id="followToggle" checked /> Auto-Follow</label>
+        <select id="mapType" onchange="map.setMapTypeId(this.value)" class="form-select form-select-sm">
+            <option value="roadmap">Roadmap</option>
+            <option value="satellite">Satellite</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="terrain">Terrain</option>
+        </select>
+        <button onclick="resetZoom()" class="btn btn-outline-secondary btn-sm">Reset Zoom</button>
+    </div>
+
+    <div class="info-panel" id="infoPanel">
+        <strong>@Model.AssignedDriverName</strong><br />
+        @Model.Make @Model.Model<br />
+        Plate: @Model.LicensePlate<br />
+        <small class="text-muted" id="lastUpdated">Last updated: --</small>
+    </div>
+
+    <div class="recent-log" id="recentLog">
+        <strong>Recent Updates:</strong><br />
+    </div>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgRzgqRQPMuBq-XOmtkrpP5Pk9d7nmtAc&callback=initMap">
+    </script>
+
+    <script>
+        let map, marker, polyline, streetView;
+        let lastUpdateTime = new Date();
+        const recentUpdates = [];
+        const vehicleId = '@Model.Id';
+        let isFollowEnabled = true;
+
+        function initMap() {
+            const startPos = {
+                lat: parseFloat('@Model.Latitude'),
+                lng: parseFloat('@Model.Longitude')
+            };
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 18,
+                center: startPos,
+                mapTypeId: "roadmap"
+            });
+
+            marker = new google.maps.Marker({
+                position: startPos,
+                map: map,
+                icon: {
+                    url: "/images/car_front_vehicle_icon.svg",
+                    scaledSize: new google.maps.Size(32, 32)
+                }
+            });
+
+            polyline = new google.maps.Polyline({
+                path: [startPos],
+                geodesic: true,
+                strokeColor: "#007bff",
+                strokeOpacity: 1.0,
+                strokeWeight: 3,
+                map: map
+            });
+
+            streetView = new google.maps.StreetViewPanorama(document.getElementById("streetView"), {
+                position: startPos,
+                pov: { heading: 165, pitch: 0 },
+                zoom: 1
+            });
+            map.setStreetView(streetView);
+
+            setInterval(checkOfflineStatus, 10000);
+        }
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/vehicleTrackerHub")
+            .build();
+
+        connection.on("ReceivePositionUpdate", (incomingId, lat, lng) => {
+            if (incomingId !== vehicleId) return;
+
+            const newPos = { lat: parseFloat(lat), lng: parseFloat(lng) };
+            animateMarker(marker, newPos);
+            streetView.setPosition(newPos);
+
+            if (isFollowEnabled) map.panTo(newPos);
+
+            updateTrail(newPos);
+            updateLastUpdated();
+            updateRecentLog(newPos);
+        });
+
+        connection.start().catch(console.error);
+
+        function animateMarker(marker, newPos, duration = 1000) {
+            const start = marker.getPosition();
+            const startTime = performance.now();
+
+            function step(timestamp) {
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const lat = start.lat() + (newPos.lat - start.lat()) * progress;
+                const lng = start.lng() + (newPos.lng - start.lng()) * progress;
+                marker.setPosition(new google.maps.LatLng(lat, lng));
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        function updateTrail(newPos) {
+            const path = polyline.getPath();
+            path.push(new google.maps.LatLng(newPos.lat, newPos.lng));
+        }
+
+        function updateLastUpdated() {
+            lastUpdateTime = new Date();
+            document.getElementById("lastUpdated").innerText = "Last updated: " + lastUpdateTime.toLocaleTimeString();
+        }
+
+        function checkOfflineStatus() {
+            const now = new Date();
+            const secondsSinceUpdate = (now - lastUpdateTime) / 1000;
+
+            if (secondsSinceUpdate > 30) {
+                marker.setIcon({
+                    url: "/images/car_offline.svg",
+                    scaledSize: new google.maps.Size(32, 32)
+                });
+            } else {
+                marker.setIcon({
+                    url: "/images/car_front_vehicle_icon.svg",
+                    scaledSize: new google.maps.Size(32, 32)
+                });
+            }
+        }
+
+        function updateRecentLog(pos) {
+            recentUpdates.unshift(`${new Date().toLocaleTimeString()} — (${pos.lat.toFixed(5)}, ${pos.lng.toFixed(5)})`);
+            if (recentUpdates.length > 5) recentUpdates.pop();
+
+            document.getElementById("recentLog").innerHTML =
+                "<strong>Recent Updates:</strong><br />" + recentUpdates.join("<br />");
+        }
+
+        function resetZoom() {
+            if (map && marker) {
+                map.setCenter(marker.getPosition());
+                map.setZoom(18);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("followToggle").addEventListener("change", function () {
+                isFollowEnabled = this.checked;
+            });
+        });
+    </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+@* @using FleetManagement.UI.Models.CompanyAssetDto;
+@model Vehicle
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Track Driver</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            height: 100%;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        #map-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        #map {
+            flex: 1;
+        }
+
+        .driver-info-card {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 5;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            z-index: 5;
+        }
+
+        #streetView {
+            height: 200px;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map-container">
+        <div id="map"></div>
+        <div id="streetView"></div>
+        <div class="driver-info-card" id="driverInfoCard">
+            <strong>@Model.AssignedDriverName</strong><br />
+            @Model.Make @Model.Model<br />
+            @Model.LicensePlate<br />
+            <span class="text-muted small" id="lastSeen">Last updated: --</span>
+        </div>
+
+        <div class="controls">
+            <label class="me-2">
+                <input type="checkbox" id="followToggle" checked /> Auto Follow
+            </label>
+            <select onchange="map.setMapTypeId(this.value)" class="form-select form-select-sm mt-2">
+                <option value="roadmap">Roadmap</option>
+                <option value="satellite">Satellite</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="terrain">Terrain</option>
+            </select>
+        </div>
+    </div>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgRzgqRQPMuBq-XOmtkrpP5Pk9d7nmtAc&callback=initMap">
+    </script>
+
+    <script>
+        let map, marker, infoWindow, streetView, isFollowEnabled = true;
+        const vehicleId = '@Model.Id';
+
+        function initMap() {
+            const startPosition = {
+                lat: parseFloat('@Model.Latitude'),
+                lng: parseFloat('@Model.Longitude')
+            };
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: startPosition,
+                zoom: 18,
+                mapTypeId: 'roadmap'
+            });
+
+            marker = new google.maps.Marker({
+                position: startPosition,
+                map: map,
+                icon: {
+                    url: "/images/car_front_vehicle_icon.svg",
+                    scaledSize: new google.maps.Size(32, 32)
+                }
+            });
+
+            infoWindow = new google.maps.InfoWindow();
+            marker.addListener("click", () => infoWindow.open(map, marker));
+            updateInfoWindow();
+
+            // Open initially
+            infoWindow.open(map, marker);
+
+            // Street View
+            streetView = new google.maps.StreetViewPanorama(
+                document.getElementById("streetView"),
+                {
+                    position: startPosition,
+                    pov: { heading: 165, pitch: 0 },
+                    zoom: 1,
+                }
+            );
+            map.setStreetView(streetView);
+        }
+
+        function updateInfoWindow() {
+            const now = new Date().toLocaleTimeString();
+            infoWindow.setContent(`
+                <strong>@Model.AssignedDriverName</strong><br/>
+        @Model.Make @Model.Model<br/>
+        @Model.LicensePlate<br/>
+                <small class="text-muted">Last updated: ${now}</small>
+            `);
+            document.getElementById('lastSeen').innerText = `Last updated: ${now}`;
+        }
+
+        function animateMarker(marker, targetPosition, duration = 1000) {
+            if (!targetPosition || !targetPosition.lat || !targetPosition.lng) {
+                console.warn("Invalid target position:", targetPosition);
+                return;
+            }
+
+            const start = marker.getPosition();
+            if (!start) return;
+
+            const startTime = performance.now();
+
+            function step(timestamp) {
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const lat = start.lat() + (targetPosition.lat - start.lat()) * progress;
+                const lng = start.lng() + (targetPosition.lng - start.lng()) * progress;
+                marker.setPosition(new google.maps.LatLng(lat, lng));
+                if (progress < 1) requestAnimationFrame(step);
+            }
+
+            requestAnimationFrame(step);
+        }
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/vehicleTrackerHub")
+            .build();
+
+        connection.on("ReceivePositionUpdate", (incomingId, lat, lng) => {
+            if (incomingId === vehicleId) {
+                const newPos = { lat: parseFloat(lat), lng: parseFloat(lng) };
+                animateMarker(marker, newPos);
+                streetView.setPosition(newPos);
+                updateInfoWindow();
+
+                if (isFollowEnabled) map.panTo(newPos);
+            }
+        });
+
+        connection.start().then(() => console.log("Connected to SignalR")).catch(console.error);
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("followToggle").addEventListener("change", function () {
+                isFollowEnabled = this.checked;
+            });
+        });
+    </script>
+
+</body>
+</html>
+
+
+ *@

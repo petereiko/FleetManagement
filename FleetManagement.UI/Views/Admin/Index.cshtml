@@ -148,8 +148,9 @@
         <!-- Recent Assets Table -->
         <div class="col-md-6">
             <div class="card mb-4">
-                <div class="card-header">
-                    Recent Assets
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Recent Assets</span>
+                    <a asp-controller="Fine" asp-action="Index" class="btn btn-success btn-sm">Fines & Tolls</a>
                 </div>
                 <div class="card-body">
                     <table id="assetsTable" class="table table-striped">

@@ -2,111 +2,224 @@
 @model List<FuelExpenseDto>
 
 
+@{
+    ViewData["Title"] = "Fuel Expenses";
+}
 
-<div class="body-wrapper">
-    <div class="container-fluid">
-        <div class="font-weight-medium shadow-none position-relative overflow-hidden mb-7">
-            <div class="card-body px-0">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="font-weight-medium fs-14 mb-0">Fuel datatable</h4>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item">
-                                    <a class="text-muted text-decoration-none" asp-action="Index" asp-controller="Home">
-                                        Home
-                                    </a>
-                                </li>
-                                <li class="breadcrumb-item text-muted" aria-current="page">Fuel Datatable</li>
-                            </ol>
-                        </nav>
-                    </div>
-                    <div>
-                    </div>
-                </div>
-            </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<style>
+    .summary-cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-card {
+        flex: 1 1 250px;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        text-align: center;
+    }
+
+    .summary-title {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 8px;
+    }
+
+    .summary-value {
+        font-size: 1.6rem;
+        font-weight: 700;
+    }
+
+    .summary-icon {
+        font-size: 28px;
+        color: #adb5bd;
+        margin-top: 0.5rem;
+    }
+
+    .search-filter-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-large {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 2rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .table td, .table th {
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .badge-light {
+        background-color: #f1f1f1;
+        color: #333;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Fuel Logs</h2>
+            <p class="text-muted mb-0">Track all fuel purchases and consumption</p>
         </div>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addFuelModal">
+            <i class="fa fa-plus me-1"></i> Add Fuel Log
+        </button>
+    </div>
 
-
-        <div class="datatables">
-            <div class="card">
-                <div class="card-body">
-                    <div class="mb-2">
-                        <h4 class="card-title">Fuel Expense List</h4>
-                    </div>
-                    <p class="card-subtitle mb-3">
-                        Browse through the list of recorded fuel expenses. Use the search and filters to refine your results.
-                    </p>
-
-                    <a asp-controller="Vehicle" asp-action="Expense" asp-for="Expense" class="btn btn-primary mb-2">
-                        <i class="ri-filter-line"></i> Add Expense
-                    </a>
-
-                    <div class="table-responsive">
-                        <table class="table table-striped w-100 table-bordered text-nowrap" id="expenseTable">
-                            <thead>
-                                <tr>
-                                    <th>Amount (₦)</th>
-                                    <th>State</th>
-                                    <th>LGA</th>
-                                    <th>Filling Station</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var expense in Model)
-                                {
-                                    <tr>
-                                        <td>₦@expense.Amount.ToString("N0")</td>
-                                        <td>@expense.State</td>
-                                        <td>@expense.LGA</td>
-                                        <td>@expense.FillingStation</td>
-                                        <td>@expense.Date.ToString("yyyy-MM-dd")</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-
-                        <!-- Pagination Controls -->
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination">
-                                @if (ViewBag.CurrentPage > 1)
-                                {
-                                    <li class="page-item">
-                                        <a class="page-link" asp-action="ExpenseList" asp-route-page="@(ViewBag.CurrentPage - 1)">Previous</a>
-                                    </li>
-                                }
-
-                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                                {
-                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                        <a class="page-link" asp-action="ExpenseList" asp-route-page="@i">@i</a>
-                                    </li>
-                                }
-
-                                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-                                {
-                                    <li class="page-item">
-                                        <a class="page-link" asp-action="ExpenseList" asp-route-page="@(ViewBag.CurrentPage + 1)">Next</a>
-                                    </li>
-                                }
-                            </ul>
-                        </nav>
-
-                    </div>
-                </div>
-            </div>
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+        <div class="summary-card">
+            <div class="summary-title">Total Fuel Purchased</div>
+            <div class="summary-value text-primary" id="totalLiters">@Model.Sum(x => x.Liters) L</div>
+            <div class="summary-icon"><i class="fas fa-gas-pump"></i></div>
         </div>
+        <div class="summary-card">
+            <div class="summary-title">Total Fuel Cost</div>
+            <div class="summary-value text-success" id="totalCost">₦@Model.Sum(x => x.Amount).ToString("N0")</div>
+            <div class="summary-icon"><i class="fas fa-wallet"></i></div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-title">Average Price/Liter</div>
+            <div class="summary-value text-purple" id="avgPrice">
+                ₦@((Model.Sum(x => x.Liters) > 0 ? (Model.Sum(x => x.Amount) / Model.Sum(x => x.Liters)) : 0).ToString("N2"))
+            </div>
+            <div class="summary-icon"><i class="fas fa-burn"></i></div>
+        </div>
+    </div>
 
-        
-        
+    <!-- Search and Filter -->
+    <div class="search-filter-container">
+        <input type="text" id="searchInput" class="form-control" style="max-width: 300px;" placeholder="Search by vehicle, driver, receipt..." />
+        <select id="fuelTypeFilter" class="form-select" style="max-width: 200px;">
+            <option value="">All Fuel Types</option>
+            <option>Diesel</option>
+            <option>Petrol</option>
+        </select>
+    </div>
+
+    <!-- Table -->
+    <div class="card-large">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle" id="expenseTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Vehicle</th>
+                        <th>Driver</th>
+                        <th>Fuel Type</th>
+                        <th>Liters</th>
+                        <th>Price/L (₦)</th>
+                        <th>Total (₦)</th>
+                        <th>Odometer</th>
+                        <th>Station</th>
+                        <th>State</th>
+                        <th>LGA</th>
+                        <th>Receipt #</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="expenseTableBody">
+                    @foreach (var expense in Model)
+                    {
+                        <tr>
+                            <td>@expense.Date.ToString("MM/dd/yyyy")</td>
+                            <td>@expense.Vehicle</td>
+                            <td>@expense.Driver</td>
+                            <td><span class="badge badge-light">@expense.FuelType</span></td>
+                            <td>@expense.Liters</td>
+                            <td>₦@expense.PricePerLiter.ToString("N0")</td>
+                            <td>₦@expense.Amount.ToString("N0")</td>
+                            <td>@expense.Odometer</td>
+                            <td>@expense.FillingStation</td>
+                            <td>@expense.State</td>
+                            <td>@expense.LGA</td>
+                            <td>@expense.ReceiptNumber</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <a href="#" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fas fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
+<!-- Add Fuel Modal -->
+@await Html.PartialAsync("_AddFuelModal", new FuelExpenseDto())
 
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function () {
+    flatpickr("#datePicker", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "F j, Y",
+    });
+
+    $(function () {
+        const totalLiters = @Model.Sum(x => x.Liters);
+        const totalCost = @Model.Sum(x => x.Amount);
+        const avgPrice = totalLiters > 0 ? (totalCost / totalLiters) : 0;
+
+        animateNumber("#totalLiters", 0, totalLiters, " L");
+        animateNumber("#totalCost", 0, totalCost, "", "₦");
+        animateNumber("#avgPrice", 0, Math.round(avgPrice), "", "₦");
+
+        $("#searchInput, #fuelTypeFilter").on("input change", function () {
+            const search = $("#searchInput").val().toLowerCase();
+            const typeFilter = $("#fuelTypeFilter").val();
+
+            $("#expenseTableBody tr").each(function () {
+                const rowText = $(this).text().toLowerCase();
+                const fuelType = $(this).find("td:nth-child(4)").text();
+
+                $(this).toggle(
+                    (rowText.includes(search) || search === "") &&
+                    (typeFilter === "" || fuelType.includes(typeFilter))
+                );
+            });
+        });
+
+        function animateNumber(id, start, end, suffix = '', prefix = '', duration = 1500) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                $(id).text(prefix + value.toLocaleString() + suffix);
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
         var successMessage = '@TempData["SuccessMessage"]';
         if (successMessage) {
             Toastify({
@@ -119,3 +232,247 @@
         }
     });
 </script>
+
+
+
+
+
+
+
+@* @using FleetManagement.UI.Models.Dto
+@model List<FuelExpenseDto>
+
+@{
+    ViewData["Title"] = "Fuel Expenses";
+}
+
+<style>
+    .summary-cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-card {
+        flex: 1 1 250px;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        text-align: center;
+    }
+
+    .summary-title {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 8px;
+    }
+
+    .summary-value {
+        font-size: 1.6rem;
+        font-weight: 700;
+    }
+
+    .summary-icon {
+        font-size: 28px;
+        color: #adb5bd;
+        margin-top: 0.5rem;
+    }
+
+    .search-filter-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-large {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 2rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .table td, .table th {
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .badge-light {
+        background-color: #f1f1f1;
+        color: #333;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Fuel Logs</h2>
+            <p class="text-muted mb-0">Track all fuel purchases and consumption</p>
+        </div>
+        <a asp-controller="Vehicle" asp-action="Expense" class="btn btn-success">
+            <i class="fa fa-plus me-1"></i> Add Fuel Log
+        </a>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+        <div class="summary-card">
+            <div class="summary-title">Total Fuel Purchased</div>
+            <div class="summary-value text-primary" id="totalLiters">@Model.Sum(x => x.Liters) L</div>
+            <div class="summary-icon"><i class="fas fa-gas-pump"></i></div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-title">Total Fuel Cost</div>
+            <div class="summary-value text-success" id="totalCost">₦@Model.Sum(x => x.Amount).ToString("N0")</div>
+            <div class="summary-icon"><i class="fas fa-wallet"></i></div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-title">Average Price/Liter</div>
+            <div class="summary-value text-purple" id="avgPrice">
+                ₦@((Model.Sum(x => x.Liters) > 0 ? (Model.Sum(x => x.Amount) / Model.Sum(x => x.Liters)) : 0).ToString("N2"))
+            </div>
+            <div class="summary-icon"><i class="fas fa-burn"></i></div>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="search-filter-container">
+        <input type="text" id="searchInput" class="form-control" style="max-width: 300px;" placeholder="Search by vehicle, driver, receipt..." />
+
+        <select id="fuelTypeFilter" class="form-select" style="max-width: 200px;">
+            <option value="">All Fuel Types</option>
+            <option>Diesel</option>
+            <option>Petrol</option>
+        </select>
+    </div>
+
+    <!-- Table Section -->
+    <div class="card-large">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle" id="expenseTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Vehicle</th>
+                        <th>Driver</th>
+                        <th>Fuel Type</th>
+                        <th>Liters</th>
+                        <th>Price/L (₦)</th>
+                        <th>Total (₦)</th>
+                        <th>Odometer</th>
+                        <th>Station</th>
+                        <th>State</th>
+                        <th>LGA</th>
+                        <th>Receipt #</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="expenseTableBody">
+                    @foreach (var expense in Model)
+                    {
+                        <tr>
+                            <td>@expense.Date.ToString("MM/dd/yyyy")</td>
+                            <td>@expense.Vehicle</td>
+                            <td>@expense.Driver</td>
+                            <td><span class="badge badge-light">@expense.FuelType</span></td>
+                            <td>@expense.Liters</td>
+                            <td>₦@expense.PricePerLiter.ToString("N0")</td>
+                            <td>₦@expense.Amount.ToString("N0")</td>
+                            <td>@expense.Odometer</td>
+                            <td>@expense.FillingStation</td>
+                            <td>@expense.State</td>
+                            <td>@expense.LGA</td>
+                            <td>@expense.ReceiptNumber</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+        $(document).ready(function () {
+        function animateNumber(id, start, end, suffix = '', prefix = '', duration = 1500) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                $(id).text(prefix + value.toLocaleString() + suffix);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        const totalLiters = @Model.Sum(x => x.Liters);
+        const totalCost = @Model.Sum(x => x.Amount);
+        const avgPrice = @Model.Sum(x => x.Liters) > 0 ? (@Model.Sum(x => x.Amount) / @Model.Sum(x => x.Liters)) : 0;
+
+        animateNumber("#totalLiters", 0, totalLiters, " L");
+        animateNumber("#totalCost", 0, totalCost, "", "₦");
+        animateNumber("#avgPrice", 0, Math.round(avgPrice), "", "₦");
+
+        // Toastify on success
+        var successMessage = '@TempData["SuccessMessage"]';
+        if (successMessage) {
+            Toastify({
+                text: successMessage,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#00e606",
+            }).showToast();
+        }
+
+        // Search and Filter
+        $("#searchInput, #fuelTypeFilter").on("input change", function () {
+            const search = $("#searchInput").val().toLowerCase();
+            const typeFilter = $("#fuelTypeFilter").val();
+
+            $("#expenseTableBody tr").each(function () {
+                const text = $(this).text().toLowerCase();
+                const fuelType = $(this).find("td:nth-child(4)").text();
+
+                if ((text.includes(search) || search === "") &&
+                    (typeFilter === "" || fuelType.includes(typeFilter))) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+    });
+
+</script>
+ *@

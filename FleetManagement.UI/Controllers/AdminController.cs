@@ -17,11 +17,14 @@ namespace FleetManagement.UI.Controllers
     using Microsoft.AspNetCore.Http;
     using FleetManagement.UI.Models;          // For Driver, Vehicle, etc.
     using FleetManagement.UI.Models.DriverDTOs;      // For AdminDashboardViewModel, MaintenanceTicket, etc.
+    using FleetManagement.UI.Models.ServiceHubs;
+    using static FleetManagement.UI.Models.ServiceHubs.MasterVehicleList;
 
     namespace YourNamespace.Controllers
     {
         public class AdminController : BaseController
         {
+           
             public IActionResult Index()
             {
                 // Retrieve tickets from session
@@ -342,6 +345,43 @@ namespace FleetManagement.UI.Controllers
                 }
                 return View("VehicleTracker", vehicles);
             }
+
+
+            public IActionResult TrackDriver(string driverId)
+            {
+                var vehicle = VehicleStore.Vehicles.FirstOrDefault(v => v.AssignedDriverId == driverId);
+                if (vehicle == null)
+                    return NotFound("Driver vehicle not found");
+
+                // Set the vehicle to track in simulator
+                VehiclePositionSimulator.VehicleIdToTrack = vehicle.Id;
+
+                return View("TrackDriver", vehicle);
+            }
+
+
+
+            //public IActionResult TrackDriver(string driverId)
+            //{
+            //    var sessionData = HttpContext.Session.GetString("Vehicles");
+            //    var allVehicles = string.IsNullOrEmpty(sessionData)
+            //        ? new List<Vehicle>()
+            //        : JsonSerializer.Deserialize<List<Vehicle>>(sessionData);
+
+            //    var vehicle = allVehicles.FirstOrDefault(v => v.AssignedDriverId == driverId);
+            //    if (vehicle == null)
+            //        return NotFound("Driver vehicle not found");
+
+            //    // Assign fallback coordinates if needed
+            //    if (vehicle.Latitude == 0 || vehicle.Longitude == 0)
+            //    {
+            //        vehicle.Latitude = 6.5244 + (new Random().NextDouble() - 0.5) * 0.1;
+            //        vehicle.Longitude = 3.3792 + (new Random().NextDouble() - 0.5) * 0.1;
+            //    }
+
+            //    return View("TrackDriver", vehicle);
+            //}
+
 
         }
     }
