@@ -6,6 +6,8 @@
     var care = Model.Item2;
     ViewData["Title"] = $"{driver.FirstName} {driver.LastName} - Duty of Care";
 }
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+
 
 <style>
     .card .badge.bg-primary {
@@ -106,3 +108,16 @@ else
 <!-- Partials -->
 <partial name="_AddMedicalModal" model="driver.Id" />
 <partial name="_AddContactModal" model="driver.Id" />
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        flatpickr("#nextDueDatePicker", {
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "F j, Y",
+        });
+    </script>
+}
