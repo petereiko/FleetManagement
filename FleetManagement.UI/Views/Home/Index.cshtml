@@ -1,1 +1,604 @@
-﻿
+﻿@* @{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>FleetMaster – Your Fleet at a Glance</title>
+    <meta content="Manage vehicles, drivers, and routes in one place." name="description">
+    <meta content="fleet, management, vehicles, tracking, drivers" name="keywords">
+
+    <!-- Favicons -->
+    <link href="~/assets/img/favicon.png" rel="icon">
+    <link href="~/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap"
+          rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="~/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="~/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Main CSS File -->
+    <link href="~/assets/css/main.css" rel="stylesheet">
+</head>
+
+<style>
+    .vehicle-card {
+        cursor: pointer;
+        transition: border-color .3s, box-shadow .3s;
+    }
+
+        .vehicle-card .vehicle-checkbox {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .vehicle-card input:checked + .slider { /* if you need slider style */
+        }
+
+        .vehicle-card input:checked ~ h6,
+        .vehicle-card input:checked ~ img {
+            filter: brightness(1.2);
+        }
+
+        .vehicle-card input:checked {
+            /* highlight border */
+            border-color: #0d6efd;
+            box-shadow: 0 0 8px rgba(13,110,253, .5);
+        }
+
+</style>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="header d-flex align-items-center">
+        <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+
+            <a href="index.html" class="logo d-flex align-items-center">
+                <h1>FleetMaster<span>.</span></h1>
+            </a>
+
+            <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+            <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+            <nav id="navbar" class="navbar">
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="/account/login">Login</a></li>
+                </ul>
+            </nav><!-- .navbar -->
+
+        </div>
+    </header><!-- End Header -->
+    <!-- ======= Hero Section ======= -->
+    <section id="hero" class="hero">
+
+        <div class="info d-flex align-items-center">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6 text-center">
+                        <h2 data-aos="fade-down">Welcome to <span>FleetMaster</span></h2>
+                        <p data-aos="fade-up">
+                            The all‑in‑one platform to monitor, manage, and optimize your entire vehicle fleet in real time.
+                        </p>
+                        <a data-aos="fade-up" data-aos-delay="200" href="#get-started" class="btn-get-started">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="hero-carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+            <div class="carousel-item active"
+                 style="background-image: url(assets/img/hero-carousel/fleet-1.jpg)"></div>
+            <div class="carousel-item"
+                 style="background-image: url(assets/img/hero-carousel/fleet-2.jpg)"></div>
+            <div class="carousel-item"
+                 style="background-image: url(assets/img/hero-carousel/fleet-3.jpg)"></div>
+
+            <a class="carousel-control-prev" href="#hero-carousel" role="button" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon bi bi-chevron-left" aria-hidden="true"></span>
+            </a>
+
+            <a class="carousel-control-next" href="#hero-carousel" role="button" data-bs-slide="next">
+                <span class="carousel-control-next-icon bi bi-chevron-right" aria-hidden="true"></span>
+            </a>
+        </div>
+
+    </section><!-- End Hero Section -->
+
+    <main id="main">
+
+        <!-- ======= Get Started Section ======= -->
+
+        <section id="get-quote" class="get-started section-bg">
+            <div class="container" data-aos="fade-up">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+
+                        <div id="quoteWizard" class="card p-4">
+                            <!--Progressbar-->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Step <span id="currentStep">1</span> / 5</small>
+                                    <small><span id="currentPercent">20%</span> Complete</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div id="progressBar" class="progress-bar bg-primary" role="progressbar"
+                                         style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Step Indicators -->
+                            <ul class="nav nav-pills mb-3 justify-content-between" role="tablist">
+                                <li class="nav-item" style="width:18%">
+                                    <a class="nav-link active text-center" data-step="1" href="#">1</a>
+                                </li>
+                                <li class="nav-item" style="width:18%">
+                                    <a class="nav-link text-center" data-step="2" href="#">2</a>
+                                </li>
+                                <li class="nav-item" style="width:18%">
+                                    <a class="nav-link text-center" data-step="3" href="#">3</a>
+                                </li>
+                                <li class="nav-item" style="width:18%">
+                                    <a class="nav-link text-center" data-step="4" href="#">4</a>
+                                </li>
+                                <li class="nav-item" style="width:18%">
+                                    <a class="nav-link text-center" data-step="5" href="#">5</a>
+                                </li>
+                            </ul>
+
+                            <!-- Step Contents -->
+                            <div class="tab-content">
+
+                                <!-- Step 1: Vehicle Type (multi‑select cards) -->
+                                <div class="tab-pane fade show active" id="step-1">
+                                    <h4>Select Vehicle Type</h4>
+                                    <div class="row gy-3">
+                                        <!-- repeat this col for each type -->
+                                        <div class="col-6 col-md-4">
+                                            <label class="card h-100 vehicle-card">
+                                                <div class="card-body text-center p-2">
+                                                    <img src="~/images/vehiclesClipart/car.png" alt="Cars" class="mb-2" style="width:48px;" />
+                                                    <h6>Cars</h6>
+                                                    <input type="checkbox" class="form-check-input mt-2 vehicle-checkbox" value="Cars" />
+                                                </div>
+                                            </label>
+                                        </div>
+
+                                        <div class="col-6 col-md-4">
+                                            <label class="card h-100 vehicle-card">
+                                                <div class="card-body text-center p-2">
+                                                    <img src="~/images/vehiclesClipart/truck.png" alt="Trucks/Vans" class="mb-2" style="width:48px;" />
+                                                    <h6>Trucks / Vans</h6>
+                                                    <input type="checkbox" class="form-check-input mt-2 vehicle-checkbox" value="Trucks/Vans" />
+                                                </div>
+                                            </label>
+                                        </div>
+
+                                        <div class="col-6 col-md-4">
+                                            <label class="card h-100 vehicle-card">
+                                                <div class="card-body text-center p-2">
+                                                    <img src="~/images/vehiclesClipart/trailer.png" alt="Trailers" class="mb-2" style="width:48px;" />
+                                                    <h6>Trailers</h6>
+                                                    <input type="checkbox" class="form-check-input mt-2 vehicle-checkbox" value="Trailers" />
+                                                </div>
+                                            </label>
+                                        </div>
+
+                                        <div class="col-6 col-md-4">
+                                            <label class="card h-100 vehicle-card">
+                                                <div class="card-body text-center p-2">
+                                                    <img src="~/images/vehiclesClipart/bus.png" alt="Buses" class="mb-2" style="width:48px;" />
+                                                    <h6>Buses</h6>
+                                                    <input type="checkbox" class="form-check-input mt-2 vehicle-checkbox" value="Buses" />
+                                                </div>
+                                            </label>
+                                        </div>
+
+                                        <div class="col-6 col-md-4">
+                                            <label class="card h-100 vehicle-card">
+                                                <div class="card-body text-center p-2">
+                                                    <img src="~/images/vehiclesClipart/ev.png" alt="Electric Vehicle" class="mb-2" style="width:48px;" />
+                                                    <h6>Electric Vehicle</h6>
+                                                    <input type="checkbox" class="form-check-input mt-2 vehicle-checkbox" value="Electric Vehicle" />
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 2: Fleet Size -->
+                                <div class="tab-pane fade" id="step-2">
+                                    <h4>How many vehicles do you have?</h4>
+                                    <div class="row gy-2">
+                                        <div class="col-6"><button class="btn btn-outline-primary w-100 size-btn" data-value="1-19">1–19</button></div>
+                                        <div class="col-6"><button class="btn btn-outline-primary w-100 size-btn" data-value="20-49">20–49</button></div>
+                                        <div class="col-6"><button class="btn btn-outline-primary w-100 size-btn" data-value="50-99">50–99</button></div>
+                                        <div class="col-6"><button class="btn btn-outline-primary w-100 size-btn" data-value="100-499">100–499</button></div>
+                                        <div class="col-6"><button class="btn btn-outline-primary w-100 size-btn" data-value="500-999">500–999</button></div>
+                                        <div class="col-6"><button class="btn btn-outline-primary w-100 size-btn" data-value="1000+">1000+</button></div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 3: Features -->
+                                <div class="tab-pane fade" id="step-3">
+                                    <h4>Which features interest you?</h4>
+                                    <div class="form-check">
+                                        <input class="form-check-input feat" type="checkbox" id="featGps" value="GPS Tracking">
+                                        <label class="form-check-label" for="featGps">GPS Tracking</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input feat" type="checkbox" id="featMaint" value="Maintenance">
+                                        <label class="form-check-label" for="featMaint">Maintenance</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input feat" type="checkbox" id="featRoute" value="Routing">
+                                        <label class="form-check-label" for="featRoute">Routing</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input feat" type="checkbox" id="featDashcam" value="Dashcam">
+                                        <label class="form-check-label" for="featDashcam">Dashcam</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input feat" type="checkbox" id="featOther" value="Other">
+                                        <label class="form-check-label" for="featOther">Other</label>
+                                    </div>
+                                </div>
+
+                                <!-- Step 4: Contact Info -->
+                                <div class="tab-pane fade" id="step-4">
+                                    <h4>Your Contact Details</h4>
+                                    <div class="mb-3">
+                                        <input type="email" id="quoteEmail" class="form-control" placeholder="Company Email" required>
+                                    </div>
+                                    <div class="row gy-3">
+                                        <div class="col-md-6"><input type="text" id="firstName" class="form-control" placeholder="First Name" required></div>
+                                        <div class="col-md-6"><input type="text" id="lastName" class="form-control" placeholder="Last Name" required></div>
+                                    </div>
+                                    <div class="mb-3 mt-3">
+                                        <input type="text" id="orgName" class="form-control" placeholder="Organization Name" required>
+                                    </div>
+                                </div>
+
+                                <!-- Step 5: Final & Submit -->
+                                <div class="tab-pane fade" id="step-5">
+                                    <h4>Almost Done…</h4>
+                                    <div class="mb-3">
+                                        <input type="tel" id="phone" class="form-control" placeholder="Contact Number" required>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="agreePolicy" required>
+                                        <label class="form-check-label" for="agreePolicy">
+                                            I agree to the <a href="/privacy">Privacy Policy</a>
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div><!-- /.tab-content -->
+                            <!-- Navigation Buttons -->
+                            <div class="d-flex justify-content-between mt-4">
+                                <button id="cancelQuote" class="btn btn-outline-secondary">Cancel</button>
+                                <button id="nextQuote" class="btn btn-primary">Next</button>
+                            </div>
+                        </div><!-- /#quoteWizard -->
+
+                    </div>
+                </div>
+            </div>
+        </section>
+          <!-- End Get Started Section -->
+        <!-- ======= Features Section ======= -->
+        <section id="features" class="features section-bg">
+            <div class="container" data-aos="fade-up">
+
+                <div class="section-header">
+                    <h2>Key Features</h2>
+                    <p>Your fleet, fully managed</p>
+                </div>
+
+                <div class="row gy-4">
+
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up">
+                        <div class="service-item position-relative">
+                            <div class="icon"><i class="fa-solid fa-map-marker-alt"></i></div>
+                            <h3>GPS Tracking</h3>
+                            <p>Real‑time location updates and route playback for all vehicles.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                        <div class="service-item position-relative">
+                            <div class="icon"><i class="fa-solid fa-tools"></i></div>
+                            <h3>Maintenance</h3>
+                            <p>Automated alerts and schedules to keep your fleet running smoothly.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="service-item position-relative">
+                            <div class="icon"><i class="fa-solid fa-chart-line"></i></div>
+                            <h3>Analytics</h3>
+                            <p>Performance dashboards, fuel usage, and driver behavior insights.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                        <div class="service-item position-relative">
+                            <div class="icon"><i class="fa-solid fa-mobile-alt"></i></div>
+                            <h3>Mobile App</h3>
+                            <p>Access your fleet on the go with our iOS & Android applications.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section><!-- End Features Section -->
+        <!-- ======= Services Section ======= -->
+        <section id="services" class="services">
+            <div class="container" data-aos="fade-up">
+
+                <div class="section-header">
+                    <h2>Our Services</h2>
+                    <p>Comprehensive solutions for every aspect of fleet management</p>
+                </div>
+
+                <div class="row gy-4">
+
+                    <div class="col-lg-4 col-md-6" data-aos="fade-up">
+                        <div class="service-item position-relative">
+                            <div class="icon"><i class="fa-solid fa-shield-alt"></i></div>
+                            <h3>Risk Management</h3>
+                            <p>Compliance, insurance tracking, and incident reporting.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                        <div class="service-item position-relative">
+                            <div class="icon"><i class="fa-solid fa-users"></i></div>
+                            <h3>Driver Management</h3>
+                            <p>Licenses, training logs, and performance reviews all in one place.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="service-item position-relative">
+                            <div class="icon"><i class="fa-solid fa-gas-pump"></i></div>
+                            <h3>Fuel Monitoring</h3>
+                            <p>Track consumption, refill alerts, and cost analytics.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section><!-- End Services Section -->
+        <!-- ======= Contact Section ======= -->
+        <section id="contact" class="contact section-bg">
+            <div class="container" data-aos="fade-up">
+
+                <div class="section-header">
+                    <h2>Contact Us</h2>
+                    <p>Have questions? We’re here to help.</p>
+                </div>
+
+                <div class="row gy-4">
+                    <div class="col-lg-6">
+                        <iframe src="https://maps.google.com/maps?q=Lagos%20Nigeria&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                                frameborder="0" style="border:0; width: 100%; height: 350px;" allowfullscreen></iframe>
+                    </div>
+                    <div class="col-lg-6">
+                        <form action="/contact/send" method="post" class="php-email-form">
+                            <div class="row gy-3">
+                                <div class="col-md-6">
+                                    <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="email" name="email" class="form-control" placeholder="Your Email" required>
+                                </div>
+                                <div class="col-md-12">
+                                    <input type="text" name="subject" class="form-control" placeholder="Subject" required>
+                                </div>
+                                <div class="col-md-12">
+                                    <textarea name="message" class="form-control" rows="6" placeholder="Message" required></textarea>
+                                </div>
+                                <div class="col-md-12 text-center">
+                                    <button type="submit">Send Message</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </section><!-- End Contact Section -->
+
+    </main><!-- End #main -->
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+
+        <div class="footer-content position-relative">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="footer-info">
+                            <h3>FleetMaster</h3>
+                            <p>
+                                123 Fleet Avenue<br>
+                                Lagos, Nigeria<br><br>
+                                <strong>Phone:</strong> +234 800 123 4567<br>
+                                <strong>Email:</strong> support@fleetmaster.com<br>
+                            </p>
+                            <div class="social-links d-flex mt-3">
+                                <a href="#" class="d-flex align-items-center justify-content-center"><i class="bi bi-twitter"></i></a>
+                                <a href="#" class="d-flex align-items-center justify-content-center"><i class="bi bi-facebook"></i></a>
+                                <a href="#" class="d-flex align-items-center justify-content-center"><i class="bi bi-instagram"></i></a>
+                                <a href="#" class="d-flex align-items-center justify-content-center"><i class="bi bi-linkedin"></i></a>
+                            </div>
+                        </div>
+                    </div><!-- End footer info column-->
+
+                    <div class="col-lg-2 col-md-3 footer-links">
+                        <h4>Quick Links</h4>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="#about">About</a></li>
+                            <li><a href="#features">Features</a></li>
+                            <li><a href="#services">Services</a></li>
+                            <li><a href="#contact">Contact</a></li>
+                        </ul>
+                    </div><!-- End footer links column-->
+
+                    <div class="col-lg-2 col-md-3 footer-links">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="/docs">Documentation</a></li>
+                            <li><a href="/support">Support</a></li>
+                            <li><a href="/blog">Blog</a></li>
+                        </ul>
+                    </div><!-- End footer links column-->
+
+                    <div class="col-lg-4 col-md-6 footer-newsletter">
+                        <h4>Newsletter</h4>
+                        <p>Get the latest updates and tips from FleetMaster.</p>
+                        <form action="/newsletter/subscribe" method="post">
+                            <input type="email" name="email" placeholder="Your Email"><input type="submit" value="Subscribe">
+                        </form>
+                    </div><!-- End footer newsletter column-->
+
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-legal text-center position-relative">
+            <div class="container">
+                <div class="copyright">
+                    &copy; Copyright <strong><span>FleetMaster</span></strong>. All Rights Reserved
+                </div>
+            </div>
+        </div>
+
+    </footer><!-- End Footer -->
+
+    <a href="#" class="scroll-top d-flex align-items-center justify-content-center">
+        <i class="bi bi-arrow-up-short"></i>
+    </a>
+
+    <div id="preloader"></div>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+    <script>
+        (function () {
+          const steps = [1,2,3,4,5];
+          let current = 1;
+          const wizard = document.getElementById('quoteWizard');
+          const nextBtn = document.getElementById('nextQuote');
+          const cancelBtn = document.getElementById('cancelQuote');
+
+          function showStep(n) {
+            // tabs
+            wizard.querySelectorAll('.nav-link').forEach(a=>{
+              a.classList.toggle('active', +a.dataset.step === n);
+            });
+            // content
+            wizard.querySelectorAll('.tab-pane').forEach(p=>{
+              p.classList.toggle('show', +p.id.split('-')[1]===n);
+              p.classList.toggle('active', +p.id.split('-')[1]===n);
+            });
+            nextBtn.textContent = n<5?'Next':'Submit';
+
+            //Progress bar
+                  // update progress UI:
+        const percent = Math.round((n / 5) * 100);
+        document.getElementById('currentStep').textContent = n;
+        document.getElementById('currentPercent').textContent = percent + '%';
+        const bar = document.getElementById('progressBar');
+        bar.style.width = percent + '%';
+        bar.setAttribute('aria-valuenow', percent);
+          }
+
+          nextBtn.addEventListener('click', ()=>{
+            if (current < 5) {
+              current++;
+              showStep(current);
+            } else {
+              // gather data & POST /quote endpoint
+              const payload = {
+                vehicleType: wizard.querySelector('.type-btn.active')?.dataset.value,
+                fleetSize: wizard.querySelector('.size-btn.active')?.dataset.value,
+                features: Array.from(wizard.querySelectorAll('.feat:checked')).map(e=>e.value),
+                email: document.getElementById('quoteEmail').value,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                organization: document.getElementById('orgName').value,
+                phone: document.getElementById('phone').value
+              };
+              console.log('Submitting quote:', payload);
+              // TODO: AJAX POST /api/quote
+              alert('Quote request submitted!');
+              resetWizard();
+            }
+          });
+          cancelBtn.addEventListener('click', resetWizard);
+
+          // make option buttons toggle selection
+          wizard.addEventListener('click', e=>{
+            if (e.target.matches('.type-btn')) {
+              wizard.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+              e.target.classList.add('active');
+            }
+            if (e.target.matches('.size-btn')) {
+              wizard.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active'));
+              e.target.classList.add('active');
+            }
+          });
+
+          function resetWizard(){
+            current=1;
+            // clear selections
+            wizard.querySelectorAll('button.active').forEach(b=>b.classList.remove('active'));
+            wizard.querySelectorAll('input').forEach(i=>i.type==='checkbox'?i.checked=false:i.value='');
+            showStep(current);
+          }
+
+          // init
+          showStep(current);
+        })();
+    </script>
+</body>
+
+</html>
+
+
+ *@

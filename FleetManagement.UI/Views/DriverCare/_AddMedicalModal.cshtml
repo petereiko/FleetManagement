@@ -1,6 +1,5 @@
 ﻿@model string
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 
 
 
@@ -29,7 +28,7 @@
 
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-calendar-alt me-1 text-secondary"></i> Next Due Date</label>
-                        <input type="text" class="form-control" id="nextDueDatePicker" placeholder="Select date" required />
+                        <input type="text" name="NextDueDate" class="form-control date-picker" id="nextDueDatePicker" placeholder="Select date" required />
                     </div>
 
                     <div class="mb-3">
@@ -53,14 +52,3 @@
 </form>
 
 
-
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
-        flatpickr("#nextDueDatePicker", {
-            dateFormat: "Y-m-d",
-            altInput: true,
-            altFormat: "F j, Y",
-        });
-    </script>
-}

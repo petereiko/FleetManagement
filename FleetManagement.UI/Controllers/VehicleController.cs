@@ -1,15 +1,18 @@
-﻿using FleetManagement.UI.Models.Dto;
+﻿using FleetManagement.UI.Models.CompanyAssetDto;
+using FleetManagement.UI.Models.Dto;
+using FleetManagement.UI.Models.DummyModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace FleetManagement.UI.Controllers
 {
-    public class VehicleController : Controller
+    public class VehicleController : BaseController
     {
         private const string SessionKey = "FuelExpenses";
         public IActionResult Index()
         {
-            return View();
+            var vehicles = GetVehiclesFromSession();
+            return View(vehicles);
         }
 
         public IActionResult Expense()
@@ -139,6 +142,29 @@ namespace FleetManagement.UI.Controllers
             HttpContext.Session.SetString(SessionKey, JsonSerializer.Serialize(mockExpenses));
             return mockExpenses;
         }
+
+        [HttpPost]
+        [HttpPost]
+        public IActionResult EditVehicle(Vehicle updatedVehicle)
+        {
+            var vehicles = HttpContext.Session.GetObjectFromJson<List<Vehicle>>("Vehicles")
+                ?? new List<Vehicle>();
+            var vehicle = vehicles.FirstOrDefault(v => v.Id == updatedVehicle.Id);
+
+            if (vehicle != null)
+            {
+                vehicle.Make = updatedVehicle.Make;
+                vehicle.Model = updatedVehicle.Model;
+                vehicle.Year = updatedVehicle.Year;
+                vehicle.Status = updatedVehicle.Status;
+                // Add more fields here if the modal starts including them later.
+
+                HttpContext.Session.SetObjectAsJson("Vehicles", vehicles);
+            }
+
+            return RedirectToAction("Index");
+        }
+
 
     }
 }

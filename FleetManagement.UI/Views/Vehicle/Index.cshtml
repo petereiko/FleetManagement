@@ -1,0 +1,168 @@
+﻿@using FleetManagement.UI.Models.CompanyAssetDto;
+
+
+
+
+@model List<Vehicle>
+
+<div class="container py-4">
+    <h2 class="mb-4 fw-bold">Company Vehicles</h2>
+    <div class="row">
+        @foreach (var vehicle in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow border-0">
+                    <img src="~/images/vehicles/@(vehicle.Id).jpg" class="card-img-top rounded-top" alt="Vehicle Image" style="height: 200px; object-fit: cover;">
+
+                    <div class="card-body">
+                        <h5 class="card-title mb-2 text-primary fw-semibold">@vehicle.Make @vehicle.Model</h5>
+
+                        <ul class="list-unstyled mb-3 text-muted small">
+                            <li><i class="fa fa-car me-2 text-secondary"></i><strong>Plate:</strong> @vehicle.LicensePlate</li>
+                            <li><i class="fa fa-calendar-alt me-2 text-secondary"></i><strong>Year:</strong> @vehicle.Year</li>
+                            <li><i class="fa fa-tachometer-alt me-2 text-secondary"></i><strong>Mileage:</strong> @vehicle.Mileage km</li>
+                            <li>
+                                <i class="fa fa-circle me-2" style="color: @(vehicle.Status == "Active" ? "green" : vehicle.Status == "Needs Repair" ? "red" : "gray")"></i>
+                                <strong>Status:</strong>
+                                <span class="badge bg-light text-dark border">@vehicle.Status</span>
+                            </li>
+                        </ul>
+
+                        <button class="btn btn-outline-primary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#editModal-@vehicle.Id">
+                            <i class="fa fa-edit me-1"></i>Edit Info
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Modal -->
+            <div class="modal fade" id="editModal-@vehicle.Id" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form asp-action="EditVehicle" asp-controller="Vehicle" method="post">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit Vehicle - @vehicle.LicensePlate</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" name="Id" value="@vehicle.Id" />
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Make</label>
+                                        <input type="text" name="Make" class="form-control" value="@vehicle.Make" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Model</label>
+                                        <input type="text" name="Model" class="form-control" value="@vehicle.Model" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Year</label>
+                                        <input type="number" name="Year" class="form-control" value="@vehicle.Year" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Status</label>
+                                        <select name="Status" class="form-select">
+                                            <option selected>@vehicle.Status</option>
+                                            <option value="Active">Active</option>
+                                            <option value="In Service">In Service</option>
+                                            <option value="Needs Repair">Needs Repair</option>
+                                            <option value="Inactive">Inactive</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success"><i class="fa fa-check-circle me-1"></i>Save Changes</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+@* @model List<Vehicle>
+
+<div class="container py-4">
+    <h2 class="mb-4">Company Vehicles</h2>
+    <div class="row">
+        @foreach (var vehicle in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="~/images/vehicles/@(vehicle.Id).jpg" class="card-img-top" alt="Vehicle Image">
+                    <div class="card-body">
+                        <h5 class="card-title">@vehicle.Make @vehicle.Model</h5>
+                        <p class="card-text">
+                            <strong>Plate:</strong> @vehicle.LicensePlate<br />
+                            <strong>Year:</strong> @vehicle.Year<br />
+                            <strong>Mileage:</strong> @vehicle.Mileage km<br />
+                            <strong>Status:</strong>
+                            <span class="badge bg-info text-dark">@vehicle.Status</span>
+                        </p>
+                        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal-@vehicle.Id">
+                            Edit Info
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for editing vehicle info -->
+            <div class="modal fade" id="editModal-@vehicle.Id" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form asp-action="EditVehicle" asp-controller="Vehicle" method="post">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit Vehicle - @vehicle.LicensePlate</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" name="Id" value="@vehicle.Id" />
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Make</label>
+                                        <input type="text" name="Make" class="form-control" value="@vehicle.Make" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Model</label>
+                                        <input type="text" name="Model" class="form-control" value="@vehicle.Model" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Year</label>
+                                        <input type="number" name="Year" class="form-control" value="@vehicle.Year" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Status</label>
+                                        <select name="Status" class="form-select">
+                                            <option selected>@vehicle.Status</option>
+                                            <option value="Active">Active</option>
+                                            <option value="In Service">In Service</option>
+                                            <option value="Needs Repair">Needs Repair</option>
+                                            <option value="Inactive">Inactive</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success">Save Changes</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+ *@
