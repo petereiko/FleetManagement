@@ -45,7 +45,6 @@ namespace FleetManagement.UI
 
             app.UseAuthorization();
 
-            app.MapStaticAssets();
 
             app.MapControllerRoute(
             name: "areas",
@@ -53,19 +52,9 @@ namespace FleetManagement.UI
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
-                .WithStaticAssets();
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.MapHub<VehicleTrackerHub>("/vehicleTrackerHub");
-
-
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapControllerRoute(
-            //        name: "default",
-            //        pattern: "{controller=Home}/{action=Index}/{id?}");
-            //    endpoints.MapHub<FleetManagement.UI.Models.ServiceHubs.VehicleTrackerHub>("/vehicleTrackerHub");
-            //});
 
             app.Run();
         }
